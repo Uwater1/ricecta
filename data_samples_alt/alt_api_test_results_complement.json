@@ -1,0 +1,149 @@
+{
+  "NOAA datasets list (no key)": [
+    "OK",
+    "",
+    "[]",
+    [
+      0,
+      0
+    ]
+  ],
+  "NOAA stations FIPS:CN (token required)": [
+    "OK",
+    "",
+    "[]",
+    [
+      0,
+      0
+    ]
+  ],
+  "NOAA station data CHM00057006 Beijing Jan 2024 (token required)": [
+    "OK",
+    "",
+    "[]",
+    [
+      0,
+      0
+    ]
+  ],
+  "CFETS USD/CNY fixing direct": [
+    "OK",
+    "",
+    "Expecting value: line 1 column 1 (char 0)",
+    "scalar"
+  ],
+  "CFETS FX spot direct": [
+    "OK",
+    "",
+    "Expecting value: line 1 column 1 (char 0)",
+    "scalar"
+  ],
+  "CFETS Shibor daily direct": [
+    "OK",
+    "",
+    "HTTPSConnectionPool(host='www.shibor.org', port=443): Max retries exceeded with url: /cn/shiborhome/rbvn/detail.asp?date=2024-01-02 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1032)')))",
+    "scalar"
+  ],
+  "GACC trade summary (HTML)": [
+    "OK",
+    "",
+    "No tables found",
+    "scalar"
+  ],
+  "GACC port trade (HTML)": [
+    "OK",
+    "",
+    "No tables found",
+    "scalar"
+  ],
+  "Google News RSS: china futures": [
+    "FAIL",
+    "No module named 'feedparser'",
+    "None",
+    null
+  ],
+  "Google News RSS: crude oil china": [
+    "FAIL",
+    "No module named 'feedparser'",
+    "None",
+    null
+  ],
+  "SMM daily price CU": [
+    "OK",
+    "",
+    "module 'akshare' has no attribute 'smm_price_daily'",
+    "scalar"
+  ],
+  "SMM spot weekly CU": [
+    "OK",
+    "",
+    "module 'akshare' has no attribute 'smm_spot_price_weekly'",
+    "scalar"
+  ],
+  "NBS industrial production direct API": [
+    "OK",
+    "",
+    "Expecting value: line 1 column 1 (char 0)",
+    "scalar"
+  ],
+  "NBS CPI direct API": [
+    "OK",
+    "",
+    "Expecting value: line 1 column 1 (char 0)",
+    "scalar"
+  ],
+  "NBS PMI direct API": [
+    "OK",
+    "",
+    "Expecting value: line 1 column 1 (char 0)",
+    "scalar"
+  ],
+  "NOAA GHCN FIPS:CN Jan 2024 (token required)": [
+    "OK",
+    "",
+    "[]",
+    [
+      0,
+      0
+    ]
+  ],
+  "SHFE tech spec page HTTP status": [
+    "OK",
+    "",
+    "200",
+    "scalar"
+  ],
+  "SHFE daily CSV 20240315": [
+    "OK",
+    "",
+    "404",
+    "scalar"
+  ],
+  "EIA v2 series endpoint (no key, returns meta)": [
+    "OK",
+    "",
+    "[]",
+    [
+      0,
+      0
+    ]
+  ],
+  "AkShare freight index (Baltic spot fallback)": [
+    "OK",
+    "",
+    "module 'akshare' has no attribute 'freight_index_spot'",
+    "scalar"
+  ],
+  "AkShare spot_goods BDI (alt)": [
+    "OK",
+    "",
+    "'bdi'",
+    "scalar"
+  ],
+  "spot_goods crude": [
+    "FAIL",
+    "'crude'",
+    "None",
+    null
+  ]
+}

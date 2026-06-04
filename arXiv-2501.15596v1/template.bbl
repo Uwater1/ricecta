@@ -1,0 +1,173 @@
+\begin{thebibliography}{32}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Litzenberger and Rabinowitz(1995)]{litzenberger95}
+R.H. Litzenberger and N.~Rabinowitz.
+\newblock {Backwardation in oil futures markets: Theory and empirical evidence}.
+\newblock \emph{Journal of Finance}, 50\penalty0 (5):\penalty0 1517--1545, 1995.
+
+\bibitem[Duffie et~al.(1999)Duffie, Gray, and Hoang]{duffie99}
+D.~Duffie, S.~F. Gray, and P.~Hoang.
+\newblock {Volatility in Energy Prices}.
+\newblock In \emph{Managing Energy Price Risk}, pages 273--289. Risk Publications, 1999.
+\newblock Editor: R. Jameson.
+
+\bibitem[Eydeland and Wolyniec(2003)]{eydeland03}
+A.~Eydeland and K.~Wolyniec.
+\newblock \emph{{Energy and Power Risk Management}}.
+\newblock Wiley, 2003.
+\newblock {1st Edition}.
+
+\bibitem[Samuelson(1965)]{samuelson65}
+P.A. Samuelson.
+\newblock Proof that properly anticipated prices fluctuate randomly.
+\newblock \emph{Industrial Management Review}, 6:\penalty0 41--49, 1965.
+
+\bibitem[Routledge et~al.(2000)Routledge, Seppi, and Spatt]{routledge00}
+B.~Routledge, D.J. Seppi, and C.S. Spatt.
+\newblock Equilibrium forward curves for commodities.
+\newblock \emph{Journal of Finance}, 55\penalty0 (3):\penalty0 1297--1338, 2000.
+
+\bibitem[Schwartz(1997)]{schwartz97}
+E.S. Schwartz.
+\newblock {The stochastic behavior of commodity prices: Implications for valuation and hedging}.
+\newblock \emph{Journal of Finance}, 52\penalty0 (3):\penalty0 923--973, 1997.
+
+\bibitem[Gibson and Schwartz(1990)]{schwartz90}
+R.~Gibson and E.S. Schwartz.
+\newblock Stochastic convenience yield and the pricing of oil contingent claims.
+\newblock \emph{Journal of Finance}, 45\penalty0 (3):\penalty0 959--976, 1990.
+
+\bibitem[Deng(2000)]{deng00}
+S.~Deng.
+\newblock {Stochastic models of energy commodity prices and their applications: Mean-reversion with jumps and spikes}.
+\newblock \emph{{Working Paper, University of California Energy Institute}}, 2000.
+\newblock Available at: \url{https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=26aa5225d37f464a4cb02560fac28824521d0f7a}.
+
+\bibitem[Geman and Nguyen(2005)]{geman05}
+H.~Geman and V.-N. Nguyen.
+\newblock Soybean inventory and forward curve dynamics.
+\newblock \emph{Management Science}, 51\penalty0 (7):\penalty0 1076--1091, 2005.
+
+\bibitem[Hikspoors and Jaimungal(2008)]{hikspoors08}
+S.~Hikspoors and S.~Jaimungal.
+\newblock Asymptotic pricing of commodity derivatives using stochastic volatility spot models.
+\newblock \emph{Applied Mathematical Finance}, 15\penalty0 (5-6):\penalty0 449--477, 2008.
+
+\bibitem[Lutz(2010)]{lutz10}
+B.~Lutz.
+\newblock \emph{{Pricing of Derivatives on Mean-Reverting Assets}}.
+\newblock Springer, 2010.
+\newblock {1st Edition}.
+
+\bibitem[Hughen(2010)]{hughen10}
+W.K. Hughen.
+\newblock {A maximal affine stochastic volatility model of oil prices}.
+\newblock \emph{Journal of Future Markets}, 30\penalty0 (2):\penalty0 101--133, 2010.
+
+\bibitem[Cortazar and Schwartz(1994)]{cortazar94}
+G.~Cortazar and E.S. Schwartz.
+\newblock The valuation of commodity contingent claims.
+\newblock \emph{Journal of Derivatives}, 1\penalty0 (4):\penalty0 27--39, 1994.
+
+\bibitem[Cortazar and Schwartz(2003)]{cortazar03}
+G.~Cortazar and E.S. Schwartz.
+\newblock Implementing a stochastic model for oil futures prices.
+\newblock \emph{Energy Economics}, 25\penalty0 (3):\penalty0 215--238, 2003.
+
+\bibitem[Casassus and Collin-Dufresne(2005)]{casassus05}
+J.~Casassus and P.~Collin-Dufresne.
+\newblock Stochastic convenience yield implied from commodity futures and interest rates.
+\newblock \emph{Journal of Finance}, 60\penalty0 (5):\penalty0 2283--2331, 2005.
+
+\bibitem[Tang(2012)]{tang12}
+K.~Tang.
+\newblock Time-varying long-run mean of commodity prices and the modeling of futures term structures.
+\newblock \emph{Quantitative Finance}, 12\penalty0 (5):\penalty0 781--790, 2012.
+
+\bibitem[Mellios et~al.(2016)Mellios, Six, and Lai]{mellios16}
+C.~Mellios, P.~Six, and A.N. Lai.
+\newblock Dynamic speculation and hedging in commodity futures markets with a stochastic convenience yield.
+\newblock \emph{European Journal of Operational Research}, 250\penalty0 (2):\penalty0 493--504, 2016.
+
+\bibitem[Cortazar and Naranjo(2006)]{cortazar06}
+G.~Cortazar and L.~Naranjo.
+\newblock {An \textit{N}-factor Gaussian model of oil futures prices}.
+\newblock \emph{Journal of Futures Markets}, 26\penalty0 (3):\penalty0 243--268, 2006.
+
+\bibitem[Yan(2002)]{yan02}
+X.S. Yan.
+\newblock {Valuation of commodity derivatives in a new multi-factor model}.
+\newblock \emph{Review of Derivatives Research}, 5:\penalty0 251--271, 2002.
+
+\bibitem[Schwartz and Trolle(2009{\natexlab{a}})]{schwartz09a}
+E.S. Schwartz and A.B. Trolle.
+\newblock A general stochastic volatility model for the pricing of interest rate derivatives.
+\newblock \emph{Review of Financial Studies}, 22\penalty0 (5):\penalty0 2007--2057, 2009{\natexlab{a}}.
+
+\bibitem[Schwartz and Trolle(2009{\natexlab{b}})]{schwartz09b}
+E.S. Schwartz and A.B. Trolle.
+\newblock Unspanned stochastic volatility and the pricing of commodity derivatives.
+\newblock \emph{Review of Financial Studies}, 22\penalty0 (11):\penalty0 4423--4461, 2009{\natexlab{b}}.
+
+\bibitem[Schöne and Spinler(2017)]{spinler17}
+M.F. Schöne and S.~Spinler.
+\newblock {A four-factor stochastic volatility model of commodity prices}.
+\newblock \emph{Review of Derivatives Research}, 20:\penalty0 135--165, 2017.
+
+\bibitem[Duffee(2002)]{duffee02}
+G.R. Duffee.
+\newblock Term premia and interest rate forecasts in affine models.
+\newblock \emph{Journal of Finance}, 57\penalty0 (1):\penalty0 405--443, 2002.
+
+\bibitem[Cheridito et~al.(2007)Cheridito, Filipović, and Kimmel]{cheridito07}
+P.~Cheridito, D.~Filipović, and R.L. Kimmel.
+\newblock {Market price of risk specifications for affine models: Theory and evidence}.
+\newblock \emph{Journal of Financial Economics}, 83\penalty0 (1):\penalty0 123--170, 2007.
+
+\bibitem[Kelly and Lord(2023)]{kelly23}
+C.~Kelly and G.J. Lord.
+\newblock {An adaptive splitting method for the Cox-Ingersoll-Ross process}.
+\newblock \emph{Applied Numerical Mathematics}, 186:\penalty0 252--273, 2023.
+
+\bibitem[Duffie and Kan(1996)]{duffie96}
+D.~Duffie and R.~Kan.
+\newblock A yield-factor model of interest rates.
+\newblock \emph{Mathematical Finance}, 6\penalty0 (4):\penalty0 379--406, 1996.
+
+\bibitem[Björk(2009)]{bjork09}
+T.~Björk.
+\newblock \emph{{Arbitrage Theory in Continuous Time}}.
+\newblock Oxford University Press, 2009.
+\newblock 3rd Edition.
+
+\bibitem[Duan and Simonato(1999)]{duan99}
+J.-C. Duan and J.-G. Simonato.
+\newblock {Estimating and testing exponential-affine term structure models by Kalman filter}.
+\newblock \emph{Review of Quantitative Finance and Accounting}, 13:\penalty0 111--135, 1999.
+
+\bibitem[Ewald and Zou(2021)]{ewald21}
+C.~Ewald and Y.~Zou.
+\newblock {Analytic formulas for futures and options for a linear quadratic jump diffusion model with seasonal stochastic volatility and convenience yield: Do fish jump?}
+\newblock \emph{European Journal of Operational Research}, 294\penalty0 (2):\penalty0 801--815, 2021.
+
+\bibitem[Hairer et~al.(2006)Hairer, Lubich, and Wanner]{hairer06}
+E.~Hairer, C.~Lubich, and G.~Wanner.
+\newblock \emph{Geometric Numerical Integration}.
+\newblock Springer, Heidelberg, 2006.
+
+\bibitem[Javaheri et~al.(2003)Javaheri, Lautier, and Galli]{javaheri03}
+A.~Javaheri, D.~Lautier, and A.~Galli.
+\newblock Filtering in finance.
+\newblock \emph{Wilmott Magazine}, 5:\penalty0 67--83, 2003.
+
+\bibitem[González-Rivera et~al.(2004)González-Rivera, Lee, and Mishra]{gonzales04}
+G.~González-Rivera, T.-H. Lee, and S.~Mishra.
+\newblock Forecasting volatility: A reality check based on option pricing, utility function, value-at-risk, and predictive likelihood.
+\newblock \emph{International Journal of Forecasting}, 20\penalty0 (4):\penalty0 629--645, 2004.
+
+\end{thebibliography}

@@ -1,0 +1,31 @@
+{
+   "sources" : [
+      {
+         "usage" : "toplevel",
+         "filename" : "main.tex"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "commodities_prices.pdf"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "elsarticle-harv.bst"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "elsarticle-num-names.bst"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "elsarticle-num.bst"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "references.bib"
+      }
+   ],
+   "process" : {
+      "compiler" : "pdflatex"
+   }
+}

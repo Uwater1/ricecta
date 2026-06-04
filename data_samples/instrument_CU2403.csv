@@ -1,0 +1,2 @@
+order_book_id,symbol,exchange,underlying_symbol,margin_rate,contract_multiplier,trading_hours,listed_date,maturity_date,round_lot
+CU2403,cu2403,SHFE,CU,0.2,5,"21:01-01:00,09:01-10:15,10:31-11:30,13:31-15:00",2023-03-16,2024-03-15,1

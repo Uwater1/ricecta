@@ -1,0 +1,2 @@
+order_book_id,symbol,exchange,underlying_symbol,margin_rate,contract_multiplier,trading_hours,listed_date,maturity_date,round_lot
+SC2403,原油2403,INE,SC,0.2,1000,"21:01-02:30,09:01-10:15,10:31-11:30,13:31-15:00",2021-03-01,2024-02-29,1

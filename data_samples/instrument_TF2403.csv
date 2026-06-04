@@ -1,0 +1,2 @@
+order_book_id,symbol,exchange,underlying_symbol,margin_rate,contract_multiplier,trading_hours,listed_date,maturity_date,round_lot
+TF2403,国债2403,CFFEX,TF,0.02,10000,"09:31-11:30,13:01-15:15",2023-06-12,2024-03-08,1

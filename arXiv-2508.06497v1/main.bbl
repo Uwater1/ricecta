@@ -1,0 +1,114 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{wheeler2020adding}
+C.~M. Wheeler, J.~Baffes, A.~N. Kabundi, G.~Kindberg-Hanlon, P.~S.~O. Nagle, F.~L. Ohnsorge, Adding fuel to the fire: cheap oil during the covid-19 pandemic, Tech. rep., The World Bank (2020).
+
+\bibitem{de2010agricultural}
+A.~De~Janvry, E.~Sadoulet, Agricultural growth and poverty reduction: Additional evidence, The World bank research observer 25~(1) (2010) 1--20.
+
+\bibitem{abbott2011s}
+P.~C. Abbott, C.~Hurt, W.~E. Tyner, What’s driving food prices in 2011? (2011).
+
+\bibitem{mamun2024role}
+A.~Mamun, D.~Laborde, Role of international price and domestic inflation in triggering export restrictions on food commodities, Agricultural Economics (2024).
+
+\bibitem{ghoshray2014breaks}
+A.~Ghoshray, M.~Kejriwal, M.~Wohar, Breaks, trends and unit roots in commodity prices: a robust investigation, Studies in Nonlinear Dynamics and Econometrics 18~(1) (2014) 23--40.
+
+\bibitem{zhang2022exploring}
+Q.~Zhang, Y.~Hu, J.~Jiao, S.~Wang, Exploring the trend of commodity prices: A review and bibliometric analysis, Sustainability 14~(15) (2022) 9536.
+
+\bibitem{kaur2023trade}
+S.~Kaur, S.~Aggarwal, S.~Sarwar, Trade balance, monetary supply, commodity prices, and greener energy growth: Contextual evidence from brics economies in the lens of sustainability, Environmental Science and Pollution Research 30~(29) (2023) 73928--73940.
+
+\bibitem{Behmiri2013}
+N.~B. Behmiri, J.~R.~P. Manso, Crude oil price forecasting techniques: A comprehensive review of literature, Alternative Investment Analyst Review 2013~(2) (2013) 29--48.
+
+\bibitem{Lasheras2015}
+F.~Lasheras, F.~Juez, A.~S. S{\'a}nchez, A.~Krzemie{\'n}, Forecasting the comex copper spot price by means of neural networks and arima models, Resources Policy 45 (2015) 37--43.
+
+\bibitem{Kwas2021}
+M.~Kwas, M.~Rubaszek, Forecasting commodity prices: Looking for a benchmark, Forecasting 3~(2) (2021) 447--459.
+
+\bibitem{Baumeister2015}
+C.~Baumeister, L.~Kilian, Forecasting the real price of oil in a changing world: A forecast combination approach, Journal of Business and Economic Statistics 33~(3) (2015) 338--351.
+
+\bibitem{Sezer2020}
+O.~B. Sezer, M.~U. Gudelek, A.~M. Ozbayoglu, Financial time series forecasting with deep learning : A systematic literature review: 2005--2019, Applied Soft Computing 90 (2020) 106181.
+
+\bibitem{Zhao2017}
+Y.~Zhao, J.~Li, L.~Yu, A deep learning ensemble approach for crude oil price forecasting, Energy Economics 66 (2017) 9--16.
+
+\bibitem{Chiroma2015}
+H.~Chiroma, S.~Abdulkareem, T.~Herawan, Evolutionary neural network model for west texas intermediate crude oil price prediction, Applied Energy 142 (2015) 266--273.
+
+\bibitem{Chen2024}
+P.~Chen, Z.~Boukouvalas, R.~Corizzo, A deep fusion model for stock market prediction with news headlines and time series data, Neural Computing and Applications 36 (2024) 21229--21271.
+
+\bibitem{Tetlock2007}
+P.~C. Tetlock, Giving content to investor sentiment: The role of media in the stock market, Journal of Finance 62~(3) (2007) 1139--1168.
+
+\bibitem{Li2021}
+Y.~Li, S.~Jiang, X.~Li, S.~Wang, The role of news sentiment in oil futures returns and volatility forecasting: A data-decomposition based deep learning approach, Energy Economics 95 (2021) 105008.
+
+\bibitem{Banerjee2024}
+A.~K. Banerjee, A.~Sensoy, C.~K.~M. Lau, P.~Pathak, Impact of media hype and fake news on commodity futures prices: A deep learning approach over the covid-19 period, Finance Research Letters 59 (2024) 104917.
+
+\bibitem{BOLLEN20111}
+J.~Bollen, H.~Mao, X.~Zeng, \href{https://www.sciencedirect.com/science/article/pii/S187775031100007X}{Twitter mood predicts the stock market}, Journal of Computational Science 2~(1) (2011) 1--8.
+\newblock \href {https://doi.org/https://doi.org/10.1016/j.jocs.2010.12.007} {\path{doi:https://doi.org/10.1016/j.jocs.2010.12.007}}.
+\newline\urlprefix\url{https://www.sciencedirect.com/science/article/pii/S187775031100007X}
+
+\bibitem{Ding2015}
+X.~Ding, Y.~Zhang, T.~Liu, J.~Duan, Deep learning for event-driven stock prediction, in: Proceedings of the 24th International Joint Conference on Artificial Intelligence (IJCAI), 2015, pp. 2327--2333.
+
+\bibitem{Nassirtoussi2014}
+A.~Nassirtoussi, S.~Aghabozorgi, T.~Y. Wah, D.~C.~L. Ngo, Text mining for market prediction: A systematic review, Expert Systems with Applications 41~(16) (2014) 7653--7670.
+
+\bibitem{Liu2020}
+Z.~Liu, D.~Huang, K.~Huang, Z.~Li, J.~Zhao, Finbert: A pre-trained financial language representation model for financial text mining, in: Proceedings of the 29th International Joint Conference on Artificial Intelligence (IJCAI), 2020, pp. 4513--4519.
+
+\bibitem{LopezLira2023}
+A.~Lopez-Lira, Y.~Tang, Can chatgpt forecast stock price movements? return predictability and large language models, SSRN Electronic JournalWorking Paper, available at SSRN 4392644 (2023).
+
+\bibitem{Wu2023}
+S.-W. Wu, et~al., Bloomberggpt: A large language model for finance, arXiv preprint arXiv:2303.17564 (2023).
+
+\bibitem{mghali}
+M.-K. Ghali, A.~Farrag, S.~Lam, D.~Won, \href{https://arxiv.org/abs/2503.01880}{Beyondwords is all you need: Agentic generative ai based social media themes extractor} (2025).
+\newblock \href {http://arxiv.org/abs/2503.01880} {\path{arXiv:2503.01880}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2503.01880}
+
+\bibitem{Zhang2024}
+W.~Zhang, Y.~Li, J.~Wang, H.~Chen, Finagent: A multimodal foundation agent for financial trading, arXiv preprint arXiv:2402.18485 (2024).
+
+\bibitem{Li2023}
+Y.~Li, Y.~Yu, H.~Li, Z.~Chen, K.~Khashanah, \href{https://arxiv.org/abs/2309.03736}{Tradinggpt: Multi-agent system with layered memory and distinct characters for enhanced financial trading performance} (2023).
+\newblock \href {http://arxiv.org/abs/2309.03736} {\path{arXiv:2309.03736}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2309.03736}
+
+\bibitem{Wang2024}
+M.~Wang, K.~Izumi, H.~Sakaji, \href{https://arxiv.org/abs/2406.10811}{Llmfactor: Extracting profitable factors through prompts for explainable stock movement prediction} (2024).
+\newblock \href {http://arxiv.org/abs/2406.10811} {\path{arXiv:2406.10811}}.
+\newline\urlprefix\url{https://arxiv.org/abs/2406.10811}
+
+\bibitem{Ramyar2019}
+S.~Ramyar, F.~Kianfar, Forecasting crude oil prices: A comparison between artificial neural networks and vector autoregressive models, Computational Economics 53~(3) (2019) 743--761.
+
+\bibitem{Jiang2024}
+Y.~Jiang, K.~Ning, Z.~Pan, et~al., Multi-modal time series analysis: A tutorial and survey, arXiv preprint arXiv:2503.13709 (2024).
+
+\bibitem{worldbank2024commodities}
+{World Bank}, \href{https://www.worldbank.org/en/research/commodity-markets}{Commodity markets}, accessed: 2025-05-29 (2024).
+\newline\urlprefix\url{https://www.worldbank.org/en/research/commodity-markets}
+
+\bibitem{Openai}
+Openai, \href{https://github.com/openai/openai-agents-python}{Openai/openai-agents-python: A lightweight, powerful framework for multi-agent workflows}.
+\newline\urlprefix\url{https://github.com/openai/openai-agents-python}
+
+\end{thebibliography}

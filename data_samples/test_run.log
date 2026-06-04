@@ -1,0 +1,424 @@
+================================================================================
+1) USER & QUOTA INFO
+================================================================================
+rqdatac version: 3.4.7.7
+server address: rqdatad-pro.ricequant.com:16011
+You are using license:
+U8ydEBNrTYYsKZki_nkJL-S2zqfOSvbKcP0vuIg3IbRjIFrTJ2lqUvqx9vwh1K2j9A7OPz8gLWtc0MfhGZas15yBcE34-WfZ56AkUDZdCr8QCkV2kXEUmRprZZwXWoFRtOSjx0iuc_I3wZOuLK_LfzjDRIrI_2vqlWg_skzinQ8=XodDq_Dz09V_k0UcQ7p5yXOUjuSIXw9G-7-HVoH33jyHqeQ4Y4NZDgfckbIOZ9ci6xxqcUVNsSZ9ePlWe6O9zoMS55OoFTpQFWunDOnYhJN_cZ-1_FNSBfWhgAcdC57gTsQb_25xDR1Kk_I9V8iBXw1oNSr2gxth04lulznN7q0=
+  [OK] rqdatac.info: shape=scalar
+  [OK] user.get_quota: shape=scalar
+
+================================================================================
+2) TRADING CALENDAR
+================================================================================
+  [OK] get_trading_dates: shape=scalar
+  [OK] get_previous_trading_date: shape=scalar
+  [OK] get_next_trading_date: shape=scalar
+  [OK] is_trading_date: shape=scalar
+  [OK] get_latest_trading_date: shape=scalar
+
+================================================================================
+3) INSTRUMENTS / CONTRACTS - per underlying
+================================================================================
+  [OK] all_instruments Future (total list): shape=[11052, 19]
+  [OK] instruments CU2501: shape=scalar
+  [OK] futures.get_contracts C: shape=scalar
+  [OK] futures.get_dominant C (recent): shape=[5]
+  [OK] futures.get_contract_multiplier C: shape=[5, 2]
+  [OK] futures.get_ex_factor C: shape=[0, 4]
+  [OK] futures.get_contracts M: shape=scalar
+  [OK] futures.get_dominant M (recent): shape=[5]
+  [OK] futures.get_contract_multiplier M: shape=[5, 2]
+  [OK] futures.get_ex_factor M: shape=[0, 4]
+  [OK] futures.get_contracts Y: shape=scalar
+  [OK] futures.get_dominant Y (recent): shape=[5]
+  [OK] futures.get_contract_multiplier Y: shape=[5, 2]
+  [OK] futures.get_ex_factor Y: shape=[0, 4]
+  [OK] futures.get_contracts P: shape=scalar
+  [OK] futures.get_dominant P (recent): shape=[5]
+  [OK] futures.get_contract_multiplier P: shape=[5, 2]
+  [OK] futures.get_ex_factor P: shape=[0, 4]
+  [OK] futures.get_contracts V: shape=scalar
+  [OK] futures.get_dominant V (recent): shape=[5]
+  [OK] futures.get_contract_multiplier V: shape=[5, 2]
+  [OK] futures.get_ex_factor V: shape=[0, 4]
+  [OK] futures.get_contracts J: shape=scalar
+  [OK] futures.get_dominant J (recent): shape=[5]
+  [OK] futures.get_contract_multiplier J: shape=[5, 2]
+  [OK] futures.get_ex_factor J: shape=[0, 4]
+  [OK] futures.get_contracts JD: shape=scalar
+  [OK] futures.get_dominant JD (recent): shape=[5]
+  [OK] futures.get_contract_multiplier JD: shape=[5, 2]
+  [OK] futures.get_ex_factor JD: shape=[1, 4]
+  [OK] futures.get_contracts I: shape=scalar
+  [OK] futures.get_dominant I (recent): shape=[5]
+  [OK] futures.get_contract_multiplier I: shape=[5, 2]
+  [OK] futures.get_ex_factor I: shape=[0, 4]
+  [OK] futures.get_contracts CU: shape=scalar
+  [OK] futures.get_dominant CU (recent): shape=[5]
+  [OK] futures.get_contract_multiplier CU: shape=[5, 2]
+  [OK] futures.get_ex_factor CU: shape=[0, 4]
+  [OK] futures.get_contracts AL: shape=scalar
+  [OK] futures.get_dominant AL (recent): shape=[5]
+  [OK] futures.get_contract_multiplier AL: shape=[5, 2]
+  [OK] futures.get_ex_factor AL: shape=[1, 4]
+  [OK] futures.get_contracts AU: shape=scalar
+  [OK] futures.get_dominant AU (recent): shape=[5]
+  [OK] futures.get_contract_multiplier AU: shape=[5, 2]
+  [OK] futures.get_ex_factor AU: shape=[1, 4]
+  [OK] futures.get_contracts AG: shape=scalar
+  [OK] futures.get_dominant AG (recent): shape=[5]
+  [OK] futures.get_contract_multiplier AG: shape=[5, 2]
+  [OK] futures.get_ex_factor AG: shape=[1, 4]
+  [OK] futures.get_contracts RB: shape=scalar
+  [OK] futures.get_dominant RB (recent): shape=[5]
+  [OK] futures.get_contract_multiplier RB: shape=[5, 2]
+  [OK] futures.get_ex_factor RB: shape=[0, 4]
+  [OK] futures.get_contracts RU: shape=scalar
+  [OK] futures.get_dominant RU (recent): shape=[5]
+  [OK] futures.get_contract_multiplier RU: shape=[5, 2]
+  [OK] futures.get_ex_factor RU: shape=[0, 4]
+  [OK] futures.get_contracts NI: shape=scalar
+  [OK] futures.get_dominant NI (recent): shape=[5]
+  [OK] futures.get_contract_multiplier NI: shape=[5, 2]
+  [OK] futures.get_ex_factor NI: shape=[0, 4]
+  [OK] futures.get_contracts SN: shape=scalar
+  [OK] futures.get_dominant SN (recent): shape=[5]
+  [OK] futures.get_contract_multiplier SN: shape=[5, 2]
+  [OK] futures.get_ex_factor SN: shape=[0, 4]
+  [OK] futures.get_contracts SC: shape=scalar
+  [OK] futures.get_dominant SC (recent): shape=[5]
+  [OK] futures.get_contract_multiplier SC: shape=[5, 2]
+  [OK] futures.get_ex_factor SC: shape=[0, 4]
+  [OK] futures.get_contracts CF: shape=scalar
+  [OK] futures.get_dominant CF (recent): shape=[5]
+  [OK] futures.get_contract_multiplier CF: shape=[5, 2]
+  [OK] futures.get_ex_factor CF: shape=[0, 4]
+  [OK] futures.get_contracts SR: shape=scalar
+  [OK] futures.get_dominant SR (recent): shape=[5]
+  [OK] futures.get_contract_multiplier SR: shape=[5, 2]
+  [OK] futures.get_ex_factor SR: shape=[0, 4]
+  [OK] futures.get_contracts TA: shape=scalar
+  [OK] futures.get_dominant TA (recent): shape=[5]
+  [OK] futures.get_contract_multiplier TA: shape=[5, 2]
+  [OK] futures.get_ex_factor TA: shape=[0, 4]
+  [OK] futures.get_contracts MA: shape=scalar
+  [OK] futures.get_dominant MA (recent): shape=[5]
+  [OK] futures.get_contract_multiplier MA: shape=[5, 2]
+  [OK] futures.get_ex_factor MA: shape=[0, 4]
+  [OK] futures.get_contracts SA: shape=scalar
+  [OK] futures.get_dominant SA (recent): shape=[5]
+  [OK] futures.get_contract_multiplier SA: shape=[5, 2]
+  [OK] futures.get_ex_factor SA: shape=[0, 4]
+  [OK] futures.get_contracts TF: shape=scalar
+  [OK] futures.get_dominant TF (recent): shape=[5]
+  [OK] futures.get_contract_multiplier TF: shape=[5, 2]
+  [OK] futures.get_ex_factor TF: shape=[0, 4]
+
+================================================================================
+4) PRICE (DAILY) - per underlying (using dominant contract)
+================================================================================
+  [OK] get_price C (C2405): shape=[13, 5]
+  [OK] futures.get_dominant_price C88: shape=scalar
+  [OK] get_price M (M2405): shape=[13, 5]
+  [OK] futures.get_dominant_price M88: shape=scalar
+  [OK] get_price Y (Y2405): shape=[13, 5]
+  [OK] futures.get_dominant_price Y88: shape=scalar
+  [OK] get_price P (P2405): shape=[13, 5]
+  [OK] futures.get_dominant_price P88: shape=scalar
+  [OK] get_price V (V2405): shape=[13, 5]
+  [OK] futures.get_dominant_price V88: shape=scalar
+  [OK] get_price J (J2405): shape=[13, 5]
+  [OK] futures.get_dominant_price J88: shape=scalar
+  [OK] get_price JD (JD2403): shape=[13, 5]
+  [OK] futures.get_dominant_price JD88: shape=scalar
+  [OK] get_price I (I2405): shape=[13, 5]
+  [OK] futures.get_dominant_price I88: shape=scalar
+  [OK] get_price CU (CU2403): shape=[13, 5]
+  [OK] futures.get_dominant_price CU88: shape=scalar
+  [OK] get_price AL (AL2403): shape=[13, 5]
+  [OK] futures.get_dominant_price AL88: shape=scalar
+  [OK] get_price AU (AU2404): shape=[13, 5]
+  [OK] futures.get_dominant_price AU88: shape=scalar
+  [OK] get_price AG (AG2406): shape=[13, 5]
+  [OK] futures.get_dominant_price AG88: shape=scalar
+  [OK] get_price RB (RB2405): shape=[13, 5]
+  [OK] futures.get_dominant_price RB88: shape=scalar
+  [OK] get_price RU (RU2405): shape=[13, 5]
+  [OK] futures.get_dominant_price RU88: shape=scalar
+  [OK] get_price NI (NI2402): shape=[13, 5]
+  [OK] futures.get_dominant_price NI88: shape=scalar
+  [OK] get_price SN (SN2402): shape=[13, 5]
+  [OK] futures.get_dominant_price SN88: shape=scalar
+  [OK] get_price SC (SC2403): shape=[13, 5]
+  [OK] futures.get_dominant_price SC88: shape=scalar
+  [OK] get_price CF (CF2405): shape=[13, 5]
+  [OK] futures.get_dominant_price CF88: shape=scalar
+  [OK] get_price SR (SR2405): shape=[13, 5]
+  [OK] futures.get_dominant_price SR88: shape=scalar
+  [OK] get_price TA (TA2405): shape=[13, 5]
+  [OK] futures.get_dominant_price TA88: shape=scalar
+  [OK] get_price MA (MA2405): shape=[13, 5]
+  [OK] futures.get_dominant_price MA88: shape=scalar
+  [OK] get_price SA (SA2405): shape=[13, 5]
+  [OK] futures.get_dominant_price SA88: shape=scalar
+  [OK] get_price TF (TF2403): shape=[13, 5]
+  [OK] futures.get_dominant_price TF88: shape=scalar
+
+================================================================================
+5) FUTURES FEATURES - roll yield, basis, warehouse, params, member, exchange_daily
+================================================================================
+  [OK] futures.get_roll_yield C: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks C: shape=[22, 6]
+  [OK] futures.get_member_rank C: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters C: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily C: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield M: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks M: shape=[22, 6]
+  [OK] futures.get_member_rank M: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters M: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily M: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield Y: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks Y: shape=[22, 6]
+  [OK] futures.get_member_rank Y: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters Y: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily Y: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield P: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks P: shape=[22, 6]
+  [OK] futures.get_member_rank P: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters P: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily P: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield V: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks V: shape=[22, 6]
+  [OK] futures.get_member_rank V: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters V: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily V: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield J: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks J: shape=[22, 6]
+  [OK] futures.get_member_rank J: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters J: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily J: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield JD: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks JD: shape=[22, 6]
+  [OK] futures.get_member_rank JD: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters JD: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily JD: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield I: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks I: shape=[22, 6]
+  [OK] futures.get_member_rank I: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters I: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily I: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield CU: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks CU: shape=[22, 6]
+  [OK] futures.get_member_rank CU: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters CU: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily CU: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield AL: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks AL: shape=[22, 6]
+  [OK] futures.get_member_rank AL: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters AL: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily AL: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield AU: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks AU: shape=[22, 6]
+  [OK] futures.get_member_rank AU: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters AU: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily AU: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield AG: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks AG: shape=[22, 6]
+  [OK] futures.get_member_rank AG: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters AG: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily AG: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield RB: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks RB: shape=[22, 6]
+  [OK] futures.get_member_rank RB: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters RB: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily RB: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield RU: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks RU: shape=[22, 6]
+  [OK] futures.get_member_rank RU: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters RU: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily RU: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield NI: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks NI: shape=[22, 6]
+  [OK] futures.get_member_rank NI: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters NI: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily NI: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield SN: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks SN: shape=[22, 6]
+  [OK] futures.get_member_rank SN: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters SN: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily SN: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield SC: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks SC: shape=[22, 6]
+  [OK] futures.get_member_rank SC: shape=scalar
+  [FAIL] futures.get_trading_parameters SC: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily SC: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield CF: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks CF: shape=[22, 6]
+  [OK] futures.get_member_rank CF: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters CF: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily CF: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield SR: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks SR: shape=[22, 6]
+  [OK] futures.get_member_rank SR: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters SR: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily SR: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield TA: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks TA: shape=[22, 6]
+  [OK] futures.get_member_rank TA: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters TA: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily TA: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield MA: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks MA: shape=[22, 6]
+  [OK] futures.get_member_rank MA: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters MA: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily MA: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield SA: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks SA: shape=[22, 6]
+  [OK] futures.get_member_rank SA: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters SA: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily SA: order_book_ids: at least one valid instrument expected, got none
+  [OK] futures.get_roll_yield TF: shape=[22, 5]
+  [OK] futures.get_warehouse_stocks TF: shape=scalar
+  [OK] futures.get_member_rank TF: shape=[20, 5]
+  [FAIL] futures.get_trading_parameters TF: order_book_ids: at least one valid instrument expected, got none
+  [FAIL] futures.get_exchange_daily TF: order_book_ids: at least one valid instrument expected, got none
+
+================================================================================
+6) MINUTE PRICE
+================================================================================
+  [OK] get_price C 1m: shape=[345, 3]
+  [OK] get_price CU 1m: shape=[465, 3]
+  [OK] get_price SC 1m: shape=[555, 3]
+  [OK] get_price CF 1m: shape=[345, 3]
+  [OK] get_price TF 1m: shape=[255, 3]
+
+================================================================================
+7) INDICES - HS300, Wind A, Shenwan industry 801xxx, 申万一级
+================================================================================
+  [OK] get_price 000300.XSHG (HS300): shape=[7, 7]
+  [OK] get_price 000905.XSHG (CSI500): shape=[7, 7]
+  [OK] get_price 000016.XSHG (SSE50): shape=[7, 7]
+  [OK] get_price 000852.XSHG (CSI1000): shape=[7, 7]
+  [OK] index_components 000300.XSHG: shape=scalar
+  [OK] index_components 000905.XSHG: shape=scalar
+  [OK] get_price 801010.INDX (申万农林牧渔): shape=[7, 7]
+  [OK] get_price 801040.INDX (申万有色金属): shape=[7, 7]
+  [OK] get_price 801120.INDX (申万食品饮料): shape=[7, 7]
+  [OK] get_price 801180.INDX (申万房地产): shape=[7, 7]
+  [OK] index_indicator 000300.XSHG (PE/PB): shape=[7, 9]
+  [OK] index_weights 000300.XSHG: shape=[300]
+
+================================================================================
+8) SPOT (Shanghai Gold Exchange) + Repo / Rates (Shibor)
+================================================================================
+  [OK] get_price AU9999.SGEX (gold spot): shape=[7, 12]
+  [OK] get_price AG9999.SGEX (silver spot): shape=scalar
+  [FAIL] get_price PT9999.SGEX (platinum spot): order_book_ids: at least one valid instrument expected, got none
+  [OK] get_spot_benchmark_price AU9999.SGEX: shape=[7, 2]
+  [OK] get_interbank_offered_rate (Shibor): shape=[7, 8]
+  [OK] get_yield_curve (CGB): shape=[7, 21]
+
+================================================================================
+9) FX (exchange rate)
+================================================================================
+  [OK] get_exchange_rate HKDCNY: shape=[88, 8]
+
+================================================================================
+10) MACRO (econ)
+================================================================================
+  [OK] econ.get_reserve_ratio (RRR): shape=[2, 4]
+  [OK] econ.get_money_supply (M0/M1/M2): shape=scalar
+  [OK] econ.get_factors 工业品出厂价格指...: shape=[12, 4]
+  [OK] econ.get_factors 居民消费价格指数...: shape=scalar
+  [OK] econ.get_factors 制造业PMI_指...: shape=scalar
+  [OK] econ.get_factors GDP_不变价_...: shape=scalar
+
+================================================================================
+11) ALTERNATIVE DATA - NEWS / consensus
+================================================================================
+  [OK] get_current_news (n=5): shape=[20, 2]
+  [OK] get_current_news (date range): shape=[3295, 2]
+  [OK] consensus.get_indicator 000001.XSHE FY2024: shape=[224, 67]
+  [OK] all_consensus_industries: shape=[186, 1]
+
+================================================================================
+12) CONCRETE-CONTRACT TESTS for trading_params / exchange_daily / 1m
+================================================================================
+  [OK] futures.get_trading_parameters C (C2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily C (C2405): shape=[7, 9]
+  [OK] futures.get_basis C (C2405): shape=scalar
+  [OK] futures.get_trading_parameters M (M2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily M (M2405): shape=[7, 9]
+  [OK] futures.get_basis M (M2405): shape=scalar
+  [OK] futures.get_trading_parameters Y (Y2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily Y (Y2405): shape=[7, 9]
+  [OK] futures.get_basis Y (Y2405): shape=scalar
+  [OK] futures.get_trading_parameters P (P2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily P (P2405): shape=[7, 9]
+  [OK] futures.get_basis P (P2405): shape=scalar
+  [OK] futures.get_trading_parameters V (V2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily V (V2405): shape=[7, 9]
+  [OK] futures.get_basis V (V2405): shape=scalar
+  [OK] futures.get_trading_parameters J (J2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily J (J2405): shape=[7, 9]
+  [OK] futures.get_basis J (J2405): shape=scalar
+  [OK] futures.get_trading_parameters JD (JD2403): shape=[7, 16]
+  [OK] futures.get_exchange_daily JD (JD2403): shape=[7, 9]
+  [OK] futures.get_basis JD (JD2403): shape=scalar
+  [OK] futures.get_trading_parameters I (I2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily I (I2405): shape=[7, 9]
+  [OK] futures.get_basis I (I2405): shape=scalar
+  [OK] futures.get_trading_parameters CU (CU2403): shape=[7, 16]
+  [OK] futures.get_exchange_daily CU (CU2403): shape=[7, 9]
+  [OK] futures.get_basis CU (CU2403): shape=scalar
+  [OK] futures.get_trading_parameters AL (AL2403): shape=[7, 16]
+  [OK] futures.get_exchange_daily AL (AL2403): shape=[7, 9]
+  [OK] futures.get_basis AL (AL2403): shape=scalar
+  [OK] futures.get_trading_parameters AU (AU2404): shape=[7, 16]
+  [OK] futures.get_exchange_daily AU (AU2404): shape=[7, 9]
+  [OK] futures.get_basis AU (AU2404): shape=scalar
+  [OK] futures.get_trading_parameters AG (AG2406): shape=[7, 16]
+  [OK] futures.get_exchange_daily AG (AG2406): shape=[7, 9]
+  [OK] futures.get_basis AG (AG2406): shape=scalar
+  [OK] futures.get_trading_parameters RB (RB2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily RB (RB2405): shape=[7, 9]
+  [OK] futures.get_basis RB (RB2405): shape=scalar
+  [OK] futures.get_trading_parameters RU (RU2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily RU (RU2405): shape=[7, 9]
+  [OK] futures.get_basis RU (RU2405): shape=scalar
+  [OK] futures.get_trading_parameters NI (NI2402): shape=[7, 16]
+  [OK] futures.get_exchange_daily NI (NI2402): shape=[7, 9]
+  [OK] futures.get_basis NI (NI2402): shape=scalar
+  [OK] futures.get_trading_parameters SN (SN2402): shape=[7, 16]
+  [OK] futures.get_exchange_daily SN (SN2402): shape=[7, 9]
+  [OK] futures.get_basis SN (SN2402): shape=scalar
+  [OK] futures.get_trading_parameters SC (SC2403): shape=[7, 16]
+  [OK] futures.get_exchange_daily SC (SC2403): shape=[7, 9]
+  [OK] futures.get_basis SC (SC2403): shape=scalar
+  [OK] futures.get_trading_parameters CF (CF2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily CF (CF2405): shape=[7, 9]
+  [OK] futures.get_basis CF (CF2405): shape=scalar
+  [OK] futures.get_trading_parameters SR (SR2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily SR (SR2405): shape=[7, 9]
+  [OK] futures.get_basis SR (SR2405): shape=scalar
+  [OK] futures.get_trading_parameters TA (TA2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily TA (TA2405): shape=[7, 9]
+  [OK] futures.get_basis TA (TA2405): shape=scalar
+  [OK] futures.get_trading_parameters MA (MA2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily MA (MA2405): shape=[7, 9]
+  [OK] futures.get_basis MA (MA2405): shape=scalar
+  [OK] futures.get_trading_parameters SA (SA2405): shape=[7, 16]
+  [OK] futures.get_exchange_daily SA (SA2405): shape=[7, 9]
+  [OK] futures.get_basis SA (SA2405): shape=scalar
+  [OK] futures.get_trading_parameters TF (TF2403): shape=[7, 16]
+  [OK] futures.get_exchange_daily TF (TF2403): shape=[7, 9]
+  [OK] futures.get_basis TF (TF2403): shape=scalar
+
+================================================================================
+12) SAVE RESULTS
+================================================================================
+Saved: /data/ricecta/data_samples/api_test_results.json
+Total APIs tested: 365
+OK:   318
+FAIL: 47

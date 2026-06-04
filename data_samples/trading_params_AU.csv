@@ -1,0 +1,8 @@
+order_book_id,trading_date,long_margin_ratio,short_margin_ratio,commission_type,open_commission,close_commission,discount_rate,close_commission_today,non_member_limit_rate,client_limit_rate,non_member_limit,client_limit,min_order_quantity,max_order_quantity,min_margin_ratio,trade_unit,price_unit
+AU2404,2024-01-02,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-03,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-04,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-05,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-08,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-09,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克
+AU2404,2024-01-10,0.08,0.08,by_volume,2.0,2.0,0.0,0.0,,,18000.0,9000.0,1.0,,0.04,1000克/手,元(人民币)/克

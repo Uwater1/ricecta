@@ -1,0 +1,2 @@
+order_book_id,symbol,exchange,underlying_symbol,margin_rate,contract_multiplier,trading_hours,listed_date,maturity_date,round_lot
+C2405,玉米2405,DCE,C,0.2,10,"21:01-23:00,09:01-10:15,10:31-11:30,13:31-15:00",2023-05-18,2024-05-17,1

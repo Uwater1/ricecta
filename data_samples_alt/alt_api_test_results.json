@@ -1,0 +1,783 @@
+{
+  "ak.futures_foreign_commodity_subscribe_exchange_symbol": [
+    "OK",
+    "",
+    "['FEF', 'FCPO', 'RSS3']",
+    [
+      30
+    ]
+  ],
+  "ak.futures_foreign_hist HG": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 206.55, 'high': 213.55, 'low': 206.5, 'close': 212.0, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 211.95, 'high': 214.5, 'low': 211.25, 'close': 211.7, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 211.95, 'high': 212.5, 'low': 204.5, 'close': 205.25, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2590,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist CL": [
+    "OK",
+    "",
+    "[{'date': Timestamp('1996-06-03 00:00:00'), 'open': 19.78, 'high': 19.98, 'low': 19.67, 'close': 19.85, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('1996-06-04 00:00:00'), 'open': 19.95, 'high': 20.49, 'low': 19.95, 'close': 20.44, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('1996-06-05 00:00:00'), 'open': 20.47, 'high': 20.52, 'low': 19.52, 'close': 19.72, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      7689,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist GC": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 1213.1, 'high': 1247.4, 'low': 1209.1, 'close': 1246.5, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 1245.4, 'high': 1251.3, 'low': 1242.1, 'close': 1247.7, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 1247.9, 'high': 1249.0, 'low': 1236.9, 'close': 1246.2, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2589,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist SI": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 16.01, 'high': 16.47, 'low': 15.97, 'close': 16.44, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 16.4, 'high': 16.54, 'low': 16.36, 'close': 16.49, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 16.49, 'high': 16.49, 'low': 16.24, 'close': 16.39, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2589,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist CT": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2019-04-22 00:00:00'), 'open': 78.08, 'high': 78.84, 'low': 78.03, 'close': 78.27, 'volume': 10244, 'position': 0, 's': 0}, {'date': Timestamp('2019-04-23 00:00:00'), 'open': 78.4, 'high': 78.52, 'low': 77.17, 'close': 78.47, 'volume': 18608, 'position': 0, 's': 0}, {'date': Timestamp('2019-04-24 00:00:00'), 'open': 77.66, 'high': 77.93, 'low': 77.05, 'close': 77.91, 'volume': 14947, 'position': 0, 's': 0}]",
+    [
+      1755,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist C": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 413.5, 'high': 419.25, 'low': 410.5, 'close': 419.0, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 419.75, 'high': 427.5, 'low': 419.5, 'close': 427.25, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 425.75, 'high': 428.0, 'low': 422.5, 'close': 427.5, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2543,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist W": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 484.5, 'high': 498.25, 'low': 482.25, 'close': 496.25, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 496.0, 'high': 514.75, 'low': 496.0, 'close': 507.0, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 507.25, 'high': 513.5, 'low': 500.75, 'close': 510.5, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2540,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist S": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 1141.25, 'high': 1169.0, 'low': 1127.25, 'close': 1134.25, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 1141.0, 'high': 1162.0, 'low': 1136.0, 'close': 1139.0, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 1135.0, 'high': 1148.75, 'low': 1129.0, 'close': 1142.75, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2543,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist BO": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 32.26, 'high': 32.67, 'low': 32.12, 'close': 32.32, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 32.41, 'high': 32.65, 'low': 32.34, 'close': 32.47, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 32.49, 'high': 32.78, 'low': 31.85, 'close': 32.36, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2543,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist SM": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 417.7, 'high': 432.5, 'low': 411.5, 'close': 414.9, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 417.9, 'high': 425.9, 'low': 410.5, 'close': 412.9, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 410.5, 'high': 415.5, 'low': 402.6, 'close': 408.7, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2543,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist NG": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 2.4, 'high': 2.45, 'low': 2.39, 'close': 2.4, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 2.45, 'high': 2.48, 'low': 2.4, 'close': 2.44, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 2.44, 'high': 2.49, 'low': 2.41, 'close': 2.48, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2579,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist XAU": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2006-06-05 00:00:00'), 'open': 637.3, 'high': 645.79, 'low': 635.45, 'close': 637.15, 'volume': 0, 'position': 0, 's': 0}, {'date': Timestamp('2006-06-06 00:00:00'), 'open': 637.25, 'high': 639.55, 'low': 625.85, 'close': 630.65, 'volume': 0, 'position': 0, 's': 0}, {'date': Timestamp('2006-06-07 00:00:00'), 'open': 630.55, 'high': 631.45, 'low': 617.25, 'close': 626.45, 'volume': 0, 'position': 0, 's': 0}]",
+    [
+      5184,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist XAG": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2006-06-05 00:00:00'), 'open': 12.17, 'high': 12.41, 'low': 12.12, 'close': 12.12, 'volume': 0, 'position': 0, 's': 0}, {'date': Timestamp('2006-06-06 00:00:00'), 'open': 12.13, 'high': 12.16, 'low': 11.89, 'close': 11.89, 'volume': 0, 'position': 0, 's': 0}, {'date': Timestamp('2006-06-07 00:00:00'), 'open': 11.91, 'high': 12.01, 'low': 11.88, 'close': 11.88, 'volume': 0, 'position': 0, 's': 0}]",
+    [
+      5185,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist XPT": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 981.6, 'high': 987.635, 'low': 953.09, 'close': 985.7, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 986.0, 'high': 997.5, 'low': 983.2, 'close': 991.01, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 996.11, 'high': 1005.765, 'low': 980.735, 'close': 999.21, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2577,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist XPD": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2017-11-01 00:00:00'), 'open': 994.16, 'high': 1007.51, 'low': 980.55, 'close': 1003.06, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2017-11-02 00:00:00'), 'open': 1003.9, 'high': 1007.99, 'low': 990.54, 'close': 996.92, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}, {'date': Timestamp('2017-11-03 00:00:00'), 'open': 997.64, 'high': 1003.56, 'low': 991.6, 'close': 1000.45, 'volume': 0, 'position': 0, 's': 0, 'settlement': 0}]",
+    [
+      2213,
+      9
+    ]
+  ],
+  "ak.futures_foreign_hist OIL": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 49.95, 'high': 50.33, 'low': 48.84, 'close': 49.84, 'volume': 19451, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 49.83, 'high': 50.83, 'low': 49.72, 'close': 50.48, 'volume': 22292, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 50.46, 'high': 50.94, 'low': 49.72, 'close': 50.86, 'volume': 4708, 'position': 0, 's': 0}]",
+    [
+      2586,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist FCPO": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2020-01-06 00:00:00'), 'open': 3133, 'high': 3136, 'low': 3040, 'close': 3044, 'volume': 28706, 'position': 0, 's': 0}, {'date': Timestamp('2020-01-07 00:00:00'), 'open': 3046, 'high': 3085, 'low': 3013, 'close': 3047, 'volume': 29610, 'position': 0, 's': 0}, {'date': Timestamp('2020-01-08 00:00:00'), 'open': 3042, 'high': 3059, 'low': 3024, 'close': 3043, 'volume': 18327, 'position': 0, 's': 0}]",
+    [
+      1564,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist RSS3": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2022-02-07 00:00:00'), 'open': 238.2, 'high': 243.9, 'low': 238.0, 'close': 243.8, 'volume': 659, 'position': 0, 's': 0}, {'date': Timestamp('2022-02-08 00:00:00'), 'open': 243.9, 'high': 246.3, 'low': 242.9, 'close': 246.0, 'volume': 641, 'position': 0, 's': 0}, {'date': Timestamp('2022-02-09 00:00:00'), 'open': 246.5, 'high': 248.0, 'low': 243.4, 'close': 247.8, 'volume': 341, 'position': 0, 's': 0}]",
+    [
+      989,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist NID": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 8410, 'high': 8590, 'low': 8410, 'close': 8510.0, 'volume': 965, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 8510, 'high': 8730, 'low': 8510, 'close': 8650.0, 'volume': 922, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 8650, 'high': 8705, 'low': 8545, 'close': 8640.0, 'volume': 677, 'position': 0, 's': 0}]",
+    [
+      2532,
+      8
+    ]
+  ],
+  "ak.futures_foreign_hist PBD": [
+    "OK",
+    "",
+    "[{'date': Timestamp('2016-06-03 00:00:00'), 'open': 1704.5, 'high': 1740.0, 'low': 1702.0, 'close': 1721.0, 'volume': 837, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-06 00:00:00'), 'open': 1721.0, 'high': 1750.5, 'low': 1714.0, 'close': 1733.5, 'volume': 830, 'position': 0, 's': 0}, {'date': Timestamp('2016-06-07 00:00:00'), 'open': 1733.5, 'high': 1740.5, 'low': 1693.0, 'close': 1695.5, 'volume': 960, 'position': 0, 's': 0}]",
+    [
+      2537,
+      8
+    ]
+  ],
+  "ak.futures_foreign_detail HG": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: '纽约铜', 2: '交易单位', 3: '每手25000磅', 4: '报价单位', 5: '美分/磅'}, {0: '最小变动价位', 1: '$0.0005/磅', 2: '涨跌停板幅度', 3: '无涨跌停限制', 4: '合约交割月份', 5: '1-12月'}, {0: '交易时间', 1: '电子盘：北京时间（夏令时）06:00-05:15；场内：北京时间（夏令时）20：20-01:30', 2: '交割品级', 3: '纽约商品交易所规定的交割品级', 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail CL": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail GC": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail SI": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail CT": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: '美棉主连(CFD差价合约并非期货)', 2: '交易单位', 3: '净重50000磅，约合100包（约合22吨', 4: '报价单位', 5: '美分/磅'}, {0: '最小变动价位', 1: '0.01美分/磅', 2: '涨跌停板幅度', 3: '3美分/磅', 4: '合约交割月份', 5: '当前月份及接下来的23个月份，交易活跃月份：3、5、7、10和12'}, {0: '交易时间', 1: '纽约时间：21:00-14:20 北京时间：10:00-3:20（对应美国标准时），9:00-2:20(对应美国夏时令)', 2: '交割品级', 3: '质量：次中级，长度：1-2/32英寸', 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail C": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail W": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail S": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail BO": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: nan, 2: '交易单位', 3: nan, 4: '报价单位', 5: nan}, {0: '最小变动价位', 1: nan, 2: '涨跌停板幅度', 3: nan, 4: '合约交割月份', 5: nan}, {0: '交易时间', 1: nan, 2: '交割品级', 3: nan, 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_detail NG": [
+    "OK",
+    "",
+    "[{0: '交易品种', 1: '天然气(CFD差价合约并非期货)', 2: '交易单位', 3: '10000mmbtu', 4: '报价单位', 5: '美元/mmbtu'}, {0: '最小变动价位', 1: '0.001美元/mmbtu', 2: '涨跌停板幅度', 3: '3美元/mmbtu，持续5分钟则扩板3美元/mmbtu', 4: '合约交割月份', 5: '1-12月'}, {0: '交易时间', 1: '北京时间(夏令时)电子盘6:00-5:15，场内21:00-2:30', 2: '交割品级', 3: '纽约商品交易所规定的交割品级', 4: '交割地点', 5: nan}]",
+    [
+      4,
+      6
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime HG": [
+    "OK",
+    "",
+    "[{'名称': 'COMEX铜', '最新价': 667.14, '人民币报价': 99513.66403888799, '涨跌额': -0.5099999999999909, '涨跌幅': -0.07638732869018063, '开盘价': 668.2, '最高价': 668.4, '最低价': 663.85, '昨日结算价': 667.65, '持仓量': 0, '买价': 666.9, '卖价': 667.0, '行情时间': '12:02:28', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime CL": [
+    "OK",
+    "",
+    "[{'名称': 'NYMEX原油', '最新价': 94.606, '人民币报价': 4672.7606307999995, '涨跌额': 0.8459999999999894, '涨跌幅': 0.9023037542662004, '开盘价': 93.45, '最高价': 96.08, '最低价': 93.45, '昨日结算价': 93.76, '持仓量': 0, '买价': 94.72, '卖价': 94.73, '行情时间': '12:02:26', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime GC": [
+    "OK",
+    "",
+    "[{'名称': 'COMEX黄金', '最新价': 4514.817, '人民币报价': 982.0941460772998, '涨跌额': -5.082999999999629, '涨跌幅': -0.11245824022654549, '开盘价': 4520.0, '最高价': 4525.1, '最低价': 4490.5, '昨日结算价': 4519.9, '持仓量': 0, '买价': 4513.5, '卖价': 4513.9, '行情时间': '12:02:29', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime SI": [
+    "OK",
+    "",
+    "[{'名称': 'COMEX白银', '最新价': 75.483, '人民币报价': 510.717978, '涨跌额': -0.07299999999999329, '涨跌幅': -0.09661707872305746, '开盘价': 75.495, '最高价': 75.625, '最低价': 74.105, '昨日结算价': 75.556, '持仓量': 0, '买价': 75.45, '卖价': 75.465, '行情时间': '12:01:46', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime CT": [
+    "OK",
+    "",
+    "[{'名称': 'NYBOT-棉花', '最新价': 80.725, '人民币报价': 12041.31146317, '涨跌额': 0.18499999999998806, '涨跌幅': 0.2296995281847381, '开盘价': 80.59, '最高价': 80.88, '最低价': 80.45, '昨日结算价': 80.54, '持仓量': 0, '买价': 80.7, '卖价': 80.73, '行情时间': '11:51:19', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime C": [
+    "OK",
+    "",
+    "[{'名称': 'CBOT-玉米', '最新价': 490.27, '人民币报价': 1305.9105266146498, '涨跌额': 0.7699999999999818, '涨跌幅': 0.15730337078651316, '开盘价': 489.75, '最高价': 490.5, '最低价': 489.25, '昨日结算价': 489.5, '持仓量': 0, '买价': 489.75, '卖价': 490.25, '行情时间': '11:53:52', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime W": [
+    "OK",
+    "",
+    "[{'名称': 'CBOT-小麦', '最新价': 681.523, '人民币报价': 1694.3198424840662, '涨跌额': -1.7269999999999754, '涨跌幅': -0.25276253201609594, '开盘价': 680.0, '最高价': 681.75, '最低价': 675.25, '昨日结算价': 683.25, '持仓量': 0, '买价': 681.25, '卖价': 682.0, '行情时间': '02:15:31', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime S": [
+    "OK",
+    "",
+    "[{'名称': 'CBOT-黄豆', '最新价': 1168.36, '人民币报价': 2904.63495900312, '涨跌额': 3.1099999999999, '涨跌幅': 0.2668955159836859, '开盘价': 1167.5, '最高价': 1169.25, '最低价': 1161.5, '昨日结算价': 1165.25, '持仓量': 0, '买价': 1168.0, '卖价': 1168.25, '行情时间': '12:01:26', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime BO": [
+    "OK",
+    "",
+    "[{'名称': 'CBOT-黄豆油', '最新价': 78.963, '人民币报价': 11778.483456999598, '涨跌额': 0.5529999999999973, '涨跌幅': 0.7052671853079929, '开盘价': 78.55, '最高价': 79.09, '最低价': 78.41, '昨日结算价': 78.41, '持仓量': 0, '买价': 78.95, '卖价': 78.96, '行情时间': '11:58:21', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_foreign_commodity_realtime NG": [
+    "OK",
+    "",
+    "[{'名称': 'NYMEX天然气', '最新价': 3.17, '人民币报价': 21.44822, '涨跌额': 0.0030000000000001137, '涨跌幅': 0.09472687085570299, '开盘价': 3.172, '最高价': 3.177, '最低价': 3.159, '昨日结算价': 3.167, '持仓量': 0, '买价': 3.169, '卖价': 3.17, '行情时间': '12:00:58', '日期': '2026-06-03'}]",
+    [
+      1,
+      14
+    ]
+  ],
+  "ak.futures_spot_price all (default date)": [
+    "OK",
+    "",
+    "[{'date': '20240430', 'symbol': 'C', 'spot_price': 2298.57, 'near_contract': 'c2405', 'near_contract_price': 2372.0, 'dominant_contract': 'c2407', 'dominant_contract_price': 2388.0, 'near_month': '2405', 'dominant_month': '2407', 'near_basis': 73.42999999999984, 'dom_basis': 89.42999999999984, 'near_basis_rate': 0.03194594900307579, 'dom_basis_rate': 0.03890679857476598}, {'date': '20240430', 'symbol': 'A', 'spot_price': 4730.0, 'near_contract': 'a2405', 'near_contract_price': 4655.0, 'dominant_contract': 'a2407', 'dominant_contract_price': 4646.0, 'near_month': '2405', 'dominant_month': '2407', 'near_basis': -75.0, 'dom_basis': -84.0, 'near_basis_rate': -0.015856236786469302, 'dom_basis_rate': -0.017758985200845623}, {'date': '20240430', 'symbol': 'M', 'spot_price': 3340.0, 'near_contract': 'm2405', 'near_contract_price': 3293.0, 'dominant_contract': 'm2409', 'dominant_contract_price': 3399.0, 'near_month': '2405', 'dominant_month': '2409', 'near_basis': -47.0, 'dom_basis': 59.0, 'near_basis_rate': -0.014071856287425133, 'dom_basis_rate': 0.017664670658682713}]",
+    [
+      52,
+      13
+    ]
+  ],
+  "ak.futures_spot_price 20240315 [12 majors]": [
+    "OK",
+    "",
+    "[{'date': '20240315', 'symbol': 'CU', 'spot_price': 71981.67, 'near_contract': 'cu2403', 'near_contract_price': 72910.0, 'dominant_contract': 'cu2405', 'dominant_contract_price': 73130.0, 'near_month': '2403', 'dominant_month': '2405', 'near_basis': 928.3300000000017, 'dom_basis': 1148.3300000000017, 'near_basis_rate': 0.01289675552123204, 'dom_basis_rate': 0.015953089168395218}, {'date': '20240315', 'symbol': 'AU', 'spot_price': 506.34, 'near_contract': 'au2403', 'near_contract_price': 506.5, 'dominant_contract': 'au2406', 'dominant_contract_price': 508.16, 'near_month': '2403', 'dominant_month': '2406', 'near_basis': 0.160000000000025, 'dom_basis': 1.82000000000005, 'near_basis_rate': 0.0003159932061460591, 'dom_basis_rate': 0.0035944227199116163}, {'date': '20240315', 'symbol': 'RB', 'spot_price': 3459.56, 'near_contract': 'rb2403', 'near_contract_price': 3490.0, 'dominant_contract': 'rb2405', 'dominant_contract_price': 3490.0, 'near_month': '2403', 'dominant_month': '2405', 'near_basis': 30.440000000000055, 'dom_basis': 30.440000000000055, 'near_basis_rate': 0.008798806784677815, 'dom_basis_rate': 0.008798806784677815}]",
+    [
+      11,
+      13
+    ]
+  ],
+  "ak.futures_spot_price 20240315 [aluminum, nickel, etc.]": [
+    "OK",
+    "",
+    "[{'date': '20240315', 'symbol': 'AL', 'spot_price': 19190.0, 'near_contract': 'al2403', 'near_contract_price': 19200.0, 'dominant_contract': 'al2405', 'dominant_contract_price': 19295.0, 'near_month': '2403', 'dominant_month': '2405', 'near_basis': 10.0, 'dom_basis': 105.0, 'near_basis_rate': 0.0005211047420532466, 'dom_basis_rate': 0.0054715997915582015}, {'date': '20240315', 'symbol': 'NI', 'spot_price': 141028.33, 'near_contract': 'ni2403', 'near_contract_price': 141000.0, 'dominant_contract': 'ni2405', 'dominant_contract_price': 141870.0, 'near_month': '2403', 'dominant_month': '2405', 'near_basis': -28.329999999987194, 'dom_basis': 841.6700000000128, 'near_basis_rate': -0.0002008816242806688, 'dom_basis_rate': 0.005968091659314112}, {'date': '20240315', 'symbol': 'SN', 'spot_price': 224200.0, 'near_contract': 'sn2403', 'near_contract_price': 225400.0, 'dominant_contract': 'sn2405', 'dominant_contract_price': 226300.0, 'near_month': '2403', 'dominant_month': '2405', 'near_basis': 1200.0, 'dom_basis': 2100.0, 'near_basis_rate': 0.00535236396074934, 'dom_basis_rate': 0.009366636931311234}]",
+    [
+      12,
+      13
+    ]
+  ],
+  "ak.futures_spot_price_previous 20240315": [
+    "OK",
+    "",
+    "[{'商品': '铜', '现货价格': '71981.7', '主力合约代码': '2405', '主力合约价格': '73130', '主力合约基差': -1148.0, '主力合约变动百分比': '-1.59', '180日内主力基差最高': '1203.33', '180日内主力基差最低': '-1148.33', '180日内主力基差平均': '222.12'}, {'商品': '螺纹钢', '现货价格': '3459.56', '主力合约代码': '2405', '主力合约价格': '3490', '主力合约基差': -30.0, '主力合约变动百分比': '-0.87', '180日内主力基差最高': '121.89', '180日内主力基差最低': '-80.78', '180日内主力基差平均': '14.23'}, {'商品': '锌', '现货价格': '21314', '主力合约代码': '2405', '主力合约价格': '21500', '主力合约基差': -186.0, '主力合约变动百分比': '-0.87', '180日内主力基差最高': '602.00', '180日内主力基差最低': '-186.00', '180日内主力基差平均': '99.36'}]",
+    [
+      51,
+      9
+    ]
+  ],
+  "ak.futures_spot_price_daily 20240101-20240131 [CU/AU/RB/I]": [
+    "OK",
+    "",
+    "[{'date': '20240102', 'symbol': 'CU', 'spot_price': 69141.67, 'near_contract': 'cu2401', 'near_contract_price': 69030.0, 'dominant_contract': 'cu2402', 'dominant_contract_price': 68960.0, 'near_month': '2401', 'dominant_month': '2402', 'near_basis': -111.66999999999825, 'dom_basis': -181.66999999999825, 'near_basis_rate': -0.0016150897136271158, 'dom_basis_rate': -0.002627503790405994}, {'date': '20240102', 'symbol': 'AU', 'spot_price': 481.2, 'near_contract': 'au2401', 'near_contract_price': 481.0, 'dominant_contract': 'au2404', 'dominant_contract_price': 484.1, 'near_month': '2401', 'dominant_month': '2404', 'near_basis': -0.19999999999998863, 'dom_basis': 2.900000000000034, 'near_basis_rate': -0.00041562759767244106, 'dom_basis_rate': 0.006026600166251006}, {'date': '20240102', 'symbol': 'RB', 'spot_price': 3966.22, 'near_contract': 'rb2401', 'near_contract_price': 4041.0, 'dominant_contract': 'rb2405', 'dominant_contract_price': 4047.0, 'near_month': '2401', 'dominant_month': '2405', 'near_basis': 74.7800000000002, 'dom_basis': 80.7800000000002, 'near_basis_rate': 0.01885422392101299, 'dom_basis_rate': 0.020366999309165967}]",
+    [
+      88,
+      13
+    ]
+  ],
+  "ak.futures_spot_price_daily 20240101-20240131 [C/M/Y/SC/MA]": [
+    "OK",
+    "",
+    "[{'date': '20240102', 'symbol': 'C', 'spot_price': 2491.43, 'near_contract': 'c2401', 'near_contract_price': 2400.0, 'dominant_contract': 'c2405', 'dominant_contract_price': 2424.0, 'near_month': '2401', 'dominant_month': '2405', 'near_basis': -91.42999999999984, 'dom_basis': -67.42999999999984, 'near_basis_rate': -0.036697800058600794, 'dom_basis_rate': -0.027064778059186834}, {'date': '20240102', 'symbol': 'M', 'spot_price': 3902.0, 'near_contract': 'm2401', 'near_contract_price': 3770.0, 'dominant_contract': 'm2405', 'dominant_contract_price': 3248.0, 'near_month': '2401', 'dominant_month': '2405', 'near_basis': -132.0, 'dom_basis': -654.0, 'near_basis_rate': -0.03382880574064584, 'dom_basis_rate': -0.16760635571501792}, {'date': '20240102', 'symbol': 'Y', 'spot_price': 8052.0, 'near_contract': 'y2401', 'near_contract_price': 7668.0, 'dominant_contract': 'y2405', 'dominant_contract_price': 7468.0, 'near_month': '2401', 'dominant_month': '2405', 'near_basis': -384.0, 'dom_basis': -584.0, 'near_basis_rate': -0.04769001490312963, 'dom_basis_rate': -0.07252856433184307}]",
+    [
+      88,
+      13
+    ]
+  ],
+  "ak.futures_dce_position_rank 20240115 [C/M/Y/P/V/J/JD/I/L/PP/A/B/JM]": [
+    "FAIL",
+    "File is not a zip file",
+    "None",
+    null
+  ],
+  "ak.futures_gfex_position_rank 20240315 [SI/LC/GF]": [
+    "OK",
+    "",
+    "{'si2404': [{'rank': 1, 'vol_party_name': '中信建投', 'vol': 27273, 'vol_chg': -14381, 'long_party_name': '华泰期货', 'long_open_interest': 3861, 'long_open_interest_chg': 227, 'short_party_name': '国泰君安期货', 'short_open_interest': 6508, 'short_open_interest_chg': -736, 'symbol': 'SI2404', 'variety': 'SI'}, {'rank': 2, 'vol_party_name': '广发期货', 'vol': 23598, 'vol_chg': 1321, 'long_party_name': '渤海期货', 'long_open_interest': 2385, 'long_open_interest_chg': 245, 'short_party_name': '华泰期货', 'short_open_interest': 2821, 'short_open_interest_chg': 9, 'symbol': 'SI2404', 'variety': 'SI'}], 'si2405': [{'rank': 1, 'vol_party_name': '中信期货', 'vol': 54021, 'vol_chg': 12698, 'long_party_name': '中信建投', 'long_open_interest': 17412, 'long_open_interest_chg': 347, 'short_party_name': '国泰君安期货', 'short_open_interest': 20740, 'short_open_interest_chg': 2647, 'symbol': 'SI2405', 'variety': 'SI'}, {'rank': 2, 'vol_party_name': '国泰君安期货', 'vol': 46284, 'vol_chg': 32263, 'long_party_name': '广发期货', 'long_open_interest': 12075, 'long_open_interest_chg': 658, 'short_party_name': '中信期货', 'short_open_interest': 14986, 'short_open_interest_chg': -543, 'symbol': 'SI2405', 'variety': 'SI'}], 'si2406': [{'rank': 1, 'vol_party_name': '广发期货', 'vol': 34597, 'vol_chg': 25852, 'long_party_name': '中信建投', 'long_open_interest': 4918, 'long_open_interest_chg': 346, 'short_party_name': '广发期货', 'short_open_interest': 7301, 'short_open_interest_chg': 3241, 'symbol': 'SI2406', 'variety': 'SI'}, {'rank': 2, 'vol_party_name': '国泰君安期货', 'vol': 27138, 'vol_chg': 9970, 'long_party_name': '东证期货', 'long_open_interest': 3847, 'long_open_interest_chg': 663, 'short_party_name': '中信建投', 'short_open_interest': 4952, 'short_open_interest_chg': 421, 'symbol': 'SI2406', 'variety': 'SI'}]}",
+    [
+      5
+    ]
+  ],
+  "ak.get_shfe_rank_table 20240115 [CU/AU]": [
+    "OK",
+    "",
+    "{'cu2404': [{'symbol': 'CU2404', 'rank': 1, 'vol_party_name': '东证期货', 'vol': 4609.0, 'vol_chg': 798.0, 'long_party_name': '中信期货', 'long_open_interest': 8052.0, 'long_open_interest_chg': 216.0, 'short_party_name': '中信期货', 'short_open_interest': 7579.0, 'short_open_interest_chg': 541.0, 'variety': 'CU'}, {'symbol': 'CU2404', 'rank': 2, 'vol_party_name': '中信期货', 'vol': 2353.0, 'vol_chg': 310.0, 'long_party_name': '宝城期货', 'long_open_interest': 4028.0, 'long_open_interest_chg': -248.0, 'short_party_name': '金瑞期货', 'short_open_interest': 4854.0, 'short_open_interest_chg': 119.0, 'variety': 'CU'}], 'cu2402': [{'symbol': 'CU2402', 'rank': 1, 'vol_party_name': '中信期货', 'vol': 10944.0, 'vol_chg': -1376.0, 'long_party_name': '中信期货', 'long_open_interest': 10236.0, 'long_open_interest_chg': -1133.0, 'short_party_name': '中信期货', 'short_open_interest': 8892.0, 'short_open_interest_chg': -547.0, 'variety': 'CU'}, {'symbol': 'CU2402', 'rank': 2, 'vol_party_name': '东证期货', 'vol': 9743.0, 'vol_chg': -760.0, 'long_party_name': '金瑞期货', 'long_open_interest': 9314.0, 'long_open_interest_chg': 921.0, 'short_party_name': '金瑞期货', 'short_open_interest': 6166.0, 'short_open_interest_chg': -1866.0, 'variety': 'CU'}], 'cu2401': [{'symbol': 'CU2401', 'rank': 1, 'vol_party_name': '金瑞期货', 'vol': 2400.0, 'vol_chg': -505.0, 'long_party_name': '金瑞期货', 'long_open_interest': 845.0, 'long_open_interest_chg': 580.0, 'short_party_name': '五矿期货', 'short_open_interest': 1065.0, 'short_open_interest_chg': -215.0, 'variety': 'CU'}, {'symbol': 'CU2401', 'rank': 2, 'vol_party_name': '五矿期货', 'vol': 1700.0, 'vol_chg': -715.0, 'long_party_name': '中银期货', 'long_open_interest': 670.0, 'long_open_interest_chg': -105.0, 'short_party_name': '铜冠金源', 'short_open_interest': 300.0, 'short_open_interest_chg': -35.0, 'variety': 'CU'}]}",
+    [
+      10
+    ]
+  ],
+  "ak.get_rank_table_czce 20240115": [
+    "OK",
+    "",
+    "{'AP': [{'rank': 1, 'vol_party_name': '国泰君安', 'vol': '8,127', 'vol_chg': '-1,970', 'long_party_name': '国泰君安', 'long_open_interest': '5,277', 'long_open_interest_chg': '255', 'short_party_name': '一德期货', 'short_open_interest': '4,877', 'short_open_interest_chg': '33', 'symbol': 'AP', 'variety': 'AP'}, {'rank': 2, 'vol_party_name': '东证期货', 'vol': '5,628', 'vol_chg': '-2,730', 'long_party_name': '海证期货', 'long_open_interest': '4,991', 'long_open_interest_chg': '1,412', 'short_party_name': '国泰君安', 'short_open_interest': '4,693', 'short_open_interest_chg': '402', 'symbol': 'AP', 'variety': 'AP'}], 'UR409': [{'rank': 1, 'vol_party_name': '中信期货', 'vol': '7,073', 'vol_chg': '-1,149', 'long_party_name': '光大期货', 'long_open_interest': '5,128', 'long_open_interest_chg': '-416', 'short_party_name': '国泰君安', 'short_open_interest': '5,783', 'short_open_interest_chg': '-601', 'symbol': 'UR409', 'variety': 'UR'}, {'rank': 2, 'vol_party_name': '国泰君安', 'vol': '4,897', 'vol_chg': '410', 'long_party_name': '方正中期', 'long_open_interest': '4,408', 'long_open_interest_chg': '28', 'short_party_name': '东证期货', 'short_open_interest': '5,472', 'short_open_interest_chg': '-53', 'symbol': 'UR409', 'variety': 'UR'}], 'CF': [{'rank': 1, 'vol_party_name': '中信期货', 'vol': '127,799', 'vol_chg': '57,147', 'long_party_name': '中信期货', 'long_open_interest': '111,516', 'long_open_interest_chg': '-15,536', 'short_party_name': '中信期货', 'short_open_interest': '89,866', 'short_open_interest_chg': '-13,803', 'symbol': 'CF', 'variety': 'CF'}, {'rank': 2, 'vol_party_name': '东证期货', 'vol': '63,548', 'vol_chg': '3,292', 'long_party_name': '东证期货', 'long_open_interest': '45,863', 'long_open_interest_chg': '-2,736', 'short_party_name': '中粮期货', 'short_open_interest': '53,775', 'short_open_interest_chg': '-2,431', 'symbol': 'CF', 'variety': 'CF'}]}",
+    [
+      94
+    ]
+  ],
+  "ak.get_cffex_rank_table 20240115 [TF]": [
+    "OK",
+    "",
+    "{'TF2403': [{'long_open_interest': 25017, 'long_open_interest_chg': -134, 'long_party_name': '中信期货', 'rank': 1, 'short_open_interest': 14407, 'short_open_interest_chg': -29, 'short_party_name': '银河期货', 'symbol': 'TF2403', 'vol': 37966, 'vol_chg': -7596, 'vol_party_name': '东证期货', 'variety': 'TF'}, {'long_open_interest': 22734, 'long_open_interest_chg': -3, 'long_party_name': '东证期货', 'rank': 2, 'short_open_interest': 12780, 'short_open_interest_chg': -493, 'short_party_name': '中信期货', 'symbol': 'TF2403', 'vol': 17801, 'vol_chg': -2674, 'vol_party_name': '中信期货', 'variety': 'TF'}]}",
+    [
+      1
+    ]
+  ],
+  "ak.futures_inventory_em CU": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em AU": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em AG": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em AL": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em NI": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em SN": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em ZN": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em PB": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em RB": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em WR": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em HC": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em RU": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em C": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em M": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em Y": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em P": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em A": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em JD": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em L": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em V": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em PP": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em J": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em JM": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em I": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em B": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em BB": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em SC": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em FU": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em BU": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em EC": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em PG": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em EB": [
+    "FAIL",
+    "请输入正确的 symbol, 可选项为: {'中证1000': 'IM', '中证500': 'IC', '沪深300': 'IF', '上证50': 'IH', '短纤': 'PF', '瓶片': 'PR', '低硫燃料油': 'lu', '20号胶': 'nr', '豆二': 'B', '生猪': 'LH', '鸡蛋': 'JD', '苯乙烯': 'EB', '沪铜': 'CU', '沪锌': 'ZN', '沪铝': 'AL', '不锈钢': 'SS', '镍': 'NI', '丁二烯橡胶': 'BR', '锡': 'SN', '沪铅': 'PB', '玉米淀粉': 'CS', '烧碱':",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em CF": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 11013, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 11124, '增减': 111.0}, {'日期': datetime.date(2026, 2, 26), '库存': 11137, '增减': 13.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em SR": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 14461, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 14461, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 14461, '增减': 0.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em TA": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 113652, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 113652, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 112250, '增减': -1402.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em MA": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 9994, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 9929, '增减': -65.0}, {'日期': datetime.date(2026, 2, 26), '库存': 8979, '增减': -950.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em SA": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 3224, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 3224, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 2924, '增减': -300.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em OI": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 625, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 625, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 625, '增减': 0.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em RM": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 0, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 0, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 0, '增减': 0.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em RS": [
+    "OK",
+    "",
+    "[{'日期': datetime.date(2026, 2, 24), '库存': 0, '增减': nan}, {'日期': datetime.date(2026, 2, 25), '库存': 0, '增减': 0.0}, {'日期': datetime.date(2026, 2, 26), '库存': 0, '增减': 0.0}]",
+    [
+      67,
+      3
+    ]
+  ],
+  "ak.futures_inventory_em WH": [
+    "FAIL",
+    "'NoneType' object is not subscriptable",
+    "None",
+    null
+  ],
+  "ak.futures_inventory_em PM": [
+    "FAIL",
+    "'NoneType' object is not subscriptable",
+    "None",
+    null
+  ],
+  "ak.futures_shfe_warehouse_receipt 20240315": [
+    "OK",
+    "",
+    "{'锡': [{'VARNAME': '锡', 'VARSORT': '48', 'REGNAME': '上海', 'REGSORT': '0', 'WHABBRNAME': '国储天威', 'WHROWS': '4', 'WGHTUNIT': '2', 'WRTWGHTS': '2928', 'WRTCHANGE': '0', 'ROWORDER': '16', 'ROWSTATUS': '0', 'VARID': 'sn', 'WHTYPE': '1'}, {'VARNAME': '锡', 'VARSORT': '48', 'REGNAME': '上海', 'REGSORT': '0', 'WHABBRNAME': '中储大场', 'WHROWS': '4', 'WGHTUNIT': '2', 'WRTWGHTS': '2199', 'WRTCHANGE': '0', 'ROWORDER': '38', 'ROWSTATUS': '0', 'VARID': 'sn', 'WHTYPE': '1'}], '石油沥青厂库': [{'VARNAME': '石油沥青厂库', 'VARSORT': '95', 'REGNAME': '广东', 'REGSORT': '1', 'WHABBRNAME': '中油高富', 'WHROWS': '1', 'WGHTUNIT': '2', 'WRTWGHTS': '0', 'WRTCHANGE': '0', 'ROWORDER': '527', 'ROWSTATUS': '0', 'VARID': 'bu', 'WHTYPE': '2'}, {'VARNAME': '石油沥青厂库', 'VARSORT': '95', 'REGNAME': '江苏', 'REGSORT': '2', 'WHABBRNAME': '中基宁波(江苏)', 'WHROWS': '5', 'WGHTUNIT': '2', 'WRTWGHTS': '0', 'WRTCHANGE': '0', 'ROWORDER': '512', 'ROWSTATUS': '0', 'VARID': 'bu', 'WHTYPE': '2'}], '热轧卷板': [{'VARNAME': '热轧卷板', 'VARSORT': '85', 'REGNAME': '上海', 'REGSORT': '0', 'WHABBRNAME': '上港保税共青', 'WHROWS': '4', 'WGHTUNIT': '2', 'WRTWGHTS': '0', 'WRTCHANGE': '0', 'ROWORDER': '79', 'ROWSTATUS': '0', 'VARID': 'hc', 'WHTYPE': '1'}, {'VARNAME': '热轧卷板', 'VARSORT': '85', 'REGNAME': '上海', 'REGSORT': '0', 'WHABBRNAME': '上海兴晟', 'WHROWS': '4', 'WGHTUNIT': '2', 'WRTWGHTS': '8927', 'WRTCHANGE': '3175', 'ROWORDER': '90', 'ROWSTATUS': '0', 'VARID': 'hc', 'WHTYPE': '1'}]}",
+    [
+      28
+    ]
+  ],
+  "ak.futures_warehouse_receipt_dce 20240315": [
+    "FAIL",
+    "Expecting value: line 1 column 1 (char 0)",
+    "None",
+    null
+  ],
+  "ak.futures_warehouse_receipt_czce 20240315": [
+    "OK",
+    "",
+    "{'SR': [{'仓库编号': '0103', '仓库简称': '藁城永安', '年度': '2324', '等级': '1', '品牌': '佰惠生', '仓单数量': 2360, '当日增减': 0, '有效预报': nan, '升贴水': 100}, {'仓库编号': nan, '仓库简称': nan, '年度': '2324', '等级': '1', '品牌': '中糖', '仓单数量': 785, '当日增减': 0, '有效预报': nan, '升贴水': nan}], 'CF': [{'仓库编号': '0301', '仓库简称': '四三二处', '年度': '2324', '等级': '2129', '产地': '新疆', '仓单数量': 1, '当日增减': 0, '有效预报': nan}, {'仓库编号': nan, '仓库简称': nan, '年度': '2324', '等级': '2130', '产地': '新疆', '仓单数量': 2, '当日增减': 0, '有效预报': nan}], 'CY': [{'仓库编号': '0301', '仓库简称': '四三二处', '仓库/厂库': '仓库', '类别': nan, '仓单数量': 0, '当日增减': 0, '有效预报': nan, '升贴水': 0}, {'仓库编号': '0303', '仓库简称': '豫棉物流', '仓库/厂库': '仓库', '类别': nan, '仓单数量': 0, '当日增减': 0, '有效预报': nan, '升贴水': 0}]}",
+    [
+      25
+    ]
+  ],
+  "ak.futures_gfex_warehouse_receipt 20240315": [
+    "OK",
+    "",
+    "{'LC': [{'品种': '碳酸锂', '仓库/分库': '象屿速传上海', '昨日仓单量': 2190, '今日仓单量': 2196, '增减': 70}, {'品种': '碳酸锂', '仓库/分库': '中物流（常州）', '昨日仓单量': 120, '今日仓单量': 120, '增减': 0}], 'SI': [{'品种': '工业硅', '仓库/分库': '中储吴淞', '昨日仓单量': 756, '今日仓单量': 756, '增减': 0}, {'品种': '工业硅', '仓库/分库': '中储大场137', '昨日仓单量': 996, '今日仓单量': 1032, '增减': 36}]}",
+    [
+      2
+    ]
+  ],
+  "ak.futures_inventory_99 (a, 豆一)": [
+    "FAIL",
+    "Expecting value: line 1 column 1 (char 0)",
+    "None",
+    null
+  ],
+  "ak.futures_comex_inventory (黄金 gold)": [
+    "OK",
+    "",
+    "[{'序号': 1, '日期': datetime.date(2021, 6, 3), 'COMEX黄金库存量-吨': 1076.100106486, 'COMEX黄金库存量-盎司': 34597396.0}, {'序号': 2, '日期': datetime.date(2021, 6, 4), 'COMEX黄金库存量-吨': 1078.0961113915, 'COMEX黄金库存量-盎司': 34661569.0}, {'序号': 3, '日期': datetime.date(2021, 6, 7), 'COMEX黄金库存量-吨': 1081.1849999765, 'COMEX黄金库存量-盎司': 34760879.0}]",
+    [
+      1242,
+      4
+    ]
+  ]
+}
