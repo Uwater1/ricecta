@@ -5,5 +5,4 @@ venv/
 .venv/
 .env
 .lisence
-data/
 data_samples/futures_minute_*.csv
