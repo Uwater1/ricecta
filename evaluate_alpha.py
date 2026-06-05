@@ -68,29 +68,21 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005):
     if df.empty:
         return {}
         
-    # Standardize weights cross-sectionally: mean=0, sum(abs(weights))=1
-    def standardize_weights(group):
-        signals = group[alpha_col]
-        # Remove NaNs
-        signals = signals.dropna()
-        if signals.empty:
-            return group
-        demeaned = signals - signals.mean()
-        abs_sum = demeaned.abs().sum()
-        if abs_sum > 0:
-            group["weight"] = demeaned / abs_sum
-        else:
-            group["weight"] = 0.0
-        return group
-        
-    # Apply weight calculation group-by date
-    df = df.groupby(level="date", group_keys=False).apply(standardize_weights)
-    if "weight" not in df.columns:
-        df["weight"] = 0.0
-        
+    # Cast key columns to float32 for speed and memory efficiency
+    for col in ["close", "volume", "returns", alpha_col]:
+        if col in df.columns:
+            df[col] = df[col].astype(np.float32)
+            
     # Pivot weights and returns to align them
-    weights = df["weight"].unstack().fillna(0.0)
-    asset_returns = df["returns"].unstack().fillna(0.0)
+    signals = df[alpha_col].unstack()
+    asset_returns = df["returns"].unstack().fillna(0.0).astype(np.float32)
+    
+    # Demean cross-sectionally: signals - mean(signals)
+    demeaned = signals.sub(signals.mean(axis=1), axis=0)
+    abs_sum = demeaned.abs().sum(axis=1)
+    
+    # Compute standardized weights: demeaned / sum(|demeaned|)
+    weights = demeaned.div(abs_sum.replace(0.0, np.nan), axis=0).fillna(0.0).astype(np.float32)
     
     # Shift weights by 1 day to avoid lookahead (trade at close of t-1, hold on day t)
     weights_shifted = weights.shift(1).fillna(0.0)
@@ -138,47 +130,39 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005):
     
     # Information Coefficient (IC)
     # Daily rank correlation between alpha at t and asset return at t+1
-    daily_ics = []
-    dates = weights.index
-    for i in range(len(dates) - 1):
-        dt = dates[i]
-        dt_next = dates[i+1]
-        
-        sig_t = df.loc[dt, alpha_col] if dt in df.index.levels[0] else pd.Series()
-        ret_t_next = df.loc[dt_next, "returns"] if dt_next in df.index.levels[0] else pd.Series()
-        
-        # Align series
-        aligned = pd.concat([sig_t, ret_t_next], axis=1, keys=["sig", "ret"]).dropna()
-        if len(aligned) > 5:
-            corr, _ = stats.spearmanr(aligned["sig"], aligned["ret"])
-            daily_ics.append(corr)
-            
-    mean_ic = np.nanmean(daily_ics) if daily_ics else 0.0
+    rets = asset_returns.shift(-1)
     
-    # Top/Bottom Quintile Returns
-    # Rank signals each day, form portfolios
-    def get_quintile_returns(group):
-        signals = group[alpha_col].dropna()
-        if len(signals) < 5:
-            return pd.Series(dtype='float64')
-        ranks = signals.rank()
-        q_labels = pd.qcut(ranks, 5, labels=False, duplicates='drop')
-        group["quintile"] = q_labels
-        return group
-        
-    df_q = df.groupby(level="date", group_keys=False).apply(get_quintile_returns)
-    if "quintile" not in df_q.columns:
-        df_q["quintile"] = np.nan
-        
-    q_weights_top = df_q["quintile"].apply(lambda x: 1.0 if x == 4 else 0.0)
-    q_weights_bot = df_q["quintile"].apply(lambda x: 1.0 if x == 0 else 0.0)
+    sigs_ranked = signals.rank(axis=1, ascending=True)
+    rets_ranked = rets.rank(axis=1, ascending=True)
     
-    # Normalize weights
-    q_weights_top = q_weights_top.groupby(level="date").apply(lambda x: x / x.sum() if x.sum() > 0 else x)
-    q_weights_bot = q_weights_bot.groupby(level="date").apply(lambda x: x / x.sum() if x.sum() > 0 else x)
+    sigs_dm = sigs_ranked.sub(sigs_ranked.mean(axis=1), axis=0)
+    rets_dm = rets_ranked.sub(rets_ranked.mean(axis=1), axis=0)
     
-    q_ret_top = (q_weights_top.unstack().shift(1).fillna(0.0) * asset_returns).sum(axis=1)
-    q_ret_bot = (q_weights_bot.unstack().shift(1).fillna(0.0) * asset_returns).sum(axis=1)
+    numerator = (sigs_dm * rets_dm).sum(axis=1)
+    denominator = np.sqrt((sigs_dm ** 2).sum(axis=1) * (rets_dm ** 2).sum(axis=1))
+    
+    # Only keep dates where both sigs and rets have at least 5 non-nan values
+    valid_count = (signals.notna() & rets.notna()).sum(axis=1)
+    daily_ics = (numerator / denominator.replace(0.0, np.nan)).where(valid_count > 5)
+    mean_ic = daily_ics.mean(skipna=True)
+    if np.isnan(mean_ic):
+        mean_ic = 0.0
+        
+    # Top/Bottom Quintile Returns (completely vectorized)
+    n_valid = signals.notna().sum(axis=1)
+    ranks = signals.rank(axis=1, ascending=True)
+    
+    is_top = ranks.gt(n_valid * 0.8, axis=0) & (n_valid >= 5)
+    is_bot = ranks.le(n_valid * 0.2, axis=0) & (n_valid >= 5)
+    
+    q_weights_top = is_top.astype(np.float32)
+    q_weights_bot = is_bot.astype(np.float32)
+    
+    q_weights_top = q_weights_top.div(q_weights_top.sum(axis=1).replace(0.0, np.nan), axis=0).fillna(0.0)
+    q_weights_bot = q_weights_bot.div(q_weights_bot.sum(axis=1).replace(0.0, np.nan), axis=0).fillna(0.0)
+    
+    q_ret_top = (q_weights_top.shift(1).fillna(0.0) * asset_returns).sum(axis=1)
+    q_ret_bot = (q_weights_bot.shift(1).fillna(0.0) * asset_returns).sum(axis=1)
     
     top_quintile_ann = q_ret_top.mean() * 252
     bot_quintile_ann = q_ret_bot.mean() * 252
@@ -195,18 +179,15 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005):
     capacity_sharpes = {}
     
     # Pre-calculate symbol daily volatility (rolling 20-day standard deviation of returns)
-    df["vol_20"] = df.groupby(level="symbol")["returns"].transform(lambda x: x.rolling(20).std())
+    df["vol_20"] = df["returns"].unstack().rolling(20).std().stack().astype(np.float32)
     # Pre-calculate symbol daily market notional volume (volume * close * multiplier)
-    df["multiplier"] = df.index.get_level_values("symbol").map(MULTIPLIERS).fillna(1.0)
-    df["market_notional_volume"] = df["volume"] * df["close"] * df["multiplier"]
-    df["market_vol_20"] = df.groupby(level="symbol")["market_notional_volume"].transform(lambda x: x.rolling(20).mean())
+    df["multiplier"] = df.index.get_level_values("symbol").map(MULTIPLIERS).fillna(1.0).astype(np.float32)
+    df["market_notional_volume"] = (df["volume"] * df["close"] * df["multiplier"]).astype(np.float32)
+    df["market_vol_20"] = df["market_notional_volume"].unstack().rolling(20).mean().stack().astype(np.float32)
     
     # Re-align features
     vol_20 = df["vol_20"].unstack().fillna(0.0)
     market_vol_20 = df["market_vol_20"].unstack().fillna(1.0)
-    
-    # Pivot close prices to calculate traded notional
-    closes = df["close"].unstack().fillna(0.0)
     
     for aum in aums:
         if aum == 0:

@@ -4,6 +4,7 @@ Main evaluation pipeline runner.
 Computes the 5 alphas, evaluates them on the 23 symbols, and prints/saves the summary report.
 """
 import os
+import sys
 import pandas as pd
 import numpy as np
 from alphas import compute_alphas
@@ -32,9 +33,30 @@ ALPHAS = [
 ]
 
 def run():
+    global ALPHAS
+    
+    # Parse CLI argument for specific alpha
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        if arg.isdigit():
+            idx = int(arg) - 1
+            if 0 <= idx < len(ALPHAS):
+                ALPHAS = [ALPHAS[idx]]
+                print(f"Filtering to evaluate single alpha by index: {ALPHAS[0]}")
+            else:
+                print(f"[ERROR] Alpha index {arg} out of range (1-{len(ALPHAS)})")
+                sys.exit(1)
+        elif arg in ALPHAS:
+            ALPHAS = [arg]
+            print(f"Filtering to evaluate single alpha by name: {ALPHAS[0]}")
+        else:
+            print(f"[ERROR] Unknown alpha name/index: {arg}")
+            sys.exit(1)
+
     print("=== Loading daily data and computing alphas ===")
     df_data = compute_alphas(DATA_DIR, SPOT_DIR, SYMBOLS)
     if df_data.empty:
+
         print("[ERROR] No data processed!")
         return
         

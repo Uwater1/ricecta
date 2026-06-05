@@ -154,20 +154,21 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         df["EWMA_32_64_CTA"] = (ema32 - ema64) / df["close"]
         
         # 6. ForeignAg_LeadLag
-        # Lead-lag from foreign agricultural counterparts
-        if symbol in ['C', 'M', 'Y', 'P', 'CF', 'SR']:
+        # Lead-lag difference of N-day changes
+        optimal_n = {'C': 3, 'M': 29, 'Y': 4, 'P': 30, 'CF': 8, 'SR': 24}
+        if symbol in optimal_n:
+            n_days = optimal_n[symbol]
             alt_path = os.path.join(alt_data_dir, f"{symbol}.parquet")
             if os.path.exists(alt_path):
                 df_alt = pd.read_parquet(alt_path)
                 if not isinstance(df_alt.index, pd.DatetimeIndex):
                     df_alt.index = pd.to_datetime(df_alt.index)
                 df_alt = df_alt.sort_index()
-                # Compute returns on the foreign calendar first
-                foreign_ret = df_alt["close"].pct_change(5)
-                # Reindex and forward-fill to align with domestic trading dates
-                foreign_ret_aligned = foreign_ret.reindex(df.index).ffill()
-                # Shift by 10 days to capture lead-lag relationship safely
-                df["ForeignAg_LeadLag"] = foreign_ret_aligned.shift(10)
+                # Compute returns on the foreign calendar, then shift by 1 day to prevent lookahead
+                foreign_ret = df_alt["close"].pct_change(n_days).shift(1).reindex(df.index).ffill()
+                # Compute returns on the domestic calendar
+                domestic_ret = df["close"].pct_change(n_days)
+                df["ForeignAg_LeadLag"] = (domestic_ret - foreign_ret).astype(np.float32)
             else:
                 df["ForeignAg_LeadLag"] = np.nan
         else:
