@@ -48,7 +48,7 @@ rtk venv/bin/python run_evaluation.py 6
 ```
 
 ## Recent Alpha Updates
-- **Agricultural Lead-Lag Alpha (`ForeignAg_LeadLag`):** Changed to $R^{CN}_t(N) - R^{US}_{t-1\_aligned}(N)$. Shifted foreign return by 1 day on foreign calendar before alignment. No lookahead.
-- **Optimal N parameters ($N \in [3,30]$):** `C`: 3, `M`: 29, `Y`: 4, `P`: 30, `CF`: 8, `SR`: 24.
+- **Agricultural Lead-Lag Alpha (`ForeignAg_LeadLag`):** Changed to cubed difference $(R^{CN}_t(N) - R^{US}_{t-1\_aligned}(N))^3$ to highlight anomalies and suppress noise. Shifted foreign return by 1 day on foreign calendar before alignment. No lookahead.
+- **Optimal N parameters ($N \in [3,60]$):** `C`: 3, `M`: 3, `Y`: 5, `P`: 56, `CF`: 50, `SR`: 35.
 - **Vectorized Evaluation Speedup:** Vectorized weights, IC Spearman correlation, and quintiles in [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py). Execution time down from 30+s to ~2s.
 - **Evaluation CLI args:** Added argument parser in [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) to run specific alpha.

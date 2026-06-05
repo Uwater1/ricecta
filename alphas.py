@@ -154,8 +154,8 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         df["EWMA_32_64_CTA"] = (ema32 - ema64) / df["close"]
         
         # 6. ForeignAg_LeadLag
-        # Lead-lag difference of N-day changes
-        optimal_n = {'C': 3, 'M': 29, 'Y': 4, 'P': 30, 'CF': 8, 'SR': 24}
+        # Lead-lag difference of N-day changes cubed (to highlight anomalies)
+        optimal_n = {'C': 3, 'M': 3, 'Y': 5, 'P': 56, 'CF': 50, 'SR': 35}
         if symbol in optimal_n:
             n_days = optimal_n[symbol]
             alt_path = os.path.join(alt_data_dir, f"{symbol}.parquet")
@@ -168,7 +168,7 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
                 foreign_ret = df_alt["close"].pct_change(n_days).shift(1).reindex(df.index).ffill()
                 # Compute returns on the domestic calendar
                 domestic_ret = df["close"].pct_change(n_days)
-                df["ForeignAg_LeadLag"] = (domestic_ret - foreign_ret).astype(np.float32)
+                df["ForeignAg_LeadLag"] = ((domestic_ret - foreign_ret) ** 3).astype(np.float32)
             else:
                 df["ForeignAg_LeadLag"] = np.nan
         else:
