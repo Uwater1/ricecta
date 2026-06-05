@@ -28,6 +28,3 @@ This table shows the decay of each alpha's Sharpe ratio at different levels of A
 
 ## Key Findings and Interpretations
 
-1. **Weak Performance of Price-Volume Alphas:** All 5 tested price-volume alphas showed weak or negative risk-adjusted performance. The highest Sharpe ratio was **0.23** (for `HTFC_Alpha1_meanclose12`), while others were negative. This confirms the report (`alpha.txt`) findings that single price-volume alphas on commodity futures have low standalone significance.
-2. **High Overfitting Risk (DSR):** The Deflated Sharpe Ratio (DSR) values are extremely low (maximum of **16.43%** for `HTFC_Alpha1_meanclose12`). This indicates that none of the alphas can reject the null hypothesis of zero profitability when adjusting for multiple testing and selection bias.
-3. **Capacity Constraints and Sharpe Decay:** Capacity-adjusted Sharpe ratios decay as AUM increases. For example, `HTFC_Alpha1_meanclose12` Sharpe decays from 0.23 to 0.20 as AUM grows to 500M RMB. This is due to execution market impact modeled via our square-root cost framework.

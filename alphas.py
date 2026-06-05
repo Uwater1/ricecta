@@ -1,28 +1,38 @@
 #!/usr/bin/env python3
 """
 Implementation of the 5 target alpha signals for Chinese commodity futures.
+Optimized with Numba.
 """
 import os
 import numpy as np
 import pandas as pd
+import numba
 
 # Kalman Filter 1D local level model implementation
+@numba.njit(cache=True)
 def run_kalman_filter(y, Q=1e-4, R=1e-2):
     n = len(y)
     x_hat = np.zeros(n)
     P = np.zeros(n)
     
     # Find first non-NaN index
-    valid_indices = np.where(~np.isnan(y))[0]
-    if len(valid_indices) == 0:
-        return np.full(n, np.nan)
-    first_valid = valid_indices[0]
-    
+    first_valid = -1
+    for i in range(n):
+        if not np.isnan(y[i]):
+            first_valid = i
+            break
+            
+    if first_valid == -1:
+        out = np.empty(n)
+        out.fill(np.nan)
+        return out
+        
     x_hat[first_valid] = y[first_valid]
     P[first_valid] = 1.0
     
-    x_hat[:first_valid] = np.nan
-    
+    for i in range(first_valid):
+        x_hat[i] = np.nan
+        
     for t in range(first_valid + 1, n):
         # Predict
         x_pred = x_hat[t-1]
@@ -39,8 +49,34 @@ def run_kalman_filter(y, Q=1e-4, R=1e-2):
             
     return x_hat
 
+@numba.njit(cache=True)
+def numba_rolling_rank(v, window):
+    n = len(v)
+    out = np.full(n, np.nan)
+    for i in range(window - 1, n):
+        val = v[i]
+        if np.isnan(val):
+            continue
+        
+        valid_count = 0
+        less_count = 0
+        equal_count = 0
+        for j in range(i - window + 1, i + 1):
+            x = v[j]
+            if not np.isnan(x):
+                valid_count += 1
+                if x < val:
+                    less_count += 1
+                elif x == val:
+                    equal_count += 1
+                    
+        if valid_count >= window:
+            rank = 1.0 + less_count + (equal_count - 1) * 0.5
+            out[i] = rank / valid_count
+    return out
+
 def ts_rank(s, window):
-    return s.rolling(window).rank(pct=True)
+    return pd.Series(numba_rolling_rank(s.values, window), index=s.index)
 
 def compute_alphas(data_dir, spot_dir, symbols):
     """
