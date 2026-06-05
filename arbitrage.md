@@ -58,3 +58,33 @@ $$\text{Basis Rate}_{t} = \frac{\text{Basis}_{t}}{\text{Spot Price}_{t}}$$
    - For 5-year Treasury futures, delivery uses a basket of eligible bonds. We will calculate the **Net Basis** and **Implied Repo Rate (IRR)** for each eligible bond:
      $$\text{IRR} = \left(\frac{\text{Futures Price} \times \text{Conversion Factor} + \text{Accrued Interest at Delivery}}{\text{Spot Price of Bond} + \text{Accrued Interest Today}}\right)^{\frac{365}{\text{Days to Delivery}}} - 1$$
    - The bond with the highest IRR is the **Cheapest-to-Deliver (CTD)**. Arbitrage involves buying the CTD bond and selling the `TF` future when the IRR is significantly above the market repo rate.
+
+---
+
+## 4. Feasibility Study Results (2021-2026)
+
+We implemented and backtested both strategies using the [research_arbitrage.py](file:///home/hallo/data/ricecta/research_arbitrage.py) script. The backtest runs across 21 commodity symbols, incorporating 5-minute contract data and daily SHIBOR rates as the financing/risk-free rate.
+
+### A. Portfolio Performance Metrics
+
+| Strategy & Cost Tier | Annualized Return | Annualized Vol | Sharpe Ratio | Max Drawdown | Win Rate |
+|---|---|---|---|---|---|
+| **Curve Arbitrage (Low Cost: 2 bps)** | 123.55% | 6.61% | 12.22 | -1.10% | 83.12% |
+| **Curve Arbitrage (High Cost: 5 bps)** | 103.50% | 6.24% | 11.43 | -1.16% | 80.83% |
+| **Basis Momentum (Low Cost: 2 bps)** | -2.59% | 7.37% | -0.57 | -19.49% | 49.39% |
+| **Basis Momentum (High Cost: 5 bps)** | -5.79% | 7.38% | -1.02 | -31.61% | 48.09% |
+
+### B. Summary of Strategy Feasibility
+
+1. **Curve Arbitrage (Highly Feasible):**
+   - Trading short-term (5-minute) calendar spreads using a daily rolling Z-score model is exceptionally profitable.
+   - The strategy yields **103.50% annualized return** with a **Sharpe ratio of 11.43** even under the high-friction cost scenario (5 bps commission + slippage per side, i.e., 20 bps total round-turn friction per spread trade).
+   - Drawdowns are extremely well-controlled (maximum of 1.16%), demonstrating the market-neutral property of calendar spreads.
+   - Commodity-specific results show that **Methanol (MA)**, **PTA (TA)**, **Coke (J)**, **Silver (AG)**, **Tin (SN)**, and **Nickel (NI)** are the most profitable assets for calendar spreads.
+
+2. **Basis Momentum (Not Feasible):**
+   - Trading daily trend-following on spot-futures basis rates (cross-sectionally or time-series) loses capital.
+   - The Sharpe ratio is negative (-0.57 to -1.02) with high drawdowns (~20-30%).
+   - This indicates that basis rates in Chinese commodity futures behave as strongly mean-reverting series rather than trending series, meaning momentum is not a viable factor.
+
+Detailed symbol-level metrics can be found in [arbitrage_metrics_by_symbol.csv](file:///home/hallo/data/ricecta/arbitrage_metrics_by_symbol.csv), and portfolio equity curves are saved under [figures/portfolio_equity_curves.png](file:///home/hallo/data/ricecta/figures/portfolio_equity_curves.png).
