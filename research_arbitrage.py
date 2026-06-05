@@ -202,22 +202,18 @@ def backtest_curve_arbitrage(symbol, df_spot, tc_rate=0.0003, z_window=20, entry
             except Exception:
                 pass
                 
-    # Calculate daily generic close spread for rolling Z-score stats
+    # Calculate daily generic close spread for rolling Z-score stats.
+    # Shift by 1 day to avoid look-ahead bias (using historical data only).
     df_daily = df_spot.copy()
     df_daily["daily_spread"] = df_daily["near_contract_price"] - df_daily["dominant_contract_price"]
-    df_daily["spread_mean"] = df_daily["daily_spread"].rolling(z_window).mean()
-    df_daily["spread_std"] = df_daily["daily_spread"].rolling(z_window).std()
+    df_daily["spread_mean"] = df_daily["daily_spread"].rolling(z_window).mean().shift(1)
+    df_daily["spread_std"] = df_daily["daily_spread"].rolling(z_window).std().shift(1)
     
     # Store daily stats in a dictionary for quick lookup
     stats_lookup = df_daily.set_index("date")[["spread_mean", "spread_std"]].to_dict(orient="index")
     
     # We will simulate the backtest day-by-day
-    pos = 0 # current position in spread: 1 (long near/short dom), -1 (short near/long dom), 0 (flat)
     daily_returns_list = []
-    
-    # Track open trade metrics
-    entry_spread = 0.0
-    entry_dom_price = 0.0
     
     for idx, row in df_spot.iterrows():
         date_t = row["date"]
@@ -262,14 +258,30 @@ def backtest_curve_arbitrage(symbol, df_spot, tc_rate=0.0003, z_window=20, entry
             daily_returns_list.append((date_t, 0.0))
             continue
             
-        # Run intraday simulation
+        # Run intraday simulation with EOD flat forcing
         day_pnl = 0.0
+        pos = 0 # 1: Long spread (Buy near, Sell dom), -1: Short spread, 0: Flat
+        entry_spread = 0.0
+        entry_notional = 0.0
         
+        n_bars = len(aligned)
+        bar_idx = 0
         for dt, bar in aligned.iterrows():
+            bar_idx += 1
             p_near = bar["near_close"]
             p_dom = bar["dom_close"]
             spread = p_near - p_dom
             z_score = (spread - mean_s) / std_s
+            
+            # If EOD (last bar of the day), force exit if open
+            if bar_idx == n_bars and pos != 0:
+                if pos == 1:
+                    trade_return = (spread - entry_spread) / entry_notional
+                else:
+                    trade_return = -(spread - entry_spread) / entry_notional
+                day_pnl += trade_return - 2.0 * tc_rate
+                pos = 0
+                continue
             
             # Position logic
             if pos == 0:
@@ -277,28 +289,27 @@ def backtest_curve_arbitrage(symbol, df_spot, tc_rate=0.0003, z_window=20, entry
                     # Enter long spread (buy near, sell dom)
                     pos = 1
                     entry_spread = spread
-                    entry_dom_price = p_dom
+                    entry_notional = p_near + p_dom
                     # Deduct transaction cost (2 contracts = 2 * tc_rate)
                     day_pnl -= 2.0 * tc_rate
                 elif z_score > entry_z:
                     # Enter short spread (sell near, buy dom)
                     pos = -1
                     entry_spread = spread
-                    entry_dom_price = p_dom
+                    entry_notional = p_near + p_dom
                     # Deduct transaction cost
                     day_pnl -= 2.0 * tc_rate
             elif pos == 1:
-                # Calculate return since entry
                 if z_score >= -exit_z:
                     # Exit
                     pos = 0
-                    trade_return = (spread - entry_spread) / entry_dom_price
+                    trade_return = (spread - entry_spread) / entry_notional
                     day_pnl += trade_return - 2.0 * tc_rate
             elif pos == -1:
                 if z_score <= exit_z:
                     # Exit
                     pos = 0
-                    trade_return = -(spread - entry_spread) / entry_dom_price
+                    trade_return = -(spread - entry_spread) / entry_notional
                     day_pnl += trade_return - 2.0 * tc_rate
                     
         daily_returns_list.append((date_t, day_pnl))

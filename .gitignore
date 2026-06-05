@@ -4,5 +4,4 @@ __pycache__/
 venv/
 .venv/
 .env
-.lisence
-data_samples/futures_minute_*.csv
+.git/
