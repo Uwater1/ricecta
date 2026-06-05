@@ -27,7 +27,8 @@ ALPHAS = [
     'KalmanFilter_BOS',
     'HTFC_Alpha1_meanclose12',
     'HTFC_Alpha5_skew20',
-    'EWMA_32_64_CTA'
+    'EWMA_32_64_CTA',
+    'ForeignAg_LeadLag'
 ]
 
 def run():
@@ -61,7 +62,7 @@ def run():
         
     # Generate markdown report
     report = "# Alpha Performance Evaluation Report\n\n"
-    report += "This report evaluates the performance of the 5 requested alphas across 23 Chinese commodity futures from 2021 to 2026.\n\n"
+    report += f"This report evaluates the performance of the {len(ALPHAS)} alphas across 23 Chinese commodity futures from 2021 to 2026.\n\n"
     
     report += "## Performance Metrics Summary Table\n\n"
     report += "| Alpha Name | Ann. Return | Ann. Vol | Sharpe | Deflated Sharpe (DSR) | Calmar | MaxDD | Sortino | Profit Factor | Win Rate | Hit Rate | IC (Rank) |\n"

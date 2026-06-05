@@ -78,7 +78,7 @@ def numba_rolling_rank(v, window):
 def ts_rank(s, window):
     return pd.Series(numba_rolling_rank(s.values, window), index=s.index)
 
-def compute_alphas(data_dir, spot_dir, symbols):
+def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/ricecta/data_alt'):
     """
     Computes alphas for all symbols.
     Returns a multi-indexed DataFrame with index [date, symbol] and alpha columns.
@@ -153,13 +153,34 @@ def compute_alphas(data_dir, spot_dir, symbols):
         ema64 = df["close"].ewm(span=64, adjust=False).mean()
         df["EWMA_32_64_CTA"] = (ema32 - ema64) / df["close"]
         
+        # 6. ForeignAg_LeadLag
+        # Lead-lag from foreign agricultural counterparts
+        if symbol in ['C', 'M', 'Y', 'P', 'CF', 'SR']:
+            alt_path = os.path.join(alt_data_dir, f"{symbol}.parquet")
+            if os.path.exists(alt_path):
+                df_alt = pd.read_parquet(alt_path)
+                if not isinstance(df_alt.index, pd.DatetimeIndex):
+                    df_alt.index = pd.to_datetime(df_alt.index)
+                df_alt = df_alt.sort_index()
+                # Compute returns on the foreign calendar first
+                foreign_ret = df_alt["close"].pct_change(5)
+                # Reindex and forward-fill to align with domestic trading dates
+                foreign_ret_aligned = foreign_ret.reindex(df.index).ffill()
+                # Shift by 10 days to capture lead-lag relationship safely
+                df["ForeignAg_LeadLag"] = foreign_ret_aligned.shift(10)
+            else:
+                df["ForeignAg_LeadLag"] = np.nan
+        else:
+            df["ForeignAg_LeadLag"] = np.nan
+            
         # Prepare symbol columns
         df["symbol"] = symbol
         df = df.reset_index().rename(columns={"index": "date"})
         
         all_data.append(df[["date", "symbol", "open", "high", "low", "close", "volume", "returns",
                             "HTFC_Alpha19_tsrank_mom_rev", "KalmanFilter_BOS",
-                            "HTFC_Alpha1_meanclose12", "HTFC_Alpha5_skew20", "EWMA_32_64_CTA"]])
+                            "HTFC_Alpha1_meanclose12", "HTFC_Alpha5_skew20", "EWMA_32_64_CTA",
+                            "ForeignAg_LeadLag"]])
         
     if not all_data:
         return pd.DataFrame()
