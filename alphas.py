@@ -96,6 +96,21 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
     else:
         df_spot = pd.DataFrame()
 
+    # Load exchange rates for ForeignAg_LeadLag
+    usd_path = os.path.join(alt_data_dir, "USDCNY.parquet")
+    myr_path = os.path.join(alt_data_dir, "MYRCNY.parquet")
+    if os.path.exists(usd_path) and os.path.exists(myr_path):
+        df_usd = pd.read_parquet(usd_path)
+        df_myr = pd.read_parquet(myr_path)
+        
+        myr_cny = 100.0 / df_myr['value']
+        usd_cny = df_usd['value']
+        
+        fx_rates = pd.DataFrame({'USDCNY': usd_cny, 'MYRCNY': myr_cny})
+        fx_rates = fx_rates.asfreq('D').ffill()
+    else:
+        fx_rates = pd.DataFrame()
+
     all_data = []
 
     for symbol in symbols:
@@ -155,17 +170,25 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         
         # 6. ForeignAg_LeadLag
         # Lead-lag difference of N-day changes cubed (to highlight anomalies)
-        optimal_n = {'C': 3, 'M': 3, 'Y': 5, 'P': 56, 'CF': 50, 'SR': 35}
+        optimal_n = {'C': 3, 'M': 3, 'Y': 5, 'P': 55, 'CF': 4, 'SR': 50}
         if symbol in optimal_n:
             n_days = optimal_n[symbol]
             alt_path = os.path.join(alt_data_dir, f"{symbol}.parquet")
-            if os.path.exists(alt_path):
+            if os.path.exists(alt_path) and not fx_rates.empty:
                 df_alt = pd.read_parquet(alt_path)
                 if not isinstance(df_alt.index, pd.DatetimeIndex):
                     df_alt.index = pd.to_datetime(df_alt.index)
                 df_alt = df_alt.sort_index()
+                
+                # Align exchange rate to foreign calendar
+                fx_col = 'MYRCNY' if symbol == 'P' else 'USDCNY'
+                fx_aligned = fx_rates[fx_col].reindex(df_alt.index).ffill()
+                
+                # Convert foreign price to CNY
+                close_cny = df_alt["close"] * fx_aligned
+                
                 # Compute returns on the foreign calendar, then shift by 1 day to prevent lookahead
-                foreign_ret = df_alt["close"].pct_change(n_days).shift(1).reindex(df.index).ffill()
+                foreign_ret = close_cny.pct_change(n_days).shift(1).reindex(df.index).ffill()
                 # Compute returns on the domestic calendar
                 domestic_ret = df["close"].pct_change(n_days)
                 df["ForeignAg_LeadLag"] = ((domestic_ret - foreign_ret) ** 3).astype(np.float32)

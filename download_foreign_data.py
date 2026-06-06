@@ -83,6 +83,41 @@ def download_all():
         except Exception as e:
             print(f"  [ERROR] Failed to download {foreign_sym}: {e}")
 
+def download_fx_rates():
+    print("=== Downloading Exchange Rate Factors ===")
+    import rqdatac
+    rqdatac.init()
+    
+    try:
+        print("Fetching USDCNY factor...")
+        df_usd = rqdatac.econ.get_factors('USDCNY:即期汇率:日', start_date='2020-01-01', end_date='2026-06-03')
+        if df_usd is not None and not df_usd.empty:
+            df_usd = df_usd.reset_index().rename(columns={'info_date': 'date'}).set_index('date')
+            df_usd = df_usd[~df_usd.index.duplicated(keep='last')]
+            df_usd = df_usd[['value']].astype('float32')
+            df_usd.to_parquet(os.path.join(DATA_ALT_DIR, "USDCNY.parquet"), compression='zstd')
+            print(f"  Saved USDCNY: {df_usd.shape[0]} rows")
+        else:
+            print("  [WARNING] USDCNY factor returned empty")
+    except Exception as e:
+        print(f"  [ERROR] Failed to download USDCNY: {e}")
+        
+    try:
+        print("Fetching MYRCNY factor...")
+        df_myr = rqdatac.econ.get_factors('人民币对马来西亚林吉特中间汇率(间接标价法):当期值:日', start_date='2020-01-01', end_date='2026-06-03')
+        if df_myr is not None and not df_myr.empty:
+            df_myr = df_myr.reset_index().rename(columns={'info_date': 'date'}).set_index('date')
+            df_myr = df_myr[~df_myr.index.duplicated(keep='last')]
+            df_myr = df_myr[['value']].astype('float32')
+            df_myr.to_parquet(os.path.join(DATA_ALT_DIR, "MYRCNY.parquet"), compression='zstd')
+            print(f"  Saved MYRCNY: {df_myr.shape[0]} rows")
+        else:
+            print("  [WARNING] MYRCNY factor returned empty")
+    except Exception as e:
+        print(f"  [ERROR] Failed to download MYRCNY: {e}")
+
 if __name__ == '__main__':
     download_all()
+    download_fx_rates()
     print("=== Foreign Data Download Completed ===")
+

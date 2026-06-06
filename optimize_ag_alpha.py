@@ -45,6 +45,21 @@ def run_optimization(use_cubed=True):
         df_alt.index = pd.to_datetime(df_alt.index)
         alt_dfs[sym] = df_alt.sort_index()
 
+    # Load exchange rates for ForeignAg_LeadLag
+    usd_path = os.path.join(ALT_DATA_DIR, "USDCNY.parquet")
+    myr_path = os.path.join(ALT_DATA_DIR, "MYRCNY.parquet")
+    df_usd = pd.read_parquet(usd_path)
+    df_myr = pd.read_parquet(myr_path)
+    
+    usd_cny = df_usd.reset_index().rename(columns={'info_date': 'date'}).set_index('date')['value']
+    usd_cny = usd_cny[~usd_cny.index.duplicated(keep='last')]
+    
+    myr_cny = 100.0 / df_myr.reset_index().rename(columns={'info_date': 'date'}).set_index('date')['value']
+    myr_cny = myr_cny[~myr_cny.index.duplicated(keep='last')]
+    
+    fx_rates = pd.DataFrame({'USDCNY': usd_cny, 'MYRCNY': myr_cny})
+    fx_rates = fx_rates.asfreq('D').ffill()
+
     # Pre-pivot asset returns for all 23 symbols
     # Pivot all returns to shape (dates, 23_symbols)
     list_rets = []
@@ -61,12 +76,20 @@ def run_optimization(use_cubed=True):
     for sym in SYMBOLS:
         close_prices[sym] = dfs[sym]['close'].copy()
 
+    # Pre-calculate foreign close prices adjusted for FX
+    alt_close_prices_fx = {}
+    for sym in SYMBOLS:
+        df_alt = alt_dfs[sym]
+        fx_col = 'MYRCNY' if sym == 'P' else 'USDCNY'
+        fx_aligned = fx_rates[fx_col].reindex(df_alt.index).ffill()
+        alt_close_prices_fx[sym] = df_alt['close'] * fx_aligned
+
     # Helper function for ultra-fast Sharpe calculation in the inner loop
     def get_portfolio_sharpe_fast(n_dict):
         signals_dict = {}
         for sym in SYMBOLS:
             close_dom = close_prices[sym]
-            close_alt = alt_dfs[sym]['close']
+            close_alt = alt_close_prices_fx[sym]
             
             dom_ret = close_dom.pct_change(n_dict[sym])
             for_ret = close_alt.pct_change(n_dict[sym])
@@ -101,11 +124,11 @@ def run_optimization(use_cubed=True):
         else:
             return -999.0
 
-    # Starting values (linear model results)
-    current_n = {'C': 3, 'M': 55, 'Y': 4, 'P': 56, 'CF': 50, 'SR': 42}
+    # Starting values
+    current_n = {'C': 3, 'M': 3, 'Y': 5, 'P': 55, 'CF': 4, 'SR': 50}
     
     best_sharpe = get_portfolio_sharpe_fast(current_n)
-    print(f"Initial Portfolio Sharpe: {best_sharpe:.4f}")
+    print(f"Initial Portfolio Sharpe with FX adjustment: {best_sharpe:.4f}")
     
     N_choices = [3, 4, 5, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
     improved = True
@@ -131,7 +154,7 @@ def run_optimization(use_cubed=True):
         step += 1
         
     print("\n=== Optimization Complete ===")
-    print("Optimal Ns (Cubed):", current_n)
+    print("Optimal Ns (Cubed, FX-adjusted):", current_n)
     print(f"Final Frictionless Sharpe: {best_sharpe:.4f}")
     
     # Run a single full evaluation once to print complete metrics
@@ -141,9 +164,9 @@ def run_optimization(use_cubed=True):
         df = dfs[sym].copy()
         if sym in current_n:
             N = current_n[sym]
-            df_alt = alt_dfs[sym]
+            close_alt_fx = alt_close_prices_fx[sym]
             dom_ret = df['close'].pct_change(N)
-            for_ret = df_alt['close'].pct_change(N)
+            for_ret = close_alt_fx.pct_change(N)
             for_ret_safe = for_ret.shift(1).reindex(df.index).ffill()
             diff = dom_ret - for_ret_safe
             if use_cubed:
