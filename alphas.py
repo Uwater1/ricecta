@@ -4,6 +4,7 @@ Implementation of the 5 target alpha signals for Chinese commodity futures.
 Optimized with Numba.
 """
 import os
+import re
 import numpy as np
 import pandas as pd
 import numba
@@ -78,7 +79,7 @@ def numba_rolling_rank(v, window):
 def ts_rank(s, window):
     return pd.Series(numba_rolling_rank(s.values, window), index=s.index)
 
-def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/ricecta/data_alt'):
+def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/ricecta/data_alt', macro_data_dir='/home/hallo/data/ricecta/data/macro_factors'):
     """
     Computes alphas for all symbols.
     Returns a multi-indexed DataFrame with index [date, symbol] and alpha columns.
@@ -110,6 +111,33 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         fx_rates = fx_rates.asfreq('D').ffill()
     else:
         fx_rates = pd.DataFrame()
+
+    # Best-performing macro factor configs per symbol from screening results
+    BEST_MACRO_CONFIGS = {
+        'AG': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
+        'AL': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'zscore', 'sign': -1},
+        'AU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'C': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},
+        'CF': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},
+        'CU': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
+        'I': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'diff', 'sign': 1},
+        'J': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
+        'JD': {'factor': '居民食品消费价格指数CPI_(上年=100)_当月', 'representation': 'diff', 'sign': -1},
+        'M': {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': 1},
+        'MA': {'factor': '非制造业PMI_建筑业_全国_当期值_月', 'representation': 'zscore', 'sign': -1},
+        'NI': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1},
+        'P': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'zscore', 'sign': -1},
+        'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
+        'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},
+        'SA': {'factor': '非制造业PMI_建筑业_全国_当期值_月', 'representation': 'diff', 'sign': -1},
+        'SC': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'zscore', 'sign': -1},
+        'SN': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'level', 'sign': 1},
+        'SR': {'factor': 'PPI_食品制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
+        'TA': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'zscore', 'sign': -1},
+        'TF': {'factor': '制造业采购经理指数PMI_当月', 'representation': 'zscore', 'sign': 1},
+        'V': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
+        'Y': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1}
+    }
 
     all_data = []
 
@@ -196,6 +224,41 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
                 df["ForeignAg_LeadLag"] = np.nan
         else:
             df["ForeignAg_LeadLag"] = np.nan
+
+        # 7. Alt_Macro_Alpha
+        df["Alt_Macro_Alpha"] = np.nan
+        if symbol in BEST_MACRO_CONFIGS:
+            cfg = BEST_MACRO_CONFIGS[symbol]
+            filename = re.sub(r'[\\/*?:"<>|]', '_', cfg['factor']) + ".parquet"
+            factor_path = os.path.join(macro_data_dir, filename)
+            if os.path.exists(factor_path):
+                try:
+                    df_fac = pd.read_parquet(factor_path)
+                    if not df_fac.empty:
+                        if 'info_date' in df_fac.index.names:
+                            df_fac = df_fac.reset_index()
+                        df_fac['info_date'] = pd.to_datetime(df_fac['info_date'])
+                        df_fac = df_fac.set_index('info_date').sort_index()
+                        df_fac = df_fac[~df_fac.index.duplicated(keep='last')]
+                        
+                        all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
+                        if cfg['representation'] == 'level':
+                            val_daily = df_fac['value'].reindex(all_dates).ffill()
+                            s = val_daily.reindex(df.index)
+                        elif cfg['representation'] == 'diff':
+                            fac_diff = df_fac['value'].diff()
+                            diff_daily = fac_diff.reindex(all_dates).ffill()
+                            s = diff_daily.reindex(df.index)
+                        elif cfg['representation'] == 'zscore':
+                            val_daily = df_fac['value'].reindex(all_dates).ffill()
+                            s_level = val_daily.reindex(df.index)
+                            s = (s_level - s_level.rolling(252).mean()) / s_level.rolling(252).std()
+                        else:
+                            s = pd.Series(np.nan, index=df.index)
+                        
+                        df["Alt_Macro_Alpha"] = (s * cfg['sign']).astype(np.float32)
+                except Exception:
+                    pass
             
         # Prepare symbol columns
         df["symbol"] = symbol
@@ -204,7 +267,7 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         all_data.append(df[["date", "symbol", "open", "high", "low", "close", "volume", "returns",
                             "HTFC_Alpha19_tsrank_mom_rev", "KalmanFilter_BOS",
                             "HTFC_Alpha1_meanclose12", "HTFC_Alpha5_skew20", "EWMA_32_64_CTA",
-                            "ForeignAg_LeadLag"]])
+                            "ForeignAg_LeadLag", "Alt_Macro_Alpha"]])
         
     if not all_data:
         return pd.DataFrame()

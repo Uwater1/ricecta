@@ -29,7 +29,9 @@ ALPHAS = [
     'HTFC_Alpha1_meanclose12',
     'HTFC_Alpha5_skew20',
     'EWMA_32_64_CTA',
-    'ForeignAg_LeadLag'
+    'ForeignAg_LeadLag',
+    'Alt_Macro_Alpha_XS',
+    'Alt_Macro_Alpha_TS'
 ]
 
 def run():
@@ -56,17 +58,17 @@ def run():
     print("=== Loading daily data and computing alphas ===")
     df_data = compute_alphas(DATA_DIR, SPOT_DIR, SYMBOLS)
     if df_data.empty:
-
         print("[ERROR] No data processed!")
         return
         
     print(f"Data shape: {df_data.shape}. Date range: {df_data.index.levels[0].min().date()} to {df_data.index.levels[0].max().date()}")
     
-    # First, calculate frictionless Sharpe ratios for all 5 alphas to serve as the multiple testing pool for DSR
+    # First, calculate frictionless Sharpe ratios for all alphas to serve as the multiple testing pool for DSR
     raw_sharpes = {}
     for alpha in ALPHAS:
-        # Evaluate without all_sharpes to get simple metric dict
-        metrics = evaluate_alpha(df_data, alpha, all_sharpes=None, N=5, tc_rate=0.0)
+        col = 'Alt_Macro_Alpha' if alpha in ['Alt_Macro_Alpha_XS', 'Alt_Macro_Alpha_TS'] else alpha
+        is_ts = (alpha == 'Alt_Macro_Alpha_TS')
+        metrics = evaluate_alpha(df_data, col, all_sharpes=None, N=len(ALPHAS), tc_rate=0.0, demean=not is_ts)
         raw_sharpes[alpha] = metrics.get("sharpe_ratio", 0.0)
         
     print("\nFrictionless Sharpe Ratios (Multiple Testing Pool):")
@@ -79,7 +81,9 @@ def run():
     results = {}
     for alpha in ALPHAS:
         print(f"\nEvaluating alpha: {alpha}...")
-        metrics = evaluate_alpha(df_data, alpha, all_sharpes=all_sharpe_list, N=5, tc_rate=0.0005)
+        col = 'Alt_Macro_Alpha' if alpha in ['Alt_Macro_Alpha_XS', 'Alt_Macro_Alpha_TS'] else alpha
+        is_ts = (alpha == 'Alt_Macro_Alpha_TS')
+        metrics = evaluate_alpha(df_data, col, all_sharpes=all_sharpe_list, N=len(ALPHAS), tc_rate=0.0005, demean=not is_ts)
         results[alpha] = metrics
         
     # Generate markdown report

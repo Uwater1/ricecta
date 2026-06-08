@@ -56,7 +56,7 @@ def calculate_dsr(returns, all_sharpes, N=5):
     
     return dsr
 
-def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005):
+def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, demean=True):
     """
     Evaluates a single alpha signal.
     df_data: DataFrame with MultiIndex [date, symbol] and columns [close, volume, returns, alpha_col]
@@ -77,8 +77,11 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005):
     signals = df[alpha_col].unstack()
     asset_returns = df["returns"].unstack().fillna(0.0).astype(np.float32)
     
-    # Demean cross-sectionally: signals - mean(signals)
-    demeaned = signals.sub(signals.mean(axis=1), axis=0)
+    # Demean cross-sectionally if demean=True
+    if demean:
+        demeaned = signals.sub(signals.mean(axis=1), axis=0)
+    else:
+        demeaned = signals
     abs_sum = demeaned.abs().sum(axis=1)
     
     # Compute standardized weights: demeaned / sum(|demeaned|)
