@@ -87,7 +87,7 @@ def load_and_align_factors(dataset_type='A'):
         
     return df_price, aligned_signals
 
-def evaluate_signals(df_price, signals, tc_rate=0.0005):
+def evaluate_signals(df_price, signals, tc_rate=0.0005, start_date=None):
     results = {}
     
     for sig_name, sig_series in signals.items():
@@ -104,6 +104,10 @@ def evaluate_signals(df_price, signals, tc_rate=0.0005):
         # Net returns
         net_ret = port_ret - turnover * tc_rate
         
+        if start_date is not None:
+            net_ret = net_ret[net_ret.index >= start_date]
+            turnover = turnover[turnover.index >= start_date]
+            
         # Metrics
         ann_ret = net_ret.mean() * 252
         ann_vol = net_ret.std() * np.sqrt(252)
@@ -139,7 +143,7 @@ def evaluate_signals(df_price, signals, tc_rate=0.0005):
         
     return results
 
-def run_combinations_for_dataset(dataset_type='A'):
+def run_combinations_for_dataset(dataset_type='A', start_date=None):
     print(f"\n--- Running combinations for Dataset Type: {dataset_type} ---")
     df_price, aligned = load_and_align_factors(dataset_type)
     
@@ -176,12 +180,13 @@ def run_combinations_for_dataset(dataset_type='A'):
     combined_signals = {}
     
     # 1. Equal Weight (Continuous)
-    # Average of oriented z-scores, clipped to [-1, 1]
-    combined_signals['EW_Continuous'] = ((sig_expect + sig_pmi + sig_soc) / 3.0).clip(-1.0, 1.0).fillna(0.0)
+    # Average of oriented z-scores, clipped to [-1, 1], ignoring NaNs
+    df_signals = pd.DataFrame({'expect': sig_expect, 'pmi': sig_pmi, 'soc': sig_soc})
+    combined_signals['EW_Continuous'] = df_signals.mean(axis=1, skipna=True).clip(-1.0, 1.0).fillna(0.0)
     
     # 2. Equal Weight (Binary)
-    # Sign of the sum of oriented z-scores
-    combined_signals['EW_Binary'] = np.sign(sig_expect.fillna(0.0) + sig_pmi.fillna(0.0) + sig_soc.fillna(0.0))
+    # Sign of the sum of oriented z-scores, ignoring NaNs
+    combined_signals['EW_Binary'] = np.sign(df_signals.sum(axis=1, skipna=True).fillna(0.0))
     
     # 3. Consensus (Voting)
     # Long (+1) if at least 2 are positive and none are highly negative (< -1.0)
@@ -219,8 +224,11 @@ def run_combinations_for_dataset(dataset_type='A'):
             return 0.0
         if p > 50.0:
             # Expansion: trade PMI and PMI Expectation
-            val = (row['expect'] + row['pmi']) / 2.0
-            return np.sign(val) if not np.isnan(val) else 0.0
+            vals = [row['expect'], row['pmi']]
+            vals = [v for v in vals if not np.isnan(v)]
+            if not vals:
+                return 0.0
+            return np.sign(np.mean(vals))
         else:
             # Contraction: trade Social Financing
             val = row['soc']
@@ -274,23 +282,23 @@ def run_combinations_for_dataset(dataset_type='A'):
     combined_signals['Baseline_SocialFin'] = np.sign(sig_soc).fillna(0.0)
     
     # Run backtests
-    eval_results = evaluate_signals(df_price, combined_signals)
+    eval_results = evaluate_signals(df_price, combined_signals, start_date=start_date)
     return eval_results, df_price.index
 
 def main():
-    # Run for Dataset A (requested factors, Dec 2023 onwards due to social financing)
-    results_a, dates_a = run_combinations_for_dataset('A')
-    
-    # Filter dates to print/analyze overlapping non-nan period for Dataset A
+    # Load raw factor to determine start date for Dataset A
     # Since social financing starts Dec 2023
-    df_price_a, _ = load_and_align_factors('A')
     soc_fin_raw = pd.read_parquet(os.path.join(MACRO_DIR, '社会融资规模_当月值.parquet'))
     if 'info_date' in soc_fin_raw.index.names:
         soc_fin_raw = soc_fin_raw.reset_index()
     start_date_a = pd.to_datetime(soc_fin_raw['info_date'].min())
     
-    # Run for Dataset B (long-history alternative, 2021 onwards)
-    results_b, dates_b = run_combinations_for_dataset('B')
+    # Run for Dataset A (requested factors, Dec 2023 onwards due to social financing)
+    results_a, dates_a = run_combinations_for_dataset('A', start_date=start_date_a)
+    
+    # Run for Dataset B (long-history alternative, 10 years, Jun 2016 onwards)
+    start_date_b = '2016-06-01'
+    results_b, dates_b = run_combinations_for_dataset('B', start_date=start_date_b)
     
     # Helper to compute drawdown from cumulative returns
     def compute_drawdown(cum_ret):
@@ -304,13 +312,11 @@ def main():
     for name in ['EW_Continuous', 'EW_Binary', 'Consensus_Voting', 'Regime_Switching', 'Rolling_Ridge', 'Baseline_PMI']:
         if name in results_b:
             cum_rets = results_b[name]['cum_returns']
-            cum_rets_valid = cum_rets[cum_rets.index >= '2021-06-01']
-            if not cum_rets_valid.empty:
-                rebased = cum_rets_valid / cum_rets_valid.iloc[0]
-                ax_b_eq.plot(rebased.index, rebased, label=f"{name} (Sharpe={results_b[name]['sharpe']:.2f})")
-                dd = compute_drawdown(rebased)
+            if not cum_rets.empty:
+                ax_b_eq.plot(cum_rets.index, cum_rets, label=f"{name} (Sharpe={results_b[name]['sharpe']:.2f})")
+                dd = compute_drawdown(cum_rets)
                 ax_b_dd.fill_between(dd.index, dd * 100, 0, alpha=0.3, label=name)
-    ax_b_eq.set_title("Dataset B (2021-2026): Cumulative Net Returns of TF Trading Signals")
+    ax_b_eq.set_title("Dataset B (2016-2026): Cumulative Net Returns of TF Trading Signals")
     ax_b_eq.set_ylabel("Equity")
     ax_b_eq.legend(fontsize=8)
     ax_b_eq.grid(True)
@@ -329,11 +335,9 @@ def main():
     for name in ['EW_Continuous', 'EW_Binary', 'Consensus_Voting', 'Regime_Switching', 'Rolling_Ridge', 'Baseline_PMI']:
         if name in results_a:
             cum_rets = results_a[name]['cum_returns']
-            cum_rets_valid = cum_rets[cum_rets.index >= start_date_a]
-            if not cum_rets_valid.empty:
-                rebased = cum_rets_valid / cum_rets_valid.iloc[0]
-                ax_a_eq.plot(rebased.index, rebased, label=f"{name} (Sharpe={results_a[name]['sharpe']:.2f})")
-                dd = compute_drawdown(rebased)
+            if not cum_rets.empty:
+                ax_a_eq.plot(cum_rets.index, cum_rets, label=f"{name} (Sharpe={results_a[name]['sharpe']:.2f})")
+                dd = compute_drawdown(cum_rets)
                 ax_a_dd.fill_between(dd.index, dd * 100, 0, alpha=0.3, label=name)
     ax_a_eq.set_title("Dataset A (2023-2026): Cumulative Net Returns of TF Trading Signals")
     ax_a_eq.set_ylabel("Equity")
@@ -377,8 +381,8 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 
 ---
 
-## Dataset B: Long-History Macro Factors (Jun 2021 - Jun 2026)
-*Using `社会融资规模存量_同比增速_月末数` to provide a full 5-year macro cycle backtest.*
+## Dataset B: Long-History Macro Factors (Jun 2016 - Jun 2026)
+*Using `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
@@ -396,17 +400,15 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 ## Key Performance Observations and Findings
 
 1. **Correlation Alignment**:
-   - Both PMI indexes exhibit **positive correlation** with TF futures price returns (meaning rising PMI/Expectation predicts rising bond futures prices in the 2021-2026 period). This suggests a positive yield-bond price regime discrepancy or specific momentum structure in the historical sample.
-   - Social Financing (both當月值 and 存量同比) exhibit **negative correlation** (meaning expanding credit leads to lower bond futures prices, aligning with standard macroeconomic logic where credit expansion increases interest rates and bond yields).
+   - Over the 10-year period (2016-2026), **all three factors (PMI Expectation, Manufacturing PMI, and Social Financing) exhibit negative correlation** with future TF returns. This means rising economic expansion indicators and credit growth both predict falling bond futures prices, aligning perfectly with macroeconomic theory.
 
 2. **Combination Superiority**:
-   - Combining factors provides significantly better and more stable risk-adjusted returns (higher Sharpe) than trading any individual factor alone.
-   - **Regime-Switching** and **Consensus Voting** outperform simple Equal Weighting, demonstrating that accounting for the state of the business cycle (using Manufacturing PMI as a filter) reduces noise and avoids false signals.
-   - **Rolling Ridge Regression** shows good adaptive capacity but is subject to higher turnover and estimation risk.
+   - Combining factors via **Rolling Ridge Regression** yields the best risk-adjusted performance with a Sharpe ratio of **0.65** for Dataset B, outperforming all individual baseline factors.
+   - **Equal Weight (Continuous)** also shows strong robustness with a Sharpe of **0.44**.
+   - Traditional combination techniques like consensus voting and regime-switching perform poorly over the long term, showing that fixed heuristic thresholds may not adapt well to changing macro regimes compared to adaptive ML models.
 
 3. **Transaction Costs Resilience**:
-   - Macro factors are low-frequency monthly updates, which translates to very low daily turnover (~1% to 2% daily).
-   - This makes the strategies highly resilient to transaction costs and slippage, preserving almost all frictionless Sharpe ratio benefits.
+   - The strategies remain highly resilient to transaction costs and slippage due to low daily turnover (1% to 3% daily), ensuring backtest metrics translate well to real trading.
 """
     
     with open(os.path.join(_SCRIPT_DIR, 'tf_combined_results.md'), 'w') as f:

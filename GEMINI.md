@@ -57,4 +57,11 @@ rtk venv/bin/python run_evaluation.py 8
 - **Flexible Evaluation Framework & 20-Day Switch:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Switched configuration to target the optimal 20-day horizon correlation. Alt_Macro_Alpha_TS achieves a Sharpe ratio of 0.90 (up from 0.81) and Alt_Macro_Alpha_XS achieves 0.62 (up from 0.25). Included 20-day horizon summary and top 3 tables in `alt_alphas.md`.
 
 ## TF Futures Macro Factor Combination Research
-- **Macro Factor Data Availability**: `社会融资规模_当月值` from rqdatac starts in December 2023, limiting joint factor testing to Dec 2023 - Jun 2026. Use `社会融资规模存量_同比增速_月末数` or `社会融资规模_新增贷款(人民币)_当月值` for longer backtests (from 2021 onwards).
+- **Macro Factor Data Availability**: `社会融资规模_当月值` from rqdatac starts in December 2023, limiting joint factor testing to Dec 2023 - Jun 2026. Use `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest (from 2016 onwards).
+- **10-Year Backtest (Jun 2016 - Jun 2026)**: Modified [test_tf_combined.py](file:///home/hallo/data/ricecta/test_tf_combined.py) to support 10-year backtests using `start_date` parameter in evaluations and handling missing data (NaNs) in signals gracefully.
+- **Correlation Regimes**: Over 10 years, all three factors (PMI Expectation, Manufacturing PMI, and Social Financing Stock) show negative correlation with future TF returns. Matches economic theory: expansion/credit growth leads to rising rates (falling bond prices).
+- **Strategy Performance**: Rolling Ridge Regression is top strategy with Sharpe 0.65. Equal Weight Continuous achieves Sharpe 0.44. Heuristics (Consensus Voting, Regime-Switching) underperform over the 10-year cycle.
+- **Run Command**:
+```bash
+rtk venv/bin/python test_tf_combined.py
+```
