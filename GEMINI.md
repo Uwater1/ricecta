@@ -59,9 +59,30 @@ rtk venv/bin/python run_evaluation.py 8
 ## TF Futures Macro Factor Combination Research
 - **Macro Factor Data Availability**: `社会融资规模_当月值` from rqdatac starts in December 2023, limiting joint factor testing to Dec 2023 - Jun 2026. Use `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest (from 2016 onwards).
 - **10-Year Backtest (Jun 2016 - Jun 2026)**: Modified [test_tf_combined.py](file:///home/hallo/data/ricecta/test_tf_combined.py) to support 10-year backtests using `start_date` parameter in evaluations and handling missing data (NaNs) in signals gracefully.
-- **Correlation Regimes**: Over 10 years, all three factors (PMI Expectation, Manufacturing PMI, and Social Financing Stock) show negative correlation with future TF returns. Matches economic theory: expansion/credit growth leads to rising rates (falling bond prices).
-- **Strategy Performance**: Rolling Ridge Regression is top strategy with Sharpe 0.65. Equal Weight Continuous achieves Sharpe 0.44. Heuristics (Consensus Voting, Regime-Switching) underperform over the 10-year cycle.
+- **Lookahead Bias Resolution**: Replaced static sign selection with **1008-day rolling Pearson correlation sign orientation** (lookahead-free). Shifted Ridge regression training target by 20 days (ends at `idx - 20` to avoid predicting using future data).
+- **Correlation Regimes**: Over 10 years, PMI correlations undergo complete sign reversal (negative in 2016-2021, positive in 2021-2026). Rolling sign handles this adaptively.
+- **Strategy Performance (Lookahead-Free)**:
+  - `Baseline_SocialFin`: Sharpe 0.61.
+  - `Rolling_Ridge`: Sharpe 0.56 (low turnover 0.51%).
+  - `EW_Continuous`: Sharpe 0.56 (up from 0.44).
+  - `Consensus_Voting`: Sharpe 0.46 (up from 0.01).
 - **Run Command**:
 ```bash
 rtk venv/bin/python test_tf_combined.py
 ```
+
+## Macro Alpha Contract Holding Strategy (No-Rolling)
+- **Concept:** Buy specific contract (nearest, 2nd, or 3rd nearest) on monthly signal, hold 5-40 days without daily rolling. Assume 5 bp slippage per transaction.
+- **Liquidity (Cold Month) Filter:** Dynamically select contracts from top 3 by 5-day rolling Open Interest. Require Open Interest >= 1000 (>= 500 for TF).
+- **Maturity Month Exit Rules:** Force-exit commodities on last trading day of month preceding delivery month. Force-exit TF 5 trading days before de-listing.
+- **Entry Window Limit:** Enter trades only in calendar months January (1), May (5), September (9) to match liquid cycles.
+- **Results:** Holding strategy dramatically improves performance (e.g., JD Sharpe 0.85 vs baseline 0.23; P Sharpe 0.60 vs baseline -0.15).
+- **Commands to Run:**
+  - Download individual contracts data:
+  ```bash
+  rtk venv/bin/python download_contracts_daily.py
+  ```
+  - Optimize holding period and contract index, compile report:
+  ```bash
+  rtk venv/bin/python run_hold_backtest.py
+  ```

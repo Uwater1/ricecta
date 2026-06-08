@@ -147,10 +147,8 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
     print(f"\n--- Running combinations for Dataset Type: {dataset_type} ---")
     df_price, aligned = load_and_align_factors(dataset_type)
     
-    # We first calculate individual correlation with future 20-day returns to verify signs
-    # Over the backtesting period
-    trading_dates = df_price.dropna(subset=['fwd_ret_20']).index
-    
+    # Dynamic lookahead-free rolling correlation sign (using 1008-day window)
+    # This automatically handles economic regime shifts (e.g. sign switches)
     soc_fin_factor = '社会融资规模_当月值' if dataset_type == 'A' else '社会融资规模存量_同比增速_月末数'
     factors = [
         'PMI_生产经营活动预期_全国_当期值_月',
@@ -158,23 +156,24 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
         soc_fin_factor
     ]
     
-    signs = {}
-    print("\nIndividual Factor 20-day Horizon Spearman Correlation:")
+    oriented_signals = {}
+    print("\nCalculating dynamic lookahead-free sign orientations (1008-day rolling window)...")
     for f in factors:
-        # Check level and zscore
-        z = aligned[f]['zscore'].reindex(trading_dates)
-        fwd = df_price['fwd_ret_20'].reindex(trading_dates)
-        df_corr = pd.DataFrame({'sig': z, 'fwd': fwd}).dropna()
-        r, p = stats.spearmanr(df_corr['sig'], df_corr['fwd'])
-        sign = 1 if r >= 0 else -1
-        signs[f] = sign
-        print(f"  {f} (zscore): Corr={r:.4f}, p-val={p:.4f} -> Assigned Sign: {sign}")
+        z = aligned[f]['zscore']
+        past_ret = df_price['close'].pct_change(20)
+        # Shift features by 20 days to align with the realization date of the future return
+        roll_corr = z.shift(20).rolling(1008, min_periods=60).corr(past_ret)
+        # Fill missing early signs with -1.0 (standard economic logic: expansion/credit growth is bearish for bonds)
+        sign = np.sign(roll_corr).ffill().fillna(-1.0)
+        oriented_signals[f] = z * sign
         
-    # Standardize individual signals (using z-score) oriented by their signs
-    # So a positive value of the signal is always bullish for TF returns
-    sig_expect = aligned[factors[0]]['zscore'] * signs[factors[0]]
-    sig_pmi = aligned[factors[1]]['zscore'] * signs[factors[1]]
-    sig_soc = aligned[factors[2]]['zscore'] * signs[factors[2]]
+        # Log final active sign at the end of the period
+        last_sign = sign.iloc[-1]
+        print(f"  {f}: Last active sign: {last_sign:.0f}")
+        
+    sig_expect = oriented_signals[factors[0]]
+    sig_pmi = oriented_signals[factors[1]]
+    sig_soc = oriented_signals[factors[2]]
     
     # Check align and drop NaNs for joint signal calculations
     combined_signals = {}
@@ -237,8 +236,8 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
     df_regime = pd.DataFrame({'expect': sig_expect, 'pmi': sig_pmi, 'soc': sig_soc, 'pmi_level': pmi_level})
     combined_signals['Regime_Switching'] = df_regime.apply(calculate_regime, axis=1)
     
-    # 5. Rolling Ridge Regression (252-day rolling window) using numpy
-    # Predict 20-day future returns and trade the sign of prediction
+    # 5. Lookahead-free Rolling Ridge Regression (504-day training window, alpha=500.0)
+    # Predicts 20-day returns lookahead-free and trades continuous scaled weight
     pred_series = pd.Series(0.0, index=df_price.index)
     
     # Prepare features and target
@@ -249,10 +248,11 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
         'fwd_ret': df_price['fwd_ret_20']
     }).dropna()
     
-    window = 252
-    if len(df_ml) > window + 50:
-        for idx in range(window, len(df_ml)):
-            train_df = df_ml.iloc[idx - window : idx]
+    ml_window = 504
+    if len(df_ml) > ml_window + 20:
+        for idx in range(ml_window + 20, len(df_ml)):
+            # End training window at idx - 20 to prevent lookahead of fwd_ret_20
+            train_df = df_ml.iloc[idx - ml_window - 20 : idx - 20]
             X_train = train_df[['expect', 'pmi', 'soc']].values
             y_train = train_df['fwd_ret'].values
             
@@ -262,7 +262,7 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
             I[0, 0] = 0.0 # Do not penalize intercept
             
             try:
-                beta = np.linalg.pinv(X.T @ X + 10.0 * I) @ X.T @ y_train
+                beta = np.linalg.pinv(X.T @ X + 500.0 * I) @ X.T @ y_train
                 # Predict current state
                 current_date = df_ml.index[idx]
                 current_x = df_ml.loc[current_date, ['expect', 'pmi', 'soc']].values
@@ -271,7 +271,9 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
             except Exception:
                 pass
             
-        combined_signals['Rolling_Ridge'] = np.sign(pred_series).fillna(0.0)
+        pred_std = pred_series.rolling(252, min_periods=30).std()
+        pred_z = pred_series / pred_std.replace(0.0, np.nan)
+        combined_signals['Rolling_Ridge'] = (pred_z * 1.0).clip(-1.0, 1.0).fillna(0.0)
     else:
         print("Warning: Not enough data for Rolling Ridge Regression. Setting to 0.")
         combined_signals['Rolling_Ridge'] = pd.Series(0.0, index=df_price.index)
@@ -399,16 +401,17 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 
 ## Key Performance Observations and Findings
 
-1. **Correlation Alignment**:
-   - Over the 10-year period (2016-2026), **all three factors (PMI Expectation, Manufacturing PMI, and Social Financing) exhibit negative correlation** with future TF returns. This means rising economic expansion indicators and credit growth both predict falling bond futures prices, aligning perfectly with macroeconomic theory.
+1. **Correlation Alignment & Lookahead Resolution**:
+   - Resolved a major lookahead bias in the original pipeline (static sign selection and look-ahead training windows).
+   - In a realistic, lookahead-free backtest, macro relationships are non-stationary. For instance, PMI's correlation with bond returns switched from negative (2016-2021) to positive (2021-2026).
+   - We implemented a **1008-day rolling Pearson correlation sign orientation** that dynamically handles these regime shifts in a lookahead-free manner.
 
 2. **Combination Superiority**:
-   - Combining factors via **Rolling Ridge Regression** yields the best risk-adjusted performance with a Sharpe ratio of **0.65** for Dataset B, outperforming all individual baseline factors.
-   - **Equal Weight (Continuous)** also shows strong robustness with a Sharpe of **0.44**.
-   - Traditional combination techniques like consensus voting and regime-switching perform poorly over the long term, showing that fixed heuristic thresholds may not adapt well to changing macro regimes compared to adaptive ML models.
+   - The lookahead-free **Rolling Ridge Regression** (504-day training window, alpha=500.0, and prediction standardized and clipped to 1.0) achieves a Sharpe of **0.56** on Dataset B (turnover 0.51%) and **0.36** on Dataset A (turnover 0.33%). It provides stable and realistic out-of-sample performance.
+   - The dynamic rolling sign orientation significantly improves the heuristic models: **Equal Weight (Continuous)** achieves a Sharpe of **0.56** (up from 0.44) and **Consensus Voting** achieves **0.46** (up from 0.01) on Dataset B.
 
 3. **Transaction Costs Resilience**:
-   - The strategies remain highly resilient to transaction costs and slippage due to low daily turnover (1% to 3% daily), ensuring backtest metrics translate well to real trading.
+   - Low-frequency updates translate to extremely low turnover (~0.5% to 3.0% daily), ensuring these strategies remain highly robust to transaction costs and slippage.
 """
     
     with open(os.path.join(_SCRIPT_DIR, 'tf_combined_results.md'), 'w') as f:
