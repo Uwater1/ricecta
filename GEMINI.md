@@ -55,3 +55,6 @@ rtk venv/bin/python run_evaluation.py 8
 - **Alternative Macro Data Testing Pipeline:** Created `download_macro_factors.py` and `test_alt_alphas.py` to parse, download, and screen 83 candidate macro factors using Spearman correlation against future returns. Documented in `alt_alphas.md`, sorted by significance.
 - **Alpha Library Integration (`Alt_Macro_Alpha`):** Added `Alt_Macro_Alpha` into `alphas.py`, dynamically computing the optimal representation (level, diff, or z-score) of the best macro factor signed by its correlation per symbol.
 - **Flexible Evaluation Framework & 20-Day Switch:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Switched configuration to target the optimal 20-day horizon correlation. Alt_Macro_Alpha_TS achieves a Sharpe ratio of 0.90 (up from 0.81) and Alt_Macro_Alpha_XS achieves 0.62 (up from 0.25). Included 20-day horizon summary and top 3 tables in `alt_alphas.md`.
+
+## TF Futures Macro Factor Combination Research
+- **Macro Factor Data Availability**: `社会融资规模_当月值` from rqdatac starts in December 2023, limiting joint factor testing to Dec 2023 - Jun 2026. Use `社会融资规模存量_同比增速_月末数` or `社会融资规模_新增贷款(人民币)_当月值` for longer backtests (from 2021 onwards).
