@@ -34,6 +34,10 @@ df_5 = pd.read_csv(os.path.join(RESULTS_DIR, 'best_factors_summary.csv'))
 df_5['abs_spearman_t'] = df_5['spearman_t'].abs()
 df_5_sorted = df_5.sort_values('abs_spearman_t', ascending=False)
 
+df_20 = pd.read_csv(os.path.join(RESULTS_DIR, 'best_factors_f20_summary.csv'))
+df_20['abs_spearman_t'] = df_20['spearman_t'].abs()
+df_20_sorted = df_20.sort_values('abs_spearman_t', ascending=False)
+
 df_30 = pd.read_csv(os.path.join(RESULTS_DIR, 'best_factors_f30_summary.csv'))
 df_30['abs_spearman_t'] = df_30['spearman_t'].abs()
 df_30_sorted = df_30.sort_values('abs_spearman_t', ascending=False)
@@ -42,7 +46,8 @@ df_40 = pd.read_csv(os.path.join(RESULTS_DIR, 'best_factors_f40_summary.csv'))
 df_40['abs_spearman_t'] = df_40['spearman_t'].abs()
 df_40_sorted = df_40.sort_values('abs_spearman_t', ascending=False)
 
-df_top3 = pd.read_csv(os.path.join(RESULTS_DIR, 'top3_factors_f5_summary.csv'))
+df_top3_f5 = pd.read_csv(os.path.join(RESULTS_DIR, 'top3_factors_f5_summary.csv'))
+df_top3_f20 = pd.read_csv(os.path.join(RESULTS_DIR, 'top3_factors_f20_summary.csv'))
 
 # Generate markdown content
 md = []
@@ -52,6 +57,21 @@ md.append("This document evaluates the effectiveness of alternative macroeconomi
 md.append("")
 md.append("## Methodology Update: Look-Ahead Prevention")
 md.append("Previously, macroeconomic factors (such as Social Financing or Money Supply) released by the PBOC or NBS on day $T$ were aligned to trading day $T$. However, many of these indicators are published after market close (e.g. 5:00 PM). Trading them at the 3:00 PM close of day $T$ introduced look-ahead bias. We now shift all macro daily series by 1 calendar day (`.shift(1)`), ensuring they are only traded on day $T+1$ when they are guaranteed to be public.")
+md.append("")
+md.append("## Performance Summary Table (20-Day Horizon) — PRIMARY")
+md.append("")
+md.append("This configuration is active in the Alpha Library (`alphas.py`).")
+md.append("")
+md.append("| Rank | Symbol | Best Factor | Signal Type | Spearman Corr (20d) | t-statistic | p-value | Description |")
+md.append("|---|---|---|---|---|---|---|---|")
+
+rank = 1
+for idx, row in df_20_sorted.iterrows():
+    sym = row['symbol']
+    desc = symbol_desc.get(sym, 'Macro connection')
+    md.append(f"| {rank} | **{sym}** | `{row['factor']}` | *{row['representation']}* | {row['spearman_corr']:.4f} | {row['spearman_t']:.2f} | {row['spearman_p']:.2e} | {desc} |")
+    rank += 1
+
 md.append("")
 md.append("## Performance Summary Table (5-Day Horizon)")
 md.append("")
@@ -89,24 +109,37 @@ for idx, row in df_40_sorted.iterrows():
     rank += 1
 
 md.append("")
-md.append("## Top 3 Alternative Alphas per Symbol (5-Day Horizon)")
-md.append("To allow multiple factor testing, the top 3 alternative factor configurations for each symbol ranked by absolute Spearman t-statistic are listed below. The full configuration files are saved in `data/results/top3_factors_f5_summary.csv`.")
+md.append("## Top 3 Alternative Alphas per Symbol (20-Day Horizon)")
+md.append("To allow multiple factor testing at the 20-day horizon, the top 3 alternative factor configurations for each symbol ranked by absolute Spearman t-statistic are listed below. The files are saved in `data/results/top3_factors_f20_summary.csv`.")
 md.append("")
 md.append("| Symbol | Rank | Alternative Factor | Representation | Spearman Corr | t-statistic |")
 md.append("|---|---|---|---|---|---|")
-for sym in sorted(df_top3['symbol'].unique()):
-    df_sym = df_top3[df_top3['symbol'] == sym].sort_values('abs_spearman_t', ascending=False)
+for sym in sorted(df_top3_f20['symbol'].unique()):
+    df_sym = df_top3_f20[df_top3_f20['symbol'] == sym].sort_values('abs_spearman_t', ascending=False)
     sub_rank = 1
     for idx, row in df_sym.iterrows():
         md.append(f"| **{sym}** | {sub_rank} | `{row['factor']}` | *{row['representation']}* | {row['spearman_corr']:.4f} | {row['spearman_t']:.2f} |")
         sub_rank += 1
 
 md.append("")
-md.append("## Commodity Specific Details (Sorted by Significance)")
+md.append("## Top 3 Alternative Alphas per Symbol (5-Day Horizon)")
+md.append("The 5-day horizon alternative configurations for reference. Saved in `data/results/top3_factors_f5_summary.csv`.")
+md.append("")
+md.append("| Symbol | Rank | Alternative Factor | Representation | Spearman Corr | t-statistic |")
+md.append("|---|---|---|---|---|---|")
+for sym in sorted(df_top3_f5['symbol'].unique()):
+    df_sym = df_top3_f5[df_top3_f5['symbol'] == sym].sort_values('abs_spearman_t', ascending=False)
+    sub_rank = 1
+    for idx, row in df_sym.iterrows():
+        md.append(f"| **{sym}** | {sub_rank} | `{row['factor']}` | *{row['representation']}* | {row['spearman_corr']:.4f} | {row['spearman_t']:.2f} |")
+        sub_rank += 1
+
+md.append("")
+md.append("## Commodity Specific Details (Sorted by Significance for 20-Day Horizon)")
 md.append("")
 
 rank = 1
-for idx, row in df_5_sorted.iterrows():
+for idx, row in df_20_sorted.iterrows():
     sym = row['symbol']
     exchange = EXCHANGE_MAPPING.get(sym, 'DCE')
     desc = symbol_desc.get(sym, 'Macro connection')
@@ -117,7 +150,7 @@ for idx, row in df_5_sorted.iterrows():
     md.append(f"* **Selected Factor**: `{row['factor']}`")
     md.append(f"* **Signal Representation**: `{row['representation']}`")
     md.append(f"* **Description**: {desc}")
-    md.append(f"* **Effectiveness Metrics (5-day horizon)**:")
+    md.append(f"* **Effectiveness Metrics (20-day horizon)**:")
     md.append(f"  * Spearman Correlation: `{row['spearman_corr']:.4f}`")
     md.append(f"  * t-statistic: `{row['spearman_t']:.2f}`")
     md.append(f"  * p-value: `{row['spearman_p']:.2e}`")

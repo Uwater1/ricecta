@@ -190,8 +190,18 @@ def run_correlation_test():
             print("\n=== Top 3 Alternative Data Factors per Symbol (fwd_ret_5) ===")
             print(df_top3_f5[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
 
-        # Also print best factors for long term horizons (30d and 40d) summary to assess macroecon long term effects
-        for h in [30, 40]:
+        # Find top 3 factors per symbol for fwd_ret_20
+        df_f20 = df_results[df_results['horizon'] == 20].copy()
+        if not df_f20.empty:
+            df_f20['abs_spearman_t'] = df_f20['spearman_t'].abs()
+            df_top3_f20 = df_f20.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
+            
+            top3_f20_path = os.path.join(RESULTS_DIR, 'top3_factors_f20_summary.csv')
+            df_top3_f20.to_csv(top3_f20_path, index=False)
+            print(f"\nSaved top 3 factors for fwd_ret_20 to: {top3_f20_path}")
+
+        # Also print best factors for long term horizons (20d, 30d and 40d) summary to assess macroecon long term effects
+        for h in [20, 30, 40]:
             df_h = df_results[df_results['horizon'] == h].copy()
             if not df_h.empty:
                 df_h['abs_spearman_t'] = df_h['spearman_t'].abs()

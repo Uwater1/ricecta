@@ -5,6 +5,36 @@ This document evaluates the effectiveness of alternative macroeconomic factors f
 ## Methodology Update: Look-Ahead Prevention
 Previously, macroeconomic factors (such as Social Financing or Money Supply) released by the PBOC or NBS on day $T$ were aligned to trading day $T$. However, many of these indicators are published after market close (e.g. 5:00 PM). Trading them at the 3:00 PM close of day $T$ introduced look-ahead bias. We now shift all macro daily series by 1 calendar day (`.shift(1)`), ensuring they are only traded on day $T+1$ when they are guaranteed to be public.
 
+## Performance Summary Table (20-Day Horizon) — PRIMARY
+
+This configuration is active in the Alpha Library (`alphas.py`).
+
+| Rank | Symbol | Best Factor | Signal Type | Spearman Corr (20d) | t-statistic | p-value | Description |
+|---|---|---|---|---|---|---|---|
+| 1 | **SN** | `制造业采购经理指数PMI_进口` | *level* | 0.3749 | 14.40 | 1.18e-43 | 棉花进口景气度 |
+| 2 | **AG** | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *diff* | -0.3357 | -12.55 | 4.36e-34 | 光伏玻璃下游 |
+| 3 | **AL** | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *zscore* | -0.4915 | -10.87 | 4.47e-24 | 需求端 |
+| 4 | **SR** | `PPI_食品制造业(全国:当期同比增长率:月)` | *zscore* | -0.2867 | -9.61 | 5.33e-21 | 食品制造出厂价 |
+| 5 | **JD** | `PPI_食品制造业(全国:当期同比增长率:月)` | *zscore* | -0.2798 | -9.36 | 4.97e-20 | 食品通胀环境 |
+| 6 | **V** | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2480 | 9.14 | 2.37e-19 | 建筑新订单 |
+| 7 | **TF** | `制造业采购经理指数PMI_当月` | *level* | 0.2425 | 8.90 | 1.86e-18 | 经济景气度直接影响利率预期 |
+| 8 | **MA** | `非制造业PMI_建筑业_全国_当期值_月` | *diff* | -0.2443 | -8.90 | 1.92e-18 | 建筑业景气度驱动玻璃需求 |
+| 9 | **SA** | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2239 | 8.20 | 5.71e-16 | 建筑业景气度驱动玻璃需求 |
+| 10 | **C** | `制造业采购经理指数PMI_进口` | *diff* | -0.2152 | -7.80 | 1.31e-14 | 企业预期 |
+| 11 | **J** | `社会融资规模_当月值` | *level* | -0.2998 | -7.52 | 2.07e-13 | 库存周期 |
+| 12 | **P** | `PMI_生产经营活动预期_全国_当期值_月` | *zscore* | -0.2245 | -7.37 | 3.50e-13 | 棉花进口景气度 |
+| 13 | **I** | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *diff* | 0.1974 | 7.11 | 1.89e-12 | 棉花进口景气度 |
+| 14 | **M** | `制造业采购经理指数PMI_新订单` | *level* | -0.1955 | -7.10 | 2.07e-12 | 信用扩张力度影响债券供给和利率 |
+| 15 | **SC** | `制造业采购经理指数PMI_进口` | *zscore* | -0.2084 | -6.79 | 1.85e-11 | 棉花进口景气度 |
+| 16 | **RB** | `非制造业PMI_建筑业_全国_当期值_月` | *diff* | -0.1806 | -6.49 | 1.26e-10 | 建筑新订单 |
+| 17 | **RU** | `PMI_生产经营活动预期_全国_当期值_月` | *level* | -0.1740 | -6.31 | 3.90e-10 | 企业预期 |
+| 18 | **AU** | `社会融资规模_当月值` | *zscore* | -0.3221 | -6.11 | 2.94e-09 | 工业品通胀 |
+| 19 | **CF** | `制造业采购经理指数PMI_进口` | *level* | 0.1608 | 5.80 | 8.36e-09 | 企业预期 |
+| 20 | **Y** | `社会融资规模_当月值` | *diff* | 0.2324 | 5.61 | 3.16e-08 | 信用扩张力度影响债券供给和利率 |
+| 21 | **CU** | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *diff* | -0.1473 | -5.24 | 1.84e-07 | 光伏玻璃下游 |
+| 22 | **TA** | `制造业采购经理指数PMI_新订单` | *zscore* | -0.1467 | -4.73 | 2.56e-06 | 需求端 |
+| 23 | **NI** | `社会融资规模_当月值` | *zscore* | -0.2151 | -3.95 | 9.55e-05 | 信用扩张力度影响债券供给和利率 |
+
 ## Performance Summary Table (5-Day Horizon)
 
 | Rank | Symbol | Best Factor | Signal Type | Spearman Corr (5d) | t-statistic | p-value | Description |
@@ -92,8 +122,83 @@ Macroeconomic forces are structural and influence pricing over longer term horiz
 | 22 | **RB** | `社会融资规模_当月值` | *zscore* | -0.3509 | -6.51 |
 | 23 | **TA** | `PMI_生产经营活动预期_全国_当期值_月` | *zscore* | 0.1947 | 6.29 |
 
+## Top 3 Alternative Alphas per Symbol (20-Day Horizon)
+To allow multiple factor testing at the 20-day horizon, the top 3 alternative factor configurations for each symbol ranked by absolute Spearman t-statistic are listed below. The files are saved in `data/results/top3_factors_f20_summary.csv`.
+
+| Symbol | Rank | Alternative Factor | Representation | Spearman Corr | t-statistic |
+|---|---|---|---|---|---|
+| **AG** | 1 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *diff* | -0.3357 | -12.55 |
+| **AG** | 2 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *zscore* | -0.4648 | -10.11 |
+| **AG** | 3 | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | -0.2441 | -9.01 |
+| **AL** | 1 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *zscore* | -0.4915 | -10.87 |
+| **AL** | 2 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *level* | -0.2036 | -7.42 |
+| **AL** | 3 | `制造业采购经理指数PMI_新订单` | *zscore* | -0.1837 | -5.96 |
+| **AU** | 1 | `社会融资规模_当月值` | *zscore* | -0.3221 | -6.11 |
+| **AU** | 2 | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | -0.1620 | -5.88 |
+| **AU** | 3 | `PMI_生产经营活动预期_全国_当期值_月` | *diff* | 0.1515 | 5.42 |
+| **C** | 1 | `制造业采购经理指数PMI_进口` | *diff* | -0.2152 | -7.80 |
+| **C** | 2 | `制造业采购经理指数PMI_新订单` | *level* | -0.1495 | -5.39 |
+| **C** | 3 | `PPI_食品制造业(全国:当期同比增长率:月)` | *diff* | 0.0767 | 2.73 |
+| **CF** | 1 | `制造业采购经理指数PMI_进口` | *level* | 0.1608 | 5.80 |
+| **CF** | 2 | `社会融资规模_当月值` | *zscore* | -0.2590 | -4.81 |
+| **CF** | 3 | `制造业采购经理指数PMI_新订单` | *diff* | -0.1281 | -4.57 |
+| **CU** | 1 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *diff* | -0.1473 | -5.24 |
+| **CU** | 2 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *level* | -0.1448 | -5.23 |
+| **CU** | 3 | `PMI_生产经营活动预期_全国_当期值_月` | *diff* | 0.1357 | 4.84 |
+| **I** | 1 | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *diff* | 0.1974 | 7.11 |
+| **I** | 2 | `PPI_全部工业品(全国:当期同比增长率:月)` | *zscore* | -0.1767 | -5.76 |
+| **I** | 3 | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.1326 | 4.78 |
+| **J** | 1 | `社会融资规模_当月值` | *level* | -0.2998 | -7.52 |
+| **J** | 2 | `社会融资规模_当月值` | *zscore* | -0.3739 | -7.23 |
+| **J** | 3 | `社会融资规模_当月值` | *diff* | -0.2691 | -6.56 |
+| **JD** | 1 | `PPI_食品制造业(全国:当期同比增长率:月)` | *zscore* | -0.2798 | -9.36 |
+| **JD** | 2 | `居民食品消费价格指数CPI_(上年=100)_当月` | *level* | 0.1473 | 5.33 |
+| **JD** | 3 | `居民食品消费价格指数CPI_(上年=100)_当月` | *zscore* | 0.1574 | 5.12 |
+| **M** | 1 | `制造业采购经理指数PMI_新订单` | *level* | -0.1955 | -7.10 |
+| **M** | 2 | `居民食品消费价格指数CPI_(上年=100)_当月` | *level* | 0.1647 | 5.98 |
+| **M** | 3 | `PPI_食品制造业(全国:当期同比增长率:月)` | *level* | 0.1613 | 5.85 |
+| **MA** | 1 | `非制造业PMI_建筑业_全国_当期值_月` | *diff* | -0.2443 | -8.90 |
+| **MA** | 2 | `制造业采购经理指数PMI_新订单` | *zscore* | -0.2192 | -7.17 |
+| **MA** | 3 | `制造业采购经理指数PMI_原材料库存` | *zscore* | -0.1930 | -6.27 |
+| **NI** | 1 | `社会融资规模_当月值` | *zscore* | -0.2151 | -3.95 |
+| **NI** | 2 | `PMI_生产经营活动预期_全国_当期值_月` | *diff* | 0.1056 | 3.75 |
+| **NI** | 3 | `制造业采购经理指数PMI_新订单` | *zscore* | -0.1096 | -3.52 |
+| **P** | 1 | `PMI_生产经营活动预期_全国_当期值_月` | *zscore* | -0.2245 | -7.37 |
+| **P** | 2 | `PPI_食品制造业(全国:当期同比增长率:月)` | *diff* | 0.1805 | 6.51 |
+| **P** | 3 | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | 0.1784 | 6.49 |
+| **RB** | 1 | `非制造业PMI_建筑业_全国_当期值_月` | *diff* | -0.1806 | -6.49 |
+| **RB** | 2 | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.1725 | 6.25 |
+| **RB** | 3 | `社会融资规模_当月值` | *zscore* | -0.2485 | -4.60 |
+| **RU** | 1 | `PMI_生产经营活动预期_全国_当期值_月` | *level* | -0.1740 | -6.31 |
+| **RU** | 2 | `社会融资规模_当月值` | *zscore* | -0.2606 | -4.84 |
+| **RU** | 3 | `制造业采购经理指数PMI_原材料库存` | *diff* | 0.1242 | 4.43 |
+| **SA** | 1 | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2239 | 8.20 |
+| **SA** | 2 | `非制造业PMI_建筑业_全国_当期值_月` | *level* | 0.1980 | 7.21 |
+| **SA** | 3 | `社会融资规模_当月值` | *zscore* | -0.3334 | -6.34 |
+| **SC** | 1 | `制造业采购经理指数PMI_进口` | *zscore* | -0.2084 | -6.79 |
+| **SC** | 2 | `社会融资规模_当月值` | *level* | -0.1538 | -3.73 |
+| **SC** | 3 | `制造业采购经理指数PMI_新订单` | *zscore* | -0.1128 | -3.62 |
+| **SN** | 1 | `制造业采购经理指数PMI_进口` | *level* | 0.3749 | 14.40 |
+| **SN** | 2 | `制造业采购经理指数PMI_进口` | *zscore* | 0.2967 | 9.91 |
+| **SN** | 3 | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *level* | -0.2088 | -7.62 |
+| **SR** | 1 | `PPI_食品制造业(全国:当期同比增长率:月)` | *zscore* | -0.2867 | -9.61 |
+| **SR** | 2 | `居民食品消费价格指数CPI_(上年=100)_当月` | *level* | 0.1890 | 6.89 |
+| **SR** | 3 | `PPI_食品制造业(全国:当期同比增长率:月)` | *diff* | -0.1844 | -6.66 |
+| **TA** | 1 | `制造业采购经理指数PMI_新订单` | *zscore* | -0.1467 | -4.73 |
+| **TA** | 2 | `制造业采购经理指数PMI_新订单` | *diff* | -0.0982 | -3.49 |
+| **TA** | 3 | `PMI_生产经营活动预期_全国_当期值_月` | *level* | 0.0833 | 2.99 |
+| **TF** | 1 | `制造业采购经理指数PMI_当月` | *level* | 0.2425 | 8.90 |
+| **TF** | 2 | `制造业采购经理指数PMI_当月` | *zscore* | 0.2623 | 8.67 |
+| **TF** | 3 | `PMI_生产经营活动预期_全国_当期值_月` | *level* | 0.2158 | 7.89 |
+| **V** | 1 | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2480 | 9.14 |
+| **V** | 2 | `非制造业PMI_建筑业_全国_当期值_月` | *level* | 0.2335 | 8.57 |
+| **V** | 3 | `非制造业PMI_建筑业_全国_当期值_月` | *zscore* | 0.2106 | 6.90 |
+| **Y** | 1 | `社会融资规模_当月值` | *diff* | 0.2324 | 5.61 |
+| **Y** | 2 | `制造业采购经理指数PMI_进口` | *level* | 0.1510 | 5.44 |
+| **Y** | 3 | `PMI_生产经营活动预期_全国_当期值_月` | *zscore* | -0.1549 | -5.02 |
+
 ## Top 3 Alternative Alphas per Symbol (5-Day Horizon)
-To allow multiple factor testing, the top 3 alternative factor configurations for each symbol ranked by absolute Spearman t-statistic are listed below. The full configuration files are saved in `data/results/top3_factors_f5_summary.csv`.
+The 5-day horizon alternative configurations for reference. Saved in `data/results/top3_factors_f5_summary.csv`.
 
 | Symbol | Rank | Alternative Factor | Representation | Spearman Corr | t-statistic |
 |---|---|---|---|---|---|
@@ -167,264 +272,264 @@ To allow multiple factor testing, the top 3 alternative factor configurations fo
 | **Y** | 2 | `社会融资规模_当月值` | *level* | 0.1883 | 4.65 |
 | **Y** | 3 | `制造业采购经理指数PMI_进口` | *zscore* | -0.1250 | -4.05 |
 
-## Commodity Specific Details (Sorted by Significance)
+## Commodity Specific Details (Sorted by Significance for 20-Day Horizon)
 
-### 1. 品种: AG (SHFE (上期所))
+### 1. 品种: SN (SHFE (上期所))
+
+* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Signal Representation**: `level`
+* **Description**: 棉花进口景气度
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.3749`
+  * t-statistic: `14.40`
+  * p-value: `1.18e-43`
+  * Correlation Sign: `Positive (Long when factor increases)`
+
+---
+
+### 2. 品种: AG (SHFE (上期所))
 
 * **Selected Factor**: `PPI_电气机械及器材制造业(全国:当期同比增长率:月)`
 * **Signal Representation**: `diff`
 * **Description**: 光伏玻璃下游
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.2110`
-  * t-statistic: `-7.65`
-  * p-value: `4.04e-14`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.3357`
+  * t-statistic: `-12.55`
+  * p-value: `4.36e-34`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 2. 品种: TF (CFFEX (中金所))
+### 3. 品种: AL (SHFE (上期所))
 
-* **Selected Factor**: `社会融资规模_当月值`
-* **Signal Representation**: `level`
-* **Description**: 经济景气度直接影响利率预期
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.2449`
-  * t-statistic: `-6.13`
-  * p-value: `1.65e-09`
+* **Selected Factor**: `PPI_电气机械及器材制造业(全国:当期同比增长率:月)`
+* **Signal Representation**: `zscore`
+* **Description**: 需求端
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.4915`
+  * t-statistic: `-10.87`
+  * p-value: `4.47e-24`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 3. 品种: SN (SHFE (上期所))
-
-* **Selected Factor**: `制造业采购经理指数PMI_进口`
-* **Signal Representation**: `level`
-* **Description**: 棉花进口景气度
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1667`
-  * t-statistic: `6.06`
-  * p-value: `1.83e-09`
-  * Correlation Sign: `Positive (Long when factor increases)`
-
----
-
-### 4. 品种: CF (CZCE (郑商所))
-
-* **Selected Factor**: `PMI_生产经营活动预期_全国_当期值_月`
-* **Signal Representation**: `diff`
-* **Description**: 企业预期
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1592`
-  * t-statistic: `-5.73`
-  * p-value: `1.25e-08`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 5. 品种: Y (DCE (大商所))
-
-* **Selected Factor**: `社会融资规模_当月值`
-* **Signal Representation**: `diff`
-* **Description**: 信用扩张力度影响债券供给和利率
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.2337`
-  * t-statistic: `5.72`
-  * p-value: `1.69e-08`
-  * Correlation Sign: `Positive (Long when factor increases)`
-
----
-
-### 6. 品种: RU (SHFE (上期所))
-
-* **Selected Factor**: `PMI_生产经营活动预期_全国_当期值_月`
-* **Signal Representation**: `level`
-* **Description**: 企业预期
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1457`
-  * t-statistic: `-5.29`
-  * p-value: `1.45e-07`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 7. 品种: V (DCE (大商所))
-
-* **Selected Factor**: `非制造业PMI_建筑业_新订单_全国_当期值_月`
-* **Signal Representation**: `level`
-* **Description**: 建筑新订单
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1375`
-  * t-statistic: `4.98`
-  * p-value: `7.07e-07`
-  * Correlation Sign: `Positive (Long when factor increases)`
-
----
-
-### 8. 品种: RB (SHFE (上期所))
-
-* **Selected Factor**: `非制造业PMI_建筑业_新订单_全国_当期值_月`
-* **Signal Representation**: `level`
-* **Description**: 建筑新订单
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1320`
-  * t-statistic: `4.78`
-  * p-value: `1.92e-06`
-  * Correlation Sign: `Positive (Long when factor increases)`
-
----
-
-### 9. 品种: SR (CZCE (郑商所))
+### 4. 品种: SR (CZCE (郑商所))
 
 * **Selected Factor**: `PPI_食品制造业(全国:当期同比增长率:月)`
 * **Signal Representation**: `zscore`
 * **Description**: 食品制造出厂价
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1406`
-  * t-statistic: `-4.59`
-  * p-value: `4.91e-06`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2867`
+  * t-statistic: `-9.61`
+  * p-value: `5.33e-21`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 10. 品种: P (DCE (大商所))
+### 5. 品种: JD (DCE (大商所))
 
-* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Selected Factor**: `PPI_食品制造业(全国:当期同比增长率:月)`
 * **Signal Representation**: `zscore`
-* **Description**: 棉花进口景气度
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1411`
-  * t-statistic: `-4.58`
-  * p-value: `5.27e-06`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 11. 品种: SA (CZCE (郑商所))
-
-* **Selected Factor**: `非制造业PMI_建筑业_全国_当期值_月`
-* **Signal Representation**: `diff`
-* **Description**: 建筑业景气度驱动玻璃需求
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1260`
-  * t-statistic: `-4.51`
-  * p-value: `6.95e-06`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 12. 品种: JD (DCE (大商所))
-
-* **Selected Factor**: `居民食品消费价格指数CPI_(上年=100)_当月`
-* **Signal Representation**: `diff`
 * **Description**: 食品通胀环境
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1247`
-  * t-statistic: `-4.49`
-  * p-value: `7.89e-06`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2798`
+  * t-statistic: `-9.36`
+  * p-value: `4.97e-20`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 13. 品种: M (DCE (大商所))
+### 6. 品种: V (DCE (大商所))
 
-* **Selected Factor**: `社会融资规模_当月值`
+* **Selected Factor**: `非制造业PMI_建筑业_新订单_全国_当期值_月`
 * **Signal Representation**: `level`
-* **Description**: 信用扩张力度影响债券供给和利率
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1642`
-  * t-statistic: `4.04`
-  * p-value: `6.13e-05`
+* **Description**: 建筑新订单
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.2480`
+  * t-statistic: `9.14`
+  * p-value: `2.37e-19`
   * Correlation Sign: `Positive (Long when factor increases)`
 
 ---
 
-### 14. 品种: AU (SHFE (上期所))
+### 7. 品种: TF (CFFEX (中金所))
+
+* **Selected Factor**: `制造业采购经理指数PMI_当月`
+* **Signal Representation**: `level`
+* **Description**: 经济景气度直接影响利率预期
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.2425`
+  * t-statistic: `8.90`
+  * p-value: `1.86e-18`
+  * Correlation Sign: `Positive (Long when factor increases)`
+
+---
+
+### 8. 品种: MA (CZCE (郑商所))
+
+* **Selected Factor**: `非制造业PMI_建筑业_全国_当期值_月`
+* **Signal Representation**: `diff`
+* **Description**: 建筑业景气度驱动玻璃需求
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2443`
+  * t-statistic: `-8.90`
+  * p-value: `1.92e-18`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 9. 品种: SA (CZCE (郑商所))
+
+* **Selected Factor**: `非制造业PMI_建筑业_新订单_全国_当期值_月`
+* **Signal Representation**: `level`
+* **Description**: 建筑业景气度驱动玻璃需求
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.2239`
+  * t-statistic: `8.20`
+  * p-value: `5.71e-16`
+  * Correlation Sign: `Positive (Long when factor increases)`
+
+---
+
+### 10. 品种: C (DCE (大商所))
+
+* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Signal Representation**: `diff`
+* **Description**: 企业预期
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2152`
+  * t-statistic: `-7.80`
+  * p-value: `1.31e-14`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 11. 品种: J (DCE (大商所))
+
+* **Selected Factor**: `社会融资规模_当月值`
+* **Signal Representation**: `level`
+* **Description**: 库存周期
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2998`
+  * t-statistic: `-7.52`
+  * p-value: `2.07e-13`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 12. 品种: P (DCE (大商所))
+
+* **Selected Factor**: `PMI_生产经营活动预期_全国_当期值_月`
+* **Signal Representation**: `zscore`
+* **Description**: 棉花进口景气度
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2245`
+  * t-statistic: `-7.37`
+  * p-value: `3.50e-13`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 13. 品种: I (DCE (大商所))
+
+* **Selected Factor**: `非制造业PMI_建筑业_新订单_全国_当期值_月`
+* **Signal Representation**: `diff`
+* **Description**: 棉花进口景气度
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.1974`
+  * t-statistic: `7.11`
+  * p-value: `1.89e-12`
+  * Correlation Sign: `Positive (Long when factor increases)`
+
+---
+
+### 14. 品种: M (DCE (大商所))
+
+* **Selected Factor**: `制造业采购经理指数PMI_新订单`
+* **Signal Representation**: `level`
+* **Description**: 信用扩张力度影响债券供给和利率
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.1955`
+  * t-statistic: `-7.10`
+  * p-value: `2.07e-12`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 15. 品种: SC (INE (能源中心))
+
+* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Signal Representation**: `zscore`
+* **Description**: 棉花进口景气度
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2084`
+  * t-statistic: `-6.79`
+  * p-value: `1.85e-11`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 16. 品种: RB (SHFE (上期所))
+
+* **Selected Factor**: `非制造业PMI_建筑业_全国_当期值_月`
+* **Signal Representation**: `diff`
+* **Description**: 建筑新订单
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.1806`
+  * t-statistic: `-6.49`
+  * p-value: `1.26e-10`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 17. 品种: RU (SHFE (上期所))
+
+* **Selected Factor**: `PMI_生产经营活动预期_全国_当期值_月`
+* **Signal Representation**: `level`
+* **Description**: 企业预期
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.1740`
+  * t-statistic: `-6.31`
+  * p-value: `3.90e-10`
+  * Correlation Sign: `Negative (Short when factor increases)`
+
+---
+
+### 18. 品种: AU (SHFE (上期所))
 
 * **Selected Factor**: `社会融资规模_当月值`
 * **Signal Representation**: `zscore`
 * **Description**: 工业品通胀
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.2145`
-  * t-statistic: `-4.03`
-  * p-value: `6.84e-05`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.3221`
+  * t-statistic: `-6.11`
+  * p-value: `2.94e-09`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 15. 品种: J (DCE (大商所))
+### 19. 品种: CF (CZCE (郑商所))
 
-* **Selected Factor**: `制造业采购经理指数PMI_原材料库存`
-* **Signal Representation**: `diff`
-* **Description**: 库存周期
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1097`
-  * t-statistic: `3.93`
-  * p-value: `8.97e-05`
+* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Signal Representation**: `level`
+* **Description**: 企业预期
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.1608`
+  * t-statistic: `5.80`
+  * p-value: `8.36e-09`
   * Correlation Sign: `Positive (Long when factor increases)`
 
 ---
 
-### 16. 品种: SC (INE (能源中心))
+### 20. 品种: Y (DCE (大商所))
 
-* **Selected Factor**: `制造业采购经理指数PMI_进口`
-* **Signal Representation**: `zscore`
-* **Description**: 棉花进口景气度
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1211`
-  * t-statistic: `-3.92`
-  * p-value: `9.45e-05`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 17. 品种: MA (CZCE (郑商所))
-
-* **Selected Factor**: `非制造业PMI_建筑业_全国_当期值_月`
-* **Signal Representation**: `zscore`
-* **Description**: 建筑业景气度驱动玻璃需求
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1205`
-  * t-statistic: `-3.91`
-  * p-value: `9.69e-05`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 18. 品种: TA (CZCE (郑商所))
-
-* **Selected Factor**: `制造业采购经理指数PMI_新订单`
-* **Signal Representation**: `zscore`
-* **Description**: 需求端
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1198`
-  * t-statistic: `-3.88`
-  * p-value: `1.13e-04`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 19. 品种: AL (SHFE (上期所))
-
-* **Selected Factor**: `制造业采购经理指数PMI_新订单`
-* **Signal Representation**: `zscore`
-* **Description**: 需求端
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.1139`
-  * t-statistic: `-3.68`
-  * p-value: `2.42e-04`
-  * Correlation Sign: `Negative (Short when factor increases)`
-
----
-
-### 20. 品种: I (DCE (大商所))
-
-* **Selected Factor**: `制造业采购经理指数PMI_进口`
+* **Selected Factor**: `社会融资规模_当月值`
 * **Signal Representation**: `diff`
-* **Description**: 棉花进口景气度
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.0989`
-  * t-statistic: `3.54`
-  * p-value: `4.16e-04`
+* **Description**: 信用扩张力度影响债券供给和利率
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `0.2324`
+  * t-statistic: `5.61`
+  * p-value: `3.16e-08`
   * Correlation Sign: `Positive (Long when factor increases)`
 
 ---
@@ -434,23 +539,23 @@ To allow multiple factor testing, the top 3 alternative factor configurations fo
 * **Selected Factor**: `PPI_电气机械及器材制造业(全国:当期同比增长率:月)`
 * **Signal Representation**: `diff`
 * **Description**: 光伏玻璃下游
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.0944`
-  * t-statistic: `-3.36`
-  * p-value: `8.06e-04`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.1473`
+  * t-statistic: `-5.24`
+  * p-value: `1.84e-07`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
 
-### 22. 品种: C (DCE (大商所))
+### 22. 品种: TA (CZCE (郑商所))
 
-* **Selected Factor**: `PMI_生产经营活动预期_全国_当期值_月`
-* **Signal Representation**: `diff`
-* **Description**: 企业预期
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `-0.0931`
-  * t-statistic: `-3.32`
-  * p-value: `9.20e-04`
+* **Selected Factor**: `制造业采购经理指数PMI_新订单`
+* **Signal Representation**: `zscore`
+* **Description**: 需求端
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.1467`
+  * t-statistic: `-4.73`
+  * p-value: `2.56e-06`
   * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
@@ -458,12 +563,12 @@ To allow multiple factor testing, the top 3 alternative factor configurations fo
 ### 23. 品种: NI (SHFE (上期所))
 
 * **Selected Factor**: `社会融资规模_当月值`
-* **Signal Representation**: `diff`
+* **Signal Representation**: `zscore`
 * **Description**: 信用扩张力度影响债券供给和利率
-* **Effectiveness Metrics (5-day horizon)**:
-  * Spearman Correlation: `0.1236`
-  * t-statistic: `2.96`
-  * p-value: `3.16e-03`
-  * Correlation Sign: `Positive (Long when factor increases)`
+* **Effectiveness Metrics (20-day horizon)**:
+  * Spearman Correlation: `-0.2151`
+  * t-statistic: `-3.95`
+  * p-value: `9.55e-05`
+  * Correlation Sign: `Negative (Short when factor increases)`
 
 ---
