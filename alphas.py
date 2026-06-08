@@ -112,11 +112,11 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
     else:
         fx_rates = pd.DataFrame()
 
-    # Best-performing macro factor configs per symbol from screening results
+    # Best-performing macro factor configs per symbol from screening results (look-ahead free, 1d-shifted)
     BEST_MACRO_CONFIGS = {
         'AG': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
         'AL': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'zscore', 'sign': -1},
-        'AU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'AU': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': -1},
         'C': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},
         'CF': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},
         'CU': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
@@ -134,7 +134,7 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
         'SN': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'level', 'sign': 1},
         'SR': {'factor': 'PPI_食品制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
         'TA': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'zscore', 'sign': -1},
-        'TF': {'factor': '制造业采购经理指数PMI_当月', 'representation': 'zscore', 'sign': 1},
+        'TF': {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': -1},
         'V': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
         'Y': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1}
     }
@@ -243,14 +243,14 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
                         
                         all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
                         if cfg['representation'] == 'level':
-                            val_daily = df_fac['value'].reindex(all_dates).ffill()
+                            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
                             s = val_daily.reindex(df.index)
                         elif cfg['representation'] == 'diff':
                             fac_diff = df_fac['value'].diff()
-                            diff_daily = fac_diff.reindex(all_dates).ffill()
+                            diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
                             s = diff_daily.reindex(df.index)
                         elif cfg['representation'] == 'zscore':
-                            val_daily = df_fac['value'].reindex(all_dates).ffill()
+                            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
                             s_level = val_daily.reindex(df.index)
                             s = (s_level - s_level.rolling(252).mean()) / s_level.rolling(252).std()
                         else:

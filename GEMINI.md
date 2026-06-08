@@ -43,8 +43,8 @@ Framework ready for Step 2 (non-price-volume alphas).
 ### Run Command
 ```bash
 rtk venv/bin/python run_evaluation.py
-# Evaluate specific alpha (1-6 or name)
-rtk venv/bin/python run_evaluation.py 6
+# Evaluate specific alpha (1-8 or name)
+rtk venv/bin/python run_evaluation.py 8
 ```
 
 ## Recent Alpha Updates
@@ -54,4 +54,4 @@ rtk venv/bin/python run_evaluation.py 6
 - **Evaluation CLI args:** Added argument parser in [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) to run specific alpha.
 - **Alternative Macro Data Testing Pipeline:** Created `download_macro_factors.py` and `test_alt_alphas.py` to parse, download, and screen 83 candidate macro factors using Spearman correlation against future returns. Documented in `alt_alphas.md`, sorted by significance.
 - **Alpha Library Integration (`Alt_Macro_Alpha`):** Added `Alt_Macro_Alpha` into `alphas.py`, dynamically computing the optimal representation (level, diff, or z-score) of the best macro factor signed by its correlation per symbol.
-- **Flexible Evaluation Framework:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Alt_Macro_Alpha_TS achieves a Sharpe ratio of 1.02 with zero capacity decay.
+- **Flexible Evaluation Framework:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Alt_Macro_Alpha_TS achieves a Sharpe ratio of 0.81 with zero capacity decay (look-ahead free after shifting releases by 1 calendar day).

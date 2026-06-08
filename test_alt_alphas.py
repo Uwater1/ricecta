@@ -74,6 +74,8 @@ def run_correlation_test():
         df_price['fwd_ret_1'] = df_price['ret'].shift(-1)
         df_price['fwd_ret_5'] = df_price['close'].pct_change(5).shift(-5)
         df_price['fwd_ret_20'] = df_price['close'].pct_change(20).shift(-20)
+        df_price['fwd_ret_30'] = df_price['close'].pct_change(30).shift(-30)
+        df_price['fwd_ret_40'] = df_price['close'].pct_change(40).shift(-40)
         
         trading_dates = df_price.index
         all_dates = pd.date_range(start=trading_dates.min(), end=trading_dates.max(), freq='D')
@@ -97,13 +99,13 @@ def run_correlation_test():
             df_fac = df_fac.set_index('info_date').sort_index()
             df_fac = df_fac[~df_fac.index.duplicated(keep='last')]
             
-            # 1. Level signal representation
-            val_daily = df_fac['value'].reindex(all_dates).ffill()
+            # 1. Level signal representation (shifted by 1 day to prevent look-ahead bias)
+            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
             s_level = val_daily.reindex(trading_dates)
             
-            # 2. Diff signal representation (change at release, ffilled)
+            # 2. Diff signal representation (change at release, ffilled, shifted 1 day)
             fac_diff = df_fac['value'].diff()
-            diff_daily = fac_diff.reindex(all_dates).ffill()
+            diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
             s_diff = diff_daily.reindex(trading_dates)
             
             # 3. Z-score signal representation (rolling 252-day Z-score of level)
@@ -117,7 +119,7 @@ def run_correlation_test():
             
             # Compute correlations for each signal representation and horizon
             for sig_name, sig_series in signals.items():
-                for horizon in [1, 5, 20]:
+                for horizon in [1, 5, 20, 30, 40]:
                     fwd_col = f"fwd_ret_{horizon}"
                     
                     # Align and drop NaNs
@@ -154,7 +156,7 @@ def run_correlation_test():
     print(f"Saved {len(df_results)} rows of correlation results to: {csv_path}")
     
     # Filter for best-performing factor configuration per symbol based on absolute Spearman t-stat for fwd_ret_5
-    df_f5 = df_results[df_results['horizon'] == 5]
+    df_f5 = df_results[df_results['horizon'] == 5].copy()
     if not df_f5.empty:
         df_f5['abs_spearman_t'] = df_f5['spearman_t'].abs()
         idx_best = df_f5.groupby('symbol')['abs_spearman_t'].idxmax()
@@ -167,6 +169,38 @@ def run_correlation_test():
         best_path = os.path.join(RESULTS_DIR, 'best_factors_summary.csv')
         df_best.to_csv(best_path, index=False)
         print(f"\nSaved best factors summary to: {best_path}")
+
+    # Top 3 factor configurations per symbol based on absolute Spearman t-stat for fwd_ret_5
+    if not df_results.empty:
+        # Save the full results containing all horizons for reference
+        full_results_path = os.path.join(RESULTS_DIR, 'all_correlation_results.csv')
+        df_results.to_csv(full_results_path, index=False)
+        print(f"Saved all correlation results to: {full_results_path}")
+        
+        # Find top 3 factors per symbol for fwd_ret_5
+        df_f5 = df_results[df_results['horizon'] == 5].copy()
+        if not df_f5.empty:
+            df_f5['abs_spearman_t'] = df_f5['spearman_t'].abs()
+            df_top3_f5 = df_f5.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
+            
+            top3_f5_path = os.path.join(RESULTS_DIR, 'top3_factors_f5_summary.csv')
+            df_top3_f5.to_csv(top3_f5_path, index=False)
+            print(f"\nSaved top 3 factors for fwd_ret_5 to: {top3_f5_path}")
+            
+            print("\n=== Top 3 Alternative Data Factors per Symbol (fwd_ret_5) ===")
+            print(df_top3_f5[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
+
+        # Also print best factors for long term horizons (30d and 40d) summary to assess macroecon long term effects
+        for h in [30, 40]:
+            df_h = df_results[df_results['horizon'] == h].copy()
+            if not df_h.empty:
+                df_h['abs_spearman_t'] = df_h['spearman_t'].abs()
+                df_best_h = df_h.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(1)
+                best_h_path = os.path.join(RESULTS_DIR, f'best_factors_f{h}_summary.csv')
+                df_best_h.to_csv(best_h_path, index=False)
+                
+                print(f"\n=== Best Alternative Data Factors per Symbol (fwd_ret_{h}) ===")
+                print(df_best_h[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
 
 if __name__ == '__main__':
     run_correlation_test()
