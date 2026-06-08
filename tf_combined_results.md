@@ -14,14 +14,14 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
-| **Regime_Switching** | 1.80% | 1.42% | 1.27 | -1.12% | 1.09 | 36.87% | 4.046% |
-| **EW_Binary** | 1.53% | 1.71% | 0.89 | -2.50% | 0.91 | 49.85% | 4.351% |
-| **EW_Continuous** | 0.49% | 0.56% | 0.86 | -0.46% | 0.65 | 21.91% | 1.958% |
-| **Baseline_SocialFin** | 0.80% | 1.10% | 0.73 | -1.03% | 0.51 | 22.06% | 3.130% |
-| **Consensus_Voting** | 0.73% | 1.23% | 0.60 | -3.08% | 0.47 | 27.25% | 4.504% |
-| **Baseline_PMI_Expect** | 0.24% | 1.72% | 0.14 | -4.19% | 0.14 | 46.95% | 2.672% |
-| **Baseline_PMI** | 0.18% | 1.71% | 0.11 | -4.08% | 0.11 | 47.25% | 3.282% |
-| **Rolling_Ridge** | -0.20% | 0.74% | -0.26 | -1.79% | -0.13 | 10.53% | 3.053% |
+| **Regime_Switching** | 1.80% | 1.42% | 1.27 | -1.12% | 1.09 | 37.18% | 4.046% |
+| **EW_Binary** | 1.53% | 1.72% | 0.89 | -2.53% | 0.90 | 50.15% | 4.351% |
+| **EW_Continuous** | 0.49% | 0.57% | 0.86 | -0.46% | 0.63 | 22.14% | 1.958% |
+| **Baseline_SocialFin** | 0.80% | 1.10% | 0.72 | -1.03% | 0.51 | 22.21% | 3.130% |
+| **Consensus_Voting** | 0.73% | 1.24% | 0.59 | -3.08% | 0.46 | 27.33% | 4.504% |
+| **Baseline_PMI_Expect** | 0.24% | 1.71% | 0.14 | -4.19% | 0.14 | 47.18% | 2.672% |
+| **Baseline_PMI** | 0.18% | 1.72% | 0.11 | -4.12% | 0.11 | 47.33% | 3.282% |
+| **Rolling_Ridge** | -0.20% | 0.73% | -0.27 | -1.79% | -0.13 | 10.46% | 3.053% |
 
 *Dataset A Cumulative Returns:*
 ![Dataset A Equity Curve](figures/tf_combined_equity_a.png)
@@ -33,14 +33,14 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
-| **Regime_Switching** | 1.97% | 1.71% | 1.16 | -1.80% | 1.12 | 51.30% | 2.519% |
-| **EW_Continuous** | 1.14% | 1.03% | 1.11 | -1.15% | 1.17 | 49.24% | 2.430% |
-| **Consensus_Voting** | 1.60% | 1.54% | 1.04 | -2.11% | 0.93 | 42.21% | 4.046% |
-| **Rolling_Ridge** | 1.16% | 1.49% | 0.78 | -1.34% | 0.67 | 39.47% | 2.595% |
-| **Baseline_SocialFin** | 1.23% | 1.71% | 0.72 | -2.34% | 0.67 | 51.30% | 1.298% |
-| **EW_Binary** | 0.95% | 1.72% | 0.55 | -3.76% | 0.53 | 50.38% | 2.824% |
-| **Baseline_PMI_Expect** | 0.24% | 1.72% | 0.14 | -4.19% | 0.14 | 46.95% | 2.672% |
-| **Baseline_PMI** | 0.18% | 1.71% | 0.11 | -4.08% | 0.11 | 47.25% | 3.282% |
+| **Regime_Switching** | 1.97% | 1.71% | 1.15 | -1.80% | 1.12 | 50.99% | 2.519% |
+| **EW_Continuous** | 1.14% | 1.02% | 1.12 | -1.15% | 1.18 | 48.78% | 2.429% |
+| **Consensus_Voting** | 1.60% | 1.55% | 1.03 | -2.14% | 0.93 | 41.98% | 4.046% |
+| **Rolling_Ridge** | 1.16% | 1.48% | 0.78 | -1.34% | 0.68 | 39.62% | 2.595% |
+| **Baseline_SocialFin** | 1.23% | 1.72% | 0.72 | -2.34% | 0.67 | 51.07% | 1.298% |
+| **EW_Binary** | 0.95% | 1.73% | 0.55 | -3.76% | 0.52 | 50.31% | 2.824% |
+| **Baseline_PMI_Expect** | 0.24% | 1.71% | 0.14 | -4.19% | 0.14 | 47.18% | 2.672% |
+| **Baseline_PMI** | 0.18% | 1.72% | 0.11 | -4.12% | 0.11 | 47.33% | 3.282% |
 
 *Dataset B Cumulative Returns:*
 ![Dataset B Equity Curve](figures/tf_combined_equity_b.png)
