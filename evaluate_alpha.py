@@ -93,8 +93,9 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, de
     # Calculate daily portfolio returns
     port_returns = (weights_shifted * asset_returns).sum(axis=1)
     
-    # Calculate daily turnover
-    turnover = weights.diff().abs().sum(axis=1)
+    # Calculate daily turnover (shifted by 1 to align cost with the day the position is held)
+    # Rebalancing from w(t-2) to w(t-1) happens at close of t-1; cost is charged on day t
+    turnover = weights.diff().abs().shift(1).fillna(0.0).sum(axis=1)
     # Deduct transaction cost
     port_net_returns = port_returns - turnover * tc_rate
     
@@ -197,8 +198,8 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, de
             capacity_sharpes[aum] = sharpe
             continue
             
-        # Daily traded notional: AUM * |w_t - w_{t-1}|
-        traded_notional = weights.diff().abs() * aum
+        # Daily traded notional: AUM * |w_{t-1} - w_{t-2}| (rebalancing at close of t-1)
+        traded_notional = weights.diff().abs().shift(1).fillna(0.0) * aum
         
         # Calculate impact cost per asset
         # impact = 0.1 * vol_20 * sqrt(traded_notional / market_vol_20)

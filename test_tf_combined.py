@@ -98,8 +98,8 @@ def evaluate_signals(df_price, signals, tc_rate=0.0005):
         # Calculate strategy daily returns
         port_ret = w * df_price['ret']
         
-        # Calculate daily turnover
-        turnover = sig_series.diff().abs().fillna(0.0)
+        # Calculate daily turnover (shifted by 1 to align cost with the day the position is held)
+        turnover = sig_series.diff().abs().shift(1).fillna(0.0)
         
         # Net returns
         net_ret = port_ret - turnover * tc_rate
