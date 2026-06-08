@@ -73,9 +73,9 @@ rtk venv/bin/python test_tf_combined.py
 
 ## Macro Alpha Contract Holding Strategy (No-Rolling)
 - **Concept:** Buy specific contract (nearest, 2nd, or 3rd nearest) on monthly signal, hold 5-40 days without daily rolling. Assume 5 bp slippage per transaction.
-- **Liquidity (Cold Month) Filter:** Dynamically select contracts from top 3 by 5-day rolling Open Interest. Require Open Interest >= 1000 (>= 500 for TF).
+- **Liquidity (Cold Month) Filter:** Dynamically select the top 3 contracts by 5-day rolling Open Interest on each entry date (relative ranking, no absolute OI floor).
 - **Maturity Month Exit Rules:** Force-exit commodities on last trading day of month preceding delivery month. Force-exit TF 5 trading days before de-listing.
-- **Entry Window Limit:** Enter trades only in calendar months January (1), May (5), September (9) to match liquid cycles.
+- **Data-Driven Entry Dates:** Entry trades are triggered on dominant contract switch dates detected from actual dominant contract mapping data (`data/dominant_contracts/dominant.parquet`). Adapts automatically to each symbol's contract cycle: monthly (SHFE metals CU/AL/AU/AG/RB/RU/NI/SN, INE SC), quarterly (CFFEX TF: months 3/6/9/12), or 1/5/9 (most DCE and CZCE grains).
 - **Results:** Holding strategy dramatically improves performance (e.g., JD Sharpe 0.85 vs baseline 0.23; P Sharpe 0.60 vs baseline -0.15).
 - **Commands to Run:**
   - Download individual contracts data:

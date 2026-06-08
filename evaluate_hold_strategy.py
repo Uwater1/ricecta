@@ -16,12 +16,62 @@ BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 SPOT_DIR = os.path.join(BASE_DIR, 'spot_basis')
 CONTRACTS_DIR = os.path.join(BASE_DIR, 'contracts_daily')
+DOMINANT_DIR = os.path.join(BASE_DIR, 'dominant_contracts')
+
+# Cache for dominant switch dates to avoid re-loading per backtest call
+_dominant_switch_cache = {}
 
 def load_metadata():
     path = os.path.join(CONTRACTS_DIR, 'metadata.parquet')
     if not os.path.exists(path):
         raise FileNotFoundError(f"Metadata file not found: {path}")
     return pd.read_parquet(path)
+
+def get_dominant_switch_dates(symbol):
+    """Detect dates where the dominant contract switches for a given symbol.
+
+    Loads the dominant contract mapping from data/dominant_contracts/dominant.parquet
+    and returns the first trading day of each new dominant contract period.
+    This is data-driven and works for all symbol contract-month patterns
+    (monthly metals, quarterly TF, 1/5/9 grains, etc.).
+    """
+    if symbol in _dominant_switch_cache:
+        return _dominant_switch_cache[symbol]
+
+    dominant_path = os.path.join(DOMINANT_DIR, 'dominant.parquet')
+    if not os.path.exists(dominant_path):
+        raise FileNotFoundError(f"Dominant contracts file not found: {dominant_path}")
+
+    df = pd.read_parquet(dominant_path)
+
+    # Filter for this symbol
+    if 'underlying_symbol' in df.columns:
+        df_sym = df[df['underlying_symbol'] == symbol].copy()
+    else:
+        raise ValueError("dominant.parquet missing 'underlying_symbol' column")
+
+    if df_sym.empty:
+        _dominant_switch_cache[symbol] = []
+        return []
+
+    # Ensure DatetimeIndex
+    if not isinstance(df_sym.index, pd.DatetimeIndex):
+        # Try resetting if underlying_symbol is in the index
+        if df_sym.index.nlevels > 1:
+            df_sym = df_sym.reset_index()
+            df_sym = df_sym.set_index(df_sym.columns[0])
+        else:
+            df_sym.index = pd.to_datetime(df_sym.index)
+
+    df_sym = df_sym.sort_index()
+
+    # Detect switch dates: where dominant_contract changes from previous day
+    df_sym['prev_contract'] = df_sym['dominant_contract'].shift(1)
+    switches = df_sym[df_sym['dominant_contract'] != df_sym['prev_contract']].dropna(subset=['prev_contract'])
+    switch_dates = switches.index.tolist()
+
+    _dominant_switch_cache[symbol] = switch_dates
+    return switch_dates
 
 def load_symbol_contracts(symbol):
     path = os.path.join(CONTRACTS_DIR, f"{symbol}.parquet")
@@ -61,11 +111,13 @@ def get_exit_limit_date(calendar_dates, symbol, de_listed_date, last_trading_day
         # Fallback to calendar month end if not in trading calendar
         return pd.Timestamp(prec_year, prec_month, 1) + pd.offsets.MonthEnd(0)
 
-def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, slippage=0.0005):
+def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, slippage=0.0005, switch_dates=None):
     """
     Runs holding strategy for a single symbol.
     H: holding period in trading days
     k: contract selection index (1 for nearest, 2 for 2nd nearest, 3 for 3rd nearest)
+    switch_dates: list of dates where the dominant contract switches (entry candidates).
+                  If None, falls back to data-driven detection via get_dominant_switch_dates().
     """
     # Create trading calendar from contract prices
     calendar_dates = pd.DatetimeIndex(df_contracts.index.get_level_values('date').unique()).sort_values()
@@ -86,18 +138,28 @@ def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, 
     
     # Align signal series with trading calendar
     signal_series = signal_series.reindex(calendar_dates).ffill().fillna(0.0)
-    
-    # Identify entry dates: first trading day of calendar months 1, 5, 9 with active signal
+
+    # Identify entry dates: use dominant contract switch dates (data-driven)
+    if switch_dates is None:
+        switch_dates = get_dominant_switch_dates(symbol)
+
+    # Map switch dates to the nearest trading day in the calendar
+    calendar_set = set(calendar_dates)
     entry_dates = []
-    prev_month = -1
-    
-    for date in calendar_dates:
-        current_month = date.month
-        if current_month in [1, 5, 9] and current_month != prev_month:
-            sig_val = signal_series.loc[date]
+    for sd in switch_dates:
+        sd = pd.Timestamp(sd)
+        if sd in calendar_set:
+            sig_val = signal_series.loc[sd]
             if sig_val != 0.0:
-                entry_dates.append(date)
-        prev_month = current_month
+                entry_dates.append(sd)
+        else:
+            # Find the next available trading day on or after the switch date
+            idx = calendar_dates.searchsorted(sd)
+            if idx < len(calendar_dates):
+                nearest_date = calendar_dates[idx]
+                sig_val = signal_series.loc[nearest_date]
+                if sig_val != 0.0:
+                    entry_dates.append(nearest_date)
         
     # Pivot prices for fast lookup during simulation
     # We need close prices indexed by date with contracts as columns
@@ -130,15 +192,12 @@ def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, 
         # Get Open Interest for active contracts on entry date
         oi_vals = oi_5d_pivoted.loc[entry_date, active_contracts] if entry_date in oi_5d_pivoted.index else pd.Series(0.0, index=active_contracts)
         
-        # Filter: Top 3 by Open Interest
-        threshold_oi = 500 if symbol == 'TF' else 1000
-        liquid_contracts = oi_vals[oi_vals >= threshold_oi]
+        # Filter: Top 3 by Open Interest (relative ranking, no absolute floor)
+        liquid_contracts = oi_vals[oi_vals > 0].sort_values(ascending=False).head(3)
         
         if liquid_contracts.empty:
-            # Fallback to top 1 contract by OI if all below threshold
+            # Fallback to top 1 contract by OI including zero-OI if nothing else
             liquid_contracts = oi_vals.sort_values(ascending=False).head(1)
-        else:
-            liquid_contracts = liquid_contracts.sort_values(ascending=False).head(3)
             
         if liquid_contracts.empty:
             continue

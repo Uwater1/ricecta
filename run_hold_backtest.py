@@ -13,6 +13,7 @@ from evaluate_hold_strategy import (
     load_symbol_contracts,
     backtest_hold_strategy,
     get_alpha_signals,
+    get_dominant_switch_dates,
     DAILY_DIR
 )
 
@@ -126,6 +127,14 @@ def main():
         print(f"\nOptimizing {symbol}...")
         sig_series = signals[symbol]
         
+        # Pre-compute dominant contract switch dates (data-driven entry candidates)
+        try:
+            switch_dates = get_dominant_switch_dates(symbol)
+            print(f"  Detected {len(switch_dates)} dominant contract switch dates")
+        except Exception as e:
+            print(f"  Warning: could not load switch dates for {symbol}: {e}")
+            switch_dates = None
+        
         # Calculate baseline first
         baseline = run_baseline(symbol, sig_series)
         if baseline is None:
@@ -139,7 +148,7 @@ def main():
         # Grid Search
         for H in H_choices:
             for k in k_choices:
-                res = backtest_hold_strategy(symbol, sig_series, df_contracts, metadata, H, k)
+                res = backtest_hold_strategy(symbol, sig_series, df_contracts, metadata, H, k, switch_dates=switch_dates)
                 sharpe = res['metrics']['sharpe']
                 
                 # We want positive Sharpe and maximizing it. If all negative, we still pick the maximum
@@ -179,7 +188,8 @@ This report evaluates a holding strategy for macroeconomic alphas using individu
 ## Strategy Highlights
 - **No Daily/Frequent Rolling:** On signal release or update, we select a specific contract and hold it for a fixed duration $H \in [5, 40]$ trading days, reducing transaction costs.
 - **Official Maturity Exit Rules:** To comply with exchange regulations for natural persons, commodity contracts are automatically exited by the last trading day of the month preceding delivery, and financial futures (TF) are exited 5 trading days before de-listing.
-- **Liquidity (Cold Month) Filter:** Active contracts are filtered based on a 5-day rolling average Open Interest (OI). Only contracts in the top 3 by OI with $\ge 1000$ (or $\ge 500$ for TF) contracts are eligible for trading, completely avoiding cold month contracts.
+- **Liquidity (Cold Month) Filter:** Active contracts are filtered by relative Open Interest (OI) ranking. The top 3 contracts by 5-day rolling OI are selected per entry date, naturally screening out cold-month contracts regardless of absolute OI levels.
+- **Data-Driven Entry Dates:** Entry trades are triggered on dominant contract switch dates detected from actual dominant contract mapping data, adapting automatically to each symbol's contract cycle (monthly for SHFE metals, quarterly for TF, 1/5/9 for most DCE/CZCE grains, etc.).
 - **Transaction Costs & Slippage:** A realistic 5 bp slippage is charged on both entry and exit (total 10 bp per trade).
 
 ---

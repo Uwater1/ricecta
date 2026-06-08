@@ -2,7 +2,14 @@
 """
 Initial screening pipeline: matches commodities with their candidate factors,
 aligns them to avoid look-ahead bias, computes Pearson/Spearman stats
-across multiple horizons, and outputs the results.
+across mixed horizons (5d, 20d fixed + H1-H3 contract-switch), and outputs the results.
+
+Horizons:
+  5d  = fixed 5-trading-day forward return (short-term momentum/reaction)
+  20d = fixed 20-trading-day forward return (medium-term adjustment)
+  H1  = forward return to the 1st next dominant contract switch date
+  H2  = forward return to the 2nd next dominant contract switch date
+  H3  = forward return to the 3rd next dominant contract switch date
 """
 import os
 import re
@@ -10,6 +17,8 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 import warnings
+
+from evaluate_hold_strategy import get_dominant_switch_dates
 
 warnings.filterwarnings('ignore')
 
@@ -28,6 +37,9 @@ SYMBOLS = [
     'CF', 'SR', 'TA', 'MA', 'SA', # CZCE
     'TF' # CFFEX
 ]
+
+HORIZONS = ['5d', '20d', 'H1', 'H2', 'H3']
+SWITCH_HORIZONS = ['H1', 'H2', 'H3']  # contract-switch-based only
 
 def parse_markdown(filepath):
     symbol_to_factors = {}
@@ -52,11 +64,66 @@ def calculate_t_stat(r, n):
         return 0.0
     return r * np.sqrt((n - 2) / (1 - r**2))
 
+def compute_switch_forward_returns(df_price, switch_dates):
+    """Compute forward returns to the next 1st-3rd dominant contract switch dates.
+
+    Also adds fixed 5-day and 20-day calendar forward returns.
+    Returns a DataFrame with columns fwd_ret_5d, fwd_ret_20d, fwd_ret_H1..H3
+    and days_H1..H3, aligned to df_price's index.
+    """
+    trading_dates = df_price.index
+    close = df_price['close'].values.astype(np.float64)
+    n = len(trading_dates)
+    td_ts = trading_dates.values
+
+    # Convert switch dates to numpy datetime64 for fast searchsorted
+    sd_ts = np.sort(np.array(switch_dates, dtype='datetime64[ns]'))
+
+    # For each trading date, find index of the first switch date >= that trading date
+    # side='left' gives the first position where sd_ts[pos] >= td_ts[i]
+    first_switch_pos = np.searchsorted(sd_ts, td_ts, side='left')
+
+    result = pd.DataFrame(index=trading_dates)
+
+    # Fixed calendar-day forward returns (short-term / medium-term)
+    close_series = df_price['close']
+    result['fwd_ret_5d'] = close_series.pct_change(5).shift(-5).values
+    result['fwd_ret_20d'] = close_series.pct_change(20).shift(-20).values
+
+    for i, label in enumerate(SWITCH_HORIZONS, start=1):
+        # The target switch is the i-th switch from now (0-indexed: first_switch_pos + i - 1)
+        target_pos = first_switch_pos + (i - 1)
+        # Mask: target_pos must be within the switch dates array
+        valid = (target_pos < len(sd_ts))
+
+        # For valid positions, map from switch array to trading date positions
+        target_td_pos = np.full(n, n, dtype=np.int64)  # default to out-of-bounds
+        valid_sd = sd_ts[target_pos[valid]]
+        target_td_pos[valid] = np.searchsorted(td_ts, valid_sd, side='left')
+
+        # Valid mask: target trading date position within bounds
+        valid &= (target_td_pos < n)
+        valid &= (target_td_pos >= 0)
+
+        days_to_switch = np.full(n, -1, dtype=np.int32)
+        days_to_switch[valid] = target_td_pos[valid] - np.arange(n)[valid]
+        # Only keep positive forward windows
+        valid &= (days_to_switch > 0)
+
+        fwd_ret = np.full(n, np.nan)
+        fwd_ret[valid] = close[target_td_pos[valid]] / close[np.arange(n)[valid]] - 1.0
+
+        result[f'fwd_ret_{label}'] = fwd_ret
+        result[f'days_{label}'] = days_to_switch
+
+    return result
+
 def run_correlation_test():
     md_path = os.path.join(_SCRIPT_DIR, 'potential_alt_alphas.md')
     symbol_to_factors = parse_markdown(md_path)
     
     rows = []
+    horizon_days_stats = {}  # {symbol: {H1: median_days, H2: ..., ...}}
     
     for symbol in SYMBOLS:
         price_path = os.path.join(DAILY_DIR, f"{symbol}.parquet")
@@ -71,13 +138,28 @@ def run_correlation_test():
             df_price.index = pd.to_datetime(df_price.index)
         df_price = df_price.sort_index()
         
-        # Calculate daily returns and future returns
-        df_price['ret'] = df_price['close'].pct_change()
-        df_price['fwd_ret_1'] = df_price['ret'].shift(-1)
-        df_price['fwd_ret_5'] = df_price['close'].pct_change(5).shift(-5)
-        df_price['fwd_ret_20'] = df_price['close'].pct_change(20).shift(-20)
-        df_price['fwd_ret_30'] = df_price['close'].pct_change(30).shift(-30)
-        df_price['fwd_ret_40'] = df_price['close'].pct_change(40).shift(-40)
+        # Load dominant contract switch dates (data-driven, per-symbol)
+        try:
+            switch_dates = get_dominant_switch_dates(symbol)
+        except Exception as e:
+            print(f"  Warning: could not load switch dates for {symbol}: {e}")
+            continue
+        
+        if len(switch_dates) < 3:
+            print(f"  Warning: {symbol} has fewer than 3 switch dates, skipping")
+            continue
+        
+        # Compute forward returns (5d, 20d fixed + H1-H3 contract-switch)
+        fwd_df = compute_switch_forward_returns(df_price, switch_dates)
+        df_price = pd.concat([df_price, fwd_df], axis=1)
+        
+        # Record median calendar days per horizon for this symbol
+        sym_days = {}
+        for label in SWITCH_HORIZONS:
+            d = fwd_df[f'days_{label}']
+            valid_days = d[d > 0]
+            sym_days[label] = int(valid_days.median()) if len(valid_days) > 0 else -1
+        horizon_days_stats[symbol] = sym_days
         
         trading_dates = df_price.index
         all_dates = pd.date_range(start=trading_dates.min(), end=trading_dates.max(), freq='D')
@@ -119,9 +201,9 @@ def run_correlation_test():
                 'zscore': s_zscore
             }
             
-            # Compute correlations for each signal representation and horizon
+            # Compute correlations for each signal representation and contract-switch horizon
             for sig_name, sig_series in signals.items():
-                for horizon in [1, 5, 20, 30, 40]:
+                for horizon in HORIZONS:
                     fwd_col = f"fwd_ret_{horizon}"
                     
                     # Align and drop NaNs
@@ -157,62 +239,59 @@ def run_correlation_test():
     df_results.to_csv(csv_path, index=False)
     print(f"Saved {len(df_results)} rows of correlation results to: {csv_path}")
     
-    # Filter for best-performing factor configuration per symbol based on absolute Spearman t-stat for fwd_ret_5
-    df_f5 = df_results[df_results['horizon'] == 5].copy()
-    if not df_f5.empty:
-        df_f5['abs_spearman_t'] = df_f5['spearman_t'].abs()
-        idx_best = df_f5.groupby('symbol')['abs_spearman_t'].idxmax()
-        df_best = df_f5.loc[idx_best].sort_values('symbol')
+    # Print median calendar days per horizon per symbol
+    print("\n=== Median Calendar Days per Horizon per Symbol ===")
+    for sym in SYMBOLS:
+        if sym in horizon_days_stats:
+            d = horizon_days_stats[sym]
+            parts = []
+            for label in HORIZONS:
+                if label in d:
+                    parts.append(f"{label}={d[label]:3d}d")
+                else:
+                    parts.append(f"{label}=  - ")
+            print(f"  {sym:4s}: {'  '.join(parts)}")
+    
+    # Save horizon days stats
+    days_df = pd.DataFrame(horizon_days_stats).T
+    days_df.index.name = 'symbol'
+    days_path = os.path.join(RESULTS_DIR, 'horizon_days_stats.csv')
+    days_df.to_csv(days_path)
+    print(f"\nSaved horizon days stats to: {days_path}")
+    
+    if df_results.empty:
+        print("No correlation results computed.")
+        return df_results, horizon_days_stats
+    
+    # Save the full results
+    full_results_path = os.path.join(RESULTS_DIR, 'all_correlation_results.csv')
+    df_results.to_csv(full_results_path, index=False)
+    print(f"Saved all correlation results to: {full_results_path}")
+    
+    # Best factor per symbol for each horizon
+    for h in HORIZONS:
+        df_h = df_results[df_results['horizon'] == h].copy()
+        if df_h.empty:
+            continue
+        df_h['abs_spearman_t'] = df_h['spearman_t'].abs()
         
-        print("\n=== Best Alternative Data Factors per Symbol (fwd_ret_5) ===")
-        print(df_best[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t', 'spearman_p']].to_string(index=False))
+        # Best 1 per symbol
+        idx_best = df_h.groupby('symbol')['abs_spearman_t'].idxmax()
+        df_best = df_h.loc[idx_best].sort_values('abs_spearman_t', ascending=False)
+        best_h_path = os.path.join(RESULTS_DIR, f'best_factors_{h}_summary.csv')
+        df_best.to_csv(best_h_path, index=False)
         
-        # Save a summary JSON or CSV for alphas.py to import dynamically
-        best_path = os.path.join(RESULTS_DIR, 'best_factors_summary.csv')
-        df_best.to_csv(best_path, index=False)
-        print(f"\nSaved best factors summary to: {best_path}")
-
-    # Top 3 factor configurations per symbol based on absolute Spearman t-stat for fwd_ret_5
-    if not df_results.empty:
-        # Save the full results containing all horizons for reference
-        full_results_path = os.path.join(RESULTS_DIR, 'all_correlation_results.csv')
-        df_results.to_csv(full_results_path, index=False)
-        print(f"Saved all correlation results to: {full_results_path}")
+        print(f"\n=== Best Alternative Data Factors per Symbol ({h}) ===")
+        print(df_best[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
         
-        # Find top 3 factors per symbol for fwd_ret_5
-        df_f5 = df_results[df_results['horizon'] == 5].copy()
-        if not df_f5.empty:
-            df_f5['abs_spearman_t'] = df_f5['spearman_t'].abs()
-            df_top3_f5 = df_f5.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
-            
-            top3_f5_path = os.path.join(RESULTS_DIR, 'top3_factors_f5_summary.csv')
-            df_top3_f5.to_csv(top3_f5_path, index=False)
-            print(f"\nSaved top 3 factors for fwd_ret_5 to: {top3_f5_path}")
-            
-            print("\n=== Top 3 Alternative Data Factors per Symbol (fwd_ret_5) ===")
-            print(df_top3_f5[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
+        # Top 3 per symbol
+        df_top3 = df_h.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
+        top3_path = os.path.join(RESULTS_DIR, f'top3_factors_{h}_summary.csv')
+        df_top3.to_csv(top3_path, index=False)
+        print(f"\n=== Top 3 Alternative Data Factors per Symbol ({h}) ===")
+        print(df_top3[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
 
-        # Find top 3 factors per symbol for fwd_ret_20
-        df_f20 = df_results[df_results['horizon'] == 20].copy()
-        if not df_f20.empty:
-            df_f20['abs_spearman_t'] = df_f20['spearman_t'].abs()
-            df_top3_f20 = df_f20.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
-            
-            top3_f20_path = os.path.join(RESULTS_DIR, 'top3_factors_f20_summary.csv')
-            df_top3_f20.to_csv(top3_f20_path, index=False)
-            print(f"\nSaved top 3 factors for fwd_ret_20 to: {top3_f20_path}")
-
-        # Also print best factors for long term horizons (20d, 30d and 40d) summary to assess macroecon long term effects
-        for h in [20, 30, 40]:
-            df_h = df_results[df_results['horizon'] == h].copy()
-            if not df_h.empty:
-                df_h['abs_spearman_t'] = df_h['spearman_t'].abs()
-                df_best_h = df_h.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(1)
-                best_h_path = os.path.join(RESULTS_DIR, f'best_factors_f{h}_summary.csv')
-                df_best_h.to_csv(best_h_path, index=False)
-                
-                print(f"\n=== Best Alternative Data Factors per Symbol (fwd_ret_{h}) ===")
-                print(df_best_h[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
+    return df_results, horizon_days_stats
 
 if __name__ == '__main__':
     run_correlation_test()
