@@ -10,6 +10,9 @@ import pandas as pd
 import numba
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DOMINANT_DIR = os.path.join(_SCRIPT_DIR, 'data', 'dominant_contracts')
+
+# Cache for dominant switch dates to avoid re-loading per call
 
 # Kalman Filter 1D local level model implementation
 @numba.njit(cache=True)
@@ -80,6 +83,94 @@ def numba_rolling_rank(v, window):
 
 def ts_rank(s, window):
     return pd.Series(numba_rolling_rank(s.values, window), index=s.index)
+
+# ---------------------------------------------------------------------------
+# No-rolling helpers
+# ---------------------------------------------------------------------------
+_dominant_switch_cache = {}
+
+def get_dominant_switch_dates(symbol):
+    """Detect dates where the dominant contract switches for a given symbol.
+
+    Loads the dominant contract mapping from data/dominant_contracts/dominant.parquet
+    and returns the first trading day of each new dominant contract period.
+    This is data-driven and works for all symbol contract-month patterns
+    (monthly metals, quarterly TF, 1/5/9 grains, etc.).
+    """
+    if symbol in _dominant_switch_cache:
+        return _dominant_switch_cache[symbol]
+
+    dominant_path = os.path.join(DOMINANT_DIR, 'dominant.parquet')
+    if not os.path.exists(dominant_path):
+        raise FileNotFoundError(f"Dominant contracts file not found: {dominant_path}")
+
+    df = pd.read_parquet(dominant_path)
+
+    # Filter for this symbol
+    if 'underlying_symbol' in df.columns:
+        df_sym = df[df['underlying_symbol'] == symbol].copy()
+    else:
+        raise ValueError("dominant.parquet missing 'underlying_symbol' column")
+
+    if df_sym.empty:
+        _dominant_switch_cache[symbol] = []
+        return []
+
+    # Ensure DatetimeIndex
+    if not isinstance(df_sym.index, pd.DatetimeIndex):
+        if df_sym.index.nlevels > 1:
+            df_sym = df_sym.reset_index()
+            df_sym = df_sym.set_index(df_sym.columns[0])
+        else:
+            df_sym.index = pd.to_datetime(df_sym.index)
+
+    df_sym = df_sym.sort_index()
+
+    # Detect switch dates: where dominant_contract changes from previous day
+    df_sym['prev_contract'] = df_sym['dominant_contract'].shift(1)
+    switches = df_sym[df_sym['dominant_contract'] != df_sym['prev_contract']].dropna(subset=['prev_contract'])
+    switch_dates = switches.index.tolist()
+
+    _dominant_switch_cache[symbol] = switch_dates
+    return switch_dates
+
+def compute_norolling_signal(daily_index, signal_series, symbol):
+    """Discretize a daily alpha signal at dominant contract switch dates.
+
+    The signal is sampled only at switch dates and forward-filled between them,
+    producing a no-rolling signal that only updates on contract cycle transitions.
+    """
+    try:
+        switch_dates = get_dominant_switch_dates(symbol)
+    except (FileNotFoundError, ValueError):
+        return signal_series.copy()
+
+    if not switch_dates:
+        return signal_series.copy()
+
+    # Build a series indexed by switch dates, then reindex to daily and ffill
+    switch_ts = pd.DatetimeIndex([pd.Timestamp(d) for d in switch_dates])
+    # Keep only switch dates that fall within the daily data range
+    switch_ts = switch_ts[(switch_ts >= daily_index.min()) & (switch_ts <= daily_index.max())]
+
+    if len(switch_ts) == 0:
+        return signal_series.copy()
+
+    # Sample signal at switch dates, reindex to full daily index, and ffill
+    sig_at_switches = signal_series.reindex(switch_ts)
+    norolling = sig_at_switches.reindex(daily_index).ffill()
+    return norolling
+
+# Best-performing hold strategy parameters per symbol (H, k)
+# from hold_strategy_report.md optimization results
+BEST_HOLD_PARAMS = {
+    'C': (25, 1), 'M': (40, 3), 'Y': (15, 1), 'P': (35, 2),
+    'V': (5, 1), 'J': (20, 2), 'JD': (30, 2), 'I': (5, 3),
+    'CU': (20, 3), 'AL': (15, 3), 'AU': (10, 1), 'AG': (25, 3),
+    'RB': (20, 1), 'RU': (15, 3), 'NI': (5, 2), 'SN': (35, 2),
+    'SC': (20, 3), 'CF': (30, 1), 'SR': (25, 1), 'TA': (40, 3),
+    'MA': (20, 1), 'SA': (30, 2), 'TF': (40, 3)
+}
 
 def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_dir=None):
     """
@@ -265,7 +356,12 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
                         df["Alt_Macro_Alpha"] = (s * cfg['sign']).astype(np.float32)
                 except Exception:
                     pass
-            
+
+        # 8. Alt_Macro_Alpha_NoRoll (discretized at contract switch dates)
+        df["Alt_Macro_Alpha_NoRoll"] = compute_norolling_signal(
+            df.index, df["Alt_Macro_Alpha"], symbol
+        )
+        
         # Prepare symbol columns
         df["symbol"] = symbol
         df = df.reset_index().rename(columns={"index": "date"})
@@ -273,7 +369,7 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         all_data.append(df[["date", "symbol", "open", "high", "low", "close", "volume", "returns",
                             "HTFC_Alpha19_tsrank_mom_rev", "KalmanFilter_BOS",
                             "HTFC_Alpha1_meanclose12", "HTFC_Alpha5_skew20", "EWMA_32_64_CTA",
-                            "ForeignAg_LeadLag", "Alt_Macro_Alpha"]])
+                            "ForeignAg_LeadLag", "Alt_Macro_Alpha", "Alt_Macro_Alpha_NoRoll"]])
         
     if not all_data:
         return pd.DataFrame()
@@ -288,4 +384,6 @@ if __name__ == '__main__':
     SYMBOLS = ['CU', 'AU', 'CF']
     res = compute_alphas(DATA_DIR, SPOT_DIR, SYMBOLS)
     print("Computed alphas shape:", res.shape)
-    print(res.tail(2))
+    print("Columns:", res.columns.tolist())
+    print("Alt_Macro_Alpha_NoRoll non-NaN count:", res['Alt_Macro_Alpha_NoRoll'].notna().sum())
+    print(res[['Alt_Macro_Alpha', 'Alt_Macro_Alpha_NoRoll']].tail(5))

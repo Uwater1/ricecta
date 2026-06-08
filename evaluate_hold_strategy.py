@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import numpy as np
 import warnings
-from alphas import compute_alphas
+from alphas import compute_alphas, get_dominant_switch_dates
 
 warnings.filterwarnings('ignore')
 
@@ -16,62 +16,12 @@ BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 SPOT_DIR = os.path.join(BASE_DIR, 'spot_basis')
 CONTRACTS_DIR = os.path.join(BASE_DIR, 'contracts_daily')
-DOMINANT_DIR = os.path.join(BASE_DIR, 'dominant_contracts')
-
-# Cache for dominant switch dates to avoid re-loading per backtest call
-_dominant_switch_cache = {}
 
 def load_metadata():
     path = os.path.join(CONTRACTS_DIR, 'metadata.parquet')
     if not os.path.exists(path):
         raise FileNotFoundError(f"Metadata file not found: {path}")
     return pd.read_parquet(path)
-
-def get_dominant_switch_dates(symbol):
-    """Detect dates where the dominant contract switches for a given symbol.
-
-    Loads the dominant contract mapping from data/dominant_contracts/dominant.parquet
-    and returns the first trading day of each new dominant contract period.
-    This is data-driven and works for all symbol contract-month patterns
-    (monthly metals, quarterly TF, 1/5/9 grains, etc.).
-    """
-    if symbol in _dominant_switch_cache:
-        return _dominant_switch_cache[symbol]
-
-    dominant_path = os.path.join(DOMINANT_DIR, 'dominant.parquet')
-    if not os.path.exists(dominant_path):
-        raise FileNotFoundError(f"Dominant contracts file not found: {dominant_path}")
-
-    df = pd.read_parquet(dominant_path)
-
-    # Filter for this symbol
-    if 'underlying_symbol' in df.columns:
-        df_sym = df[df['underlying_symbol'] == symbol].copy()
-    else:
-        raise ValueError("dominant.parquet missing 'underlying_symbol' column")
-
-    if df_sym.empty:
-        _dominant_switch_cache[symbol] = []
-        return []
-
-    # Ensure DatetimeIndex
-    if not isinstance(df_sym.index, pd.DatetimeIndex):
-        # Try resetting if underlying_symbol is in the index
-        if df_sym.index.nlevels > 1:
-            df_sym = df_sym.reset_index()
-            df_sym = df_sym.set_index(df_sym.columns[0])
-        else:
-            df_sym.index = pd.to_datetime(df_sym.index)
-
-    df_sym = df_sym.sort_index()
-
-    # Detect switch dates: where dominant_contract changes from previous day
-    df_sym['prev_contract'] = df_sym['dominant_contract'].shift(1)
-    switches = df_sym[df_sym['dominant_contract'] != df_sym['prev_contract']].dropna(subset=['prev_contract'])
-    switch_dates = switches.index.tolist()
-
-    _dominant_switch_cache[symbol] = switch_dates
-    return switch_dates
 
 def load_symbol_contracts(symbol):
     path = os.path.join(CONTRACTS_DIR, f"{symbol}.parquet")

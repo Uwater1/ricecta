@@ -31,20 +31,32 @@ rtk venv/bin/python research_arbitrage.py
 - **Basis Momentum:** daily signal using $BR_t = \frac{spot\_price - dominant\_price}{spot\_price}$. Trade dominant contract daily. Shifted 1-day. Splice returns to avoid roll gaps.
 - **Curve Arbitrage:** 5-minute calendar spread Z-score of $P_{near} - P_{dom}$ using rolling 20-day daily spread stats. Long entry $Z < -2.0$, short entry $Z > 2.0$. Exit when $|Z| \le 0.2$. Standard double transaction costs and slippage applied.
 
-## Alpha Evaluation System (Daily)
-Framework ready for Step 2 (non-price-volume alphas).
+## Alpha Evaluation System (Daily + No-Rolling)
+Framework evaluates 9 alpha signals across 23 commodity futures.
 
 ### Structure
 - **Data Downloader:** [download_daily_data.py](file:///home/hallo/data/ricecta/download_daily_data.py) — fetches pre-adjusted dominant daily contracts (no roll gaps).
-- **Alpha Library:** [alphas.py](file:///home/hallo/data/ricecta/alphas.py) — calculates signals.
+- **Alpha Library:** [alphas.py](file:///home/hallo/data/ricecta/alphas.py) — calculates 7 daily signals + 1 no-rolling discretized signal (`Alt_Macro_Alpha_NoRoll`). Also exposes `get_dominant_switch_dates()` (canonical source) and `BEST_HOLD_PARAMS` (optimized hold period H and contract index k per symbol).
 - **Metrics Evaluator:** [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py) — calculates DSR (multiple testing), Sortino, Turnover-Adjusted Calmar, Capacity-Adjusted Sharpe Decay (market impact).
-- **Runner:** [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) — runs full pipeline and exports [alpha_evaluation_report.md](file:///data/ricecta/alpha_evaluation_report.md).
+- **Hold Strategy Engine:** [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py) — per-symbol contract hold backtest with OI-based liquidity filtering and maturity exit rules. Imports `get_dominant_switch_dates` from `alphas.py`.
+- **Runner:** [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) — runs full pipeline (daily alphas + no-rolling hold strategy) and exports [alpha_evaluation_report.md](file:///data/ricecta/alpha_evaluation_report.md).
+
+### Alphas (9 total)
+1. `HTFC_Alpha19_tsrank_mom_rev` — TS_Rank momentum/reversal composite
+2. `KalmanFilter_BOS` — Kalman-filtered basis-over-spot residual Z-score
+3. `HTFC_Alpha1_meanclose12` — 12-day mean close ratio
+4. `HTFC_Alpha5_skew20` — negative 20-day return skewness
+5. `EWMA_32_64_CTA` — dual EMA trend-following signal
+6. `ForeignAg_LeadLag` — agricultural lead-lag with FX conversion
+7. `Alt_Macro_Alpha_XS` — macro factor, cross-sectional portfolio
+8. `Alt_Macro_Alpha_TS` — macro factor, time-series portfolio
+9. `Alt_Macro_Alpha_NoRoll` — macro factor, contract hold strategy (no daily rolling)
 
 ### Run Command
 ```bash
 rtk venv/bin/python run_evaluation.py
-# Evaluate specific alpha (1-8 or name)
-rtk venv/bin/python run_evaluation.py 8
+# Evaluate specific alpha (1-9 or name)
+rtk venv/bin/python run_evaluation.py 9  # runs NoRoll hold strategy
 ```
 
 ## Recent Alpha Updates
@@ -76,13 +88,18 @@ rtk venv/bin/python test_tf_combined.py
 - **Liquidity (Cold Month) Filter:** Dynamically select the top 3 contracts by 5-day rolling Open Interest on each entry date (relative ranking, no absolute OI floor).
 - **Maturity Month Exit Rules:** Force-exit commodities on last trading day of month preceding delivery month. Force-exit TF 5 trading days before de-listing.
 - **Data-Driven Entry Dates:** Entry trades are triggered on dominant contract switch dates detected from actual dominant contract mapping data (`data/dominant_contracts/dominant.parquet`). Adapts automatically to each symbol's contract cycle: monthly (SHFE metals CU/AL/AU/AG/RB/RU/NI/SN, INE SC), quarterly (CFFEX TF: months 3/6/9/12), or 1/5/9 (most DCE and CZCE grains).
-- **Results:** Holding strategy dramatically improves performance (e.g., JD Sharpe 0.85 vs baseline 0.23; P Sharpe 0.60 vs baseline -0.15).
+- **Signal Integration:** `Alt_Macro_Alpha_NoRoll` is computed in `alphas.py` by discretizing `Alt_Macro_Alpha` at dominant contract switch dates (forward-filled between switches). `BEST_HOLD_PARAMS` in `alphas.py` stores the optimized `(H, k)` per symbol. `run_evaluation.py` evaluates the no-rolling variant (alpha index 9) using the hold strategy engine alongside the 8 daily alphas in a unified report.
+- **Portfolio Performance (equal-weighted, 23 symbols, 5 bp slippage):** Sharpe 1.57, MaxDD -3.46%, Sortino 1.30, Calmar 1.03.
 - **Commands to Run:**
   - Download individual contracts data:
   ```bash
   rtk venv/bin/python download_contracts_daily.py
   ```
-  - Optimize holding period and contract index, compile report:
+  - Run unified evaluation (includes NoRoll as alpha 9):
+  ```bash
+  rtk venv/bin/python run_evaluation.py
+  ```
+  - Optimize holding period and contract index independently:
   ```bash
   rtk venv/bin/python run_hold_backtest.py
   ```

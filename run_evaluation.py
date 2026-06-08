@@ -12,8 +12,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
-from alphas import compute_alphas
-from evaluate_alpha import evaluate_alpha
+from alphas import compute_alphas, BEST_HOLD_PARAMS
+from evaluate_alpha import evaluate_alpha, calculate_dsr
+from evaluate_hold_strategy import (
+    backtest_hold_strategy, load_symbol_contracts, load_metadata
+)
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,8 +44,94 @@ ALPHAS = [
     'EWMA_32_64_CTA',
     'ForeignAg_LeadLag',
     'Alt_Macro_Alpha_XS',
-    'Alt_Macro_Alpha_TS'
+    'Alt_Macro_Alpha_TS',
+    'Alt_Macro_Alpha_NoRoll'
 ]
+
+def evaluate_norolling_hold_strategy(df_data, symbols, tc_rate=0.0):
+    """Evaluate the no-rolling macro alpha using the hold strategy backtest.
+
+    Runs a per-symbol contract hold backtest using Alt_Macro_Alpha_NoRoll
+    and aggregates results into an equal-weighted portfolio.
+    """
+    metadata = load_metadata()
+    symbol_daily_returns = {}
+    all_trades = []
+
+    for symbol in symbols:
+        if symbol not in BEST_HOLD_PARAMS:
+            continue
+        try:
+            df_contracts = load_symbol_contracts(symbol)
+        except FileNotFoundError:
+            print(f"  Skipping {symbol} (no contract data)")
+            continue
+
+        H, k = BEST_HOLD_PARAMS[symbol]
+        try:
+            sig_series = df_data['Alt_Macro_Alpha_NoRoll'].xs(symbol, level='symbol')
+        except KeyError:
+            continue
+
+        res = backtest_hold_strategy(
+            symbol, sig_series, df_contracts, metadata, H, k,
+            slippage=tc_rate
+        )
+
+        daily_ret = res.get('daily_returns')
+        if daily_ret is not None and len(daily_ret) > 0:
+            symbol_daily_returns[symbol] = daily_ret
+        trades = res.get('trades', [])
+        all_trades.extend(trades)
+        if trades:
+            print(f"  {symbol}: {len(trades)} trades, Sharpe={res['metrics']['sharpe']:.2f}")
+
+    if not symbol_daily_returns:
+        return {}
+
+    # Equal-weight portfolio across symbols
+    df_returns = pd.DataFrame(symbol_daily_returns)
+    port_returns = df_returns.mean(axis=1).fillna(0.0)
+
+    T = len(port_returns)
+    if T == 0:
+        return {}
+
+    ann_return = port_returns.mean() * 252
+    ann_vol = port_returns.std() * np.sqrt(252)
+    sharpe = ann_return / ann_vol if ann_vol > 0 else 0.0
+
+    cum_returns = (1.0 + port_returns).cumprod()
+    running_max = cum_returns.cummax()
+    drawdown = (cum_returns - running_max) / running_max
+    max_dd = drawdown.min()
+
+    neg_rets = port_returns[port_returns < 0]
+    downside_std = np.sqrt((neg_rets ** 2).mean()) * np.sqrt(252) if len(neg_rets) > 0 else 0.0
+    sortino = ann_return / downside_std if downside_std > 0 else 0.0
+
+    calmar = ann_return / abs(max_dd) if max_dd != 0 else 0.0
+    win_rate = (port_returns > 0).sum() / T if T > 0 else 0.0
+
+    return {
+        'annualized_return': ann_return,
+        'annualized_vol': ann_vol,
+        'sharpe_ratio': sharpe,
+        'deflated_sharpe_ratio': 0.0,  # computed later with full pool
+        'calmar_ratio': calmar,
+        'max_drawdown': max_dd,
+        'sortino_ratio': sortino,
+        'profit_factor': float('nan'),
+        'win_rate': win_rate,
+        'hit_rate': 0.0,
+        'ic': 0.0,
+        'top_quintile_return': 0.0,
+        'bottom_quintile_return': 0.0,
+        'capacity_sharpes': {},
+        'cum_returns': cum_returns,
+        'drawdown': drawdown,
+        'port_net_returns': port_returns
+    }
 
 def run():
     global ALPHAS
@@ -76,6 +165,11 @@ def run():
     # First, calculate frictionless Sharpe ratios for all alphas to serve as the multiple testing pool for DSR
     raw_sharpes = {}
     for alpha in ALPHAS:
+        if alpha == 'Alt_Macro_Alpha_NoRoll':
+            # NoRoll uses hold strategy backtest, not daily cross-sectional evaluation
+            norolling_metrics = evaluate_norolling_hold_strategy(df_data, SYMBOLS, tc_rate=0.0)
+            raw_sharpes[alpha] = norolling_metrics.get('sharpe_ratio', 0.0)
+            continue
         col = 'Alt_Macro_Alpha' if alpha in ['Alt_Macro_Alpha_XS', 'Alt_Macro_Alpha_TS'] else alpha
         is_ts = (alpha == 'Alt_Macro_Alpha_TS')
         metrics = evaluate_alpha(df_data, col, all_sharpes=None, N=len(ALPHAS), tc_rate=0.0, demean=not is_ts)
@@ -90,11 +184,25 @@ def run():
     # Evaluate each alpha with DSR and transaction costs (5 bps)
     results = {}
     for alpha in ALPHAS:
+        if alpha == 'Alt_Macro_Alpha_NoRoll':
+            print(f"\nEvaluating alpha: {alpha} (hold strategy)...")
+            norolling_metrics = evaluate_norolling_hold_strategy(df_data, SYMBOLS, tc_rate=0.0005)
+            if norolling_metrics:
+                results[alpha] = norolling_metrics
+            continue
         print(f"\nEvaluating alpha: {alpha}...")
         col = 'Alt_Macro_Alpha' if alpha in ['Alt_Macro_Alpha_XS', 'Alt_Macro_Alpha_TS'] else alpha
         is_ts = (alpha == 'Alt_Macro_Alpha_TS')
         metrics = evaluate_alpha(df_data, col, all_sharpes=all_sharpe_list, N=len(ALPHAS), tc_rate=0.0005, demean=not is_ts)
         results[alpha] = metrics
+    
+    # Compute DSR for NoRoll using the full Sharpe pool
+    if 'Alt_Macro_Alpha_NoRoll' in results:
+        noroll_port = results['Alt_Macro_Alpha_NoRoll'].get('port_net_returns')
+        if noroll_port is not None and len(noroll_port) > 2:
+            results['Alt_Macro_Alpha_NoRoll']['deflated_sharpe_ratio'] = calculate_dsr(
+                noroll_port, all_sharpe_list, N=len(ALPHAS)
+            )
         
     # Generate markdown report
     report = "# Alpha Performance Evaluation Report\n\n"
@@ -105,7 +213,7 @@ def run():
     report += "|---|---|---|---|---|---|---|---|---|---|---|---|\n"
     
     for alpha in ALPHAS:
-        m = results[alpha]
+        m = results.get(alpha)
         if not m:
             continue
         report += f"| **{alpha}** | {m['annualized_return']*100:.2f}% | {m['annualized_vol']*100:.2f}% | {m['sharpe_ratio']:.2f} | {m['deflated_sharpe_ratio']*100:.2f}% | {m['calmar_ratio']:.2f} | {m['max_drawdown']*100:.2f}% | {m['sortino_ratio']:.2f} | {m['profit_factor']:.2f} | {m['win_rate']*100:.2f}% | {m['hit_rate']*100:.2f}% | {m['ic']:.4f} |\n"
@@ -193,8 +301,8 @@ def run():
     report += "|---|---|---|---|---|---|\n"
     
     for alpha in ALPHAS:
-        m = results[alpha]
-        if not m or "capacity_sharpes" not in m:
+        m = results.get(alpha)
+        if not m or not m.get("capacity_sharpes"):
             continue
         cs = m["capacity_sharpes"]
         report += f"| **{alpha}** | {cs[0]:.2f} | {cs[10000000]:.2f} | {cs[50000000]:.2f} | {cs[100000000]:.2f} | {cs[500000000]:.2f} |\n"
