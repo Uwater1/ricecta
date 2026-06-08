@@ -17,8 +17,8 @@ def download_shibor():
     
     try:
         df = rqdatac.get_interbank_offered_rate(
-            start_date='20210101',
-            end_date='20260603',
+            start_date='20160101',
+            end_date='20260608',
             source='Shibor'
         )
         if df is not None and not df.empty:

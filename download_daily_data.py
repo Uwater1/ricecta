@@ -30,8 +30,8 @@ SYMBOLS = [
     'TF' # CFFEX
 ]
 
-START_DATE = '20210101'
-END_DATE = '20260603'
+START_DATE = '20160101'
+END_DATE = '20260608'
 
 def download_all():
     print("=== Downloading Daily Pre-adjusted Dominant Prices ===")

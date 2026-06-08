@@ -56,7 +56,7 @@ def clean_df(df, source):
             
     df = df.sort_index()
     # Filter 2020 onwards
-    df = df[df.index >= '2020-01-01']
+    df = df[df.index >= '2016-01-01']
     return df
 
 def download_all():
@@ -72,7 +72,7 @@ def download_all():
             if source == 'akshare':
                 df = ak.futures_foreign_hist(symbol=foreign_sym)
             elif source == 'yfinance':
-                df = yf.Ticker(foreign_sym).history(start='2020-01-01', end='2026-06-05')
+                df = yf.Ticker(foreign_sym).history(start='2016-01-01', end='2026-06-05')
                 
             if df is not None and not df.empty:
                 df_clean = clean_df(df, source)
@@ -92,7 +92,7 @@ def download_fx_rates():
     
     try:
         print("Fetching USDCNY factor...")
-        df_usd = rqdatac.econ.get_factors('USDCNY:即期汇率:日', start_date='2020-01-01', end_date='2026-06-03')
+        df_usd = rqdatac.econ.get_factors('USDCNY:即期汇率:日', start_date='2016-01-01', end_date='2026-06-03')
         if df_usd is not None and not df_usd.empty:
             df_usd = df_usd.reset_index().rename(columns={'info_date': 'date'}).set_index('date')
             df_usd = df_usd[~df_usd.index.duplicated(keep='last')]
@@ -106,7 +106,7 @@ def download_fx_rates():
         
     try:
         print("Fetching MYRCNY factor...")
-        df_myr = rqdatac.econ.get_factors('人民币对马来西亚林吉特中间汇率(间接标价法):当期值:日', start_date='2020-01-01', end_date='2026-06-03')
+        df_myr = rqdatac.econ.get_factors('人民币对马来西亚林吉特中间汇率(间接标价法):当期值:日', start_date='2016-01-01', end_date='2026-06-03')
         if df_myr is not None and not df_myr.empty:
             df_myr = df_myr.reset_index().rename(columns={'info_date': 'date'}).set_index('date')
             df_myr = df_myr[~df_myr.index.duplicated(keep='last')]

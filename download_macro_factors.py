@@ -21,8 +21,8 @@ BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 MACRO_DIR = os.path.join(BASE_DIR, 'macro_factors')
 os.makedirs(MACRO_DIR, exist_ok=True)
 
-START_DATE = '20210101'
-END_DATE = '20260603'
+START_DATE = '20160101'
+END_DATE = '20260608'
 
 # Mapping discrepancies between markdown factor names and rqdatac names
 DISCREPANCIES = {

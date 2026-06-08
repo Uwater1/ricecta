@@ -88,8 +88,8 @@ SYMBOLS = [
     'TF' # CFFEX
 ]
 
-START_DATE = '20210101'
-END_DATE = '20260603'
+START_DATE = '20160101'
+END_DATE = '20260608'
 
 def check_existing_contracts(contracts, symbol):
     """Filter out contracts that already have valid parquet files."""
@@ -116,7 +116,7 @@ def download_futures_5minute():
     df_inst = rqdatac.all_instruments(type='Future')
     df_targets = df_inst[
         df_inst['underlying_symbol'].isin(SYMBOLS) & 
-        (df_inst['de_listed_date'] >= '2021-01-01') & 
+        (df_inst['de_listed_date'] >= '2016-01-01') & 
         (df_inst['listed_date'] <= '2026-06-03')
     ]
     
@@ -192,7 +192,7 @@ def download_futures_5minute():
             for contract in contracts_to_download:
                 filepath = os.path.join(sym_dir, f"{contract}.parquet")
                 row = df_sym[df_sym['order_book_id'] == contract].iloc[0]
-                q_start = max(row['listed_date'], '2021-01-01').replace('-', '')
+                q_start = max(row['listed_date'], '2016-01-01').replace('-', '')
                 q_end = min(row['de_listed_date'], '2026-06-03').replace('-', '')
                 try:
                     df = rqdatac.get_price(contract, start_date=q_start, end_date=q_end, frequency='5m')
@@ -226,7 +226,7 @@ def fetch_spot_basis_year(year, spot_symbols):
 def download_spot_basis():
     print("=== Downloading Spot and Basis Data ===")
     spot_symbols = [s for s in SYMBOLS if s not in ['TF', 'SC']]
-    years = [2021, 2022, 2023, 2024, 2025, 2026]
+    years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
     
     # Run year-by-year spot/basis download in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
@@ -266,7 +266,7 @@ def download_global_crude():
         
     print("Downloading Brent/WTI daily from yfinance (for reference)...")
     try:
-        yf_start = '2021-01-01'
+        yf_start = '2016-01-01'
         yf_end = '2026-06-04'
         df_brent = yf.Ticker('BZ=F').history(start=yf_start, end=yf_end)
         df_wti = yf.Ticker('CL=F').history(start=yf_start, end=yf_end)
