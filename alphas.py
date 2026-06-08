@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 import numba
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Kalman Filter 1D local level model implementation
 @numba.njit(cache=True)
 def run_kalman_filter(y, Q=1e-4, R=1e-2):
@@ -79,11 +81,15 @@ def numba_rolling_rank(v, window):
 def ts_rank(s, window):
     return pd.Series(numba_rolling_rank(s.values, window), index=s.index)
 
-def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/ricecta/data_alt', macro_data_dir='/home/hallo/data/ricecta/data/macro_factors'):
+def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_dir=None):
     """
     Computes alphas for all symbols.
     Returns a multi-indexed DataFrame with index [date, symbol] and alpha columns.
     """
+    if alt_data_dir is None:
+        alt_data_dir = os.path.join(_SCRIPT_DIR, 'data_alt')
+    if macro_data_dir is None:
+        macro_data_dir = os.path.join(_SCRIPT_DIR, 'data', 'macro_factors')
     # Load daily spot basis data for KalmanFilter_BOS
     spot_dfs = []
     for year in range(2021, 2027):
@@ -277,8 +283,8 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir='/home/hallo/data/r
 
 if __name__ == '__main__':
     # Simple self-test
-    DATA_DIR = '/home/hallo/data/ricecta/data/dominant_daily'
-    SPOT_DIR = '/home/hallo/data/ricecta/data/spot_basis'
+    DATA_DIR = os.path.join(_SCRIPT_DIR, 'data', 'dominant_daily')
+    SPOT_DIR = os.path.join(_SCRIPT_DIR, 'data', 'spot_basis')
     SYMBOLS = ['CU', 'AU', 'CF']
     res = compute_alphas(DATA_DIR, SPOT_DIR, SYMBOLS)
     print("Computed alphas shape:", res.shape)

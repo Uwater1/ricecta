@@ -7,12 +7,22 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore')
 from alphas import compute_alphas
 from evaluate_alpha import evaluate_alpha
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+FIGURES_DIR = os.path.join(_SCRIPT_DIR, 'figures')
+os.makedirs(FIGURES_DIR, exist_ok=True)
+
 # Paths
-DATA_DIR = '/home/hallo/data/ricecta/data/dominant_daily'
-SPOT_DIR = '/home/hallo/data/ricecta/data/spot_basis'
+DATA_DIR = os.path.join(_SCRIPT_DIR, 'data', 'dominant_daily')
+SPOT_DIR = os.path.join(_SCRIPT_DIR, 'data', 'spot_basis')
 
 # 23 underlyings
 SYMBOLS = [
@@ -102,6 +112,81 @@ def run():
         
     report += "\n---\n\n"
     
+    # --- Generate Plots ---
+    print("Generating plots...")
+
+    # 1. Equity Curves
+    fig, ax = plt.subplots(figsize=(14, 7))
+    for alpha in ALPHAS:
+        m = results.get(alpha, {})
+        cum = m.get('cum_returns')
+        if cum is not None and not cum.empty:
+            rebased = cum / cum.iloc[0]
+            ax.plot(rebased.index, rebased, label=f"{alpha} (Sharpe={m['sharpe_ratio']:.2f})")
+    ax.set_title("Alpha Equity Curves (Cumulative Net Returns)")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Equity (rebased to 1.0)")
+    ax.legend(fontsize=8)
+    ax.grid(True, linestyle='--', alpha=0.5)
+    fig.tight_layout()
+    equity_path = os.path.join(FIGURES_DIR, 'alpha_equity_curves.png')
+    fig.savefig(equity_path, dpi=200)
+    plt.close(fig)
+    print(f"  Saved equity curves to {equity_path}")
+
+    # 2. Drawdown Plot
+    fig, ax = plt.subplots(figsize=(14, 6))
+    for alpha in ALPHAS:
+        m = results.get(alpha, {})
+        dd = m.get('drawdown')
+        if dd is not None and not dd.empty:
+            ax.fill_between(dd.index, dd * 100, 0, alpha=0.3, label=f"{alpha} (MaxDD={m['max_drawdown']*100:.1f}%)")
+    ax.set_title("Alpha Underwater Drawdown Charts")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Drawdown (%)")
+    ax.legend(fontsize=8)
+    ax.grid(True, linestyle='--', alpha=0.5)
+    fig.tight_layout()
+    dd_path = os.path.join(FIGURES_DIR, 'alpha_drawdowns.png')
+    fig.savefig(dd_path, dpi=200)
+    plt.close(fig)
+    print(f"  Saved drawdown plots to {dd_path}")
+
+    # 3. Capacity Decay Bar Chart
+    aum_labels = ['0', '10M', '50M', '100M', '500M']
+    aum_keys = [0, 10_000_000, 50_000_000, 100_000_000, 500_000_000]
+    valid_alphas = [a for a in ALPHAS if results.get(a, {}).get('capacity_sharpes')]
+    if valid_alphas:
+        x = np.arange(len(valid_alphas))
+        width = 0.15
+        fig, ax = plt.subplots(figsize=(14, 6))
+        for i, (aum, label) in enumerate(zip(aum_keys, aum_labels)):
+            vals = [results[a]['capacity_sharpes'].get(aum, 0.0) for a in valid_alphas]
+            ax.bar(x + i * width, vals, width, label=f'AUM {label}')
+        ax.set_xlabel('Alpha')
+        ax.set_ylabel('Sharpe Ratio')
+        ax.set_title('Capacity-Adjusted Sharpe Decay by AUM Level')
+        ax.set_xticks(x + width * 2)
+        ax.set_xticklabels(valid_alphas, rotation=30, ha='right', fontsize=8)
+        ax.legend()
+        ax.grid(True, axis='y', linestyle='--', alpha=0.5)
+        fig.tight_layout()
+        cap_path = os.path.join(FIGURES_DIR, 'alpha_capacity_decay.png')
+        fig.savefig(cap_path, dpi=200)
+        plt.close(fig)
+        print(f"  Saved capacity decay chart to {cap_path}")
+    else:
+        cap_path = None
+
+    # Embed plots into the report
+    report += "## Equity Curves\n\n"
+    report += f"![Alpha Equity Curves]({equity_path})\n\n"
+    report += "## Drawdown Charts\n\n"
+    report += f"![Alpha Drawdowns]({dd_path})\n\n"
+    if cap_path:
+        report += "## Capacity Decay\n\n"
+        report += f"![Capacity Decay]({cap_path})\n\n"
+
     report += "## Capacity-Adjusted Sharpe Decay Table\n\n"
     report += "This table shows the decay of each alpha's Sharpe ratio at different levels of Assets Under Management (AUM) in RMB.\n\n"
     report += "| Alpha Name | Sharpe at 0 | Sharpe at 10M | Sharpe at 50M | Sharpe at 100M | Sharpe at 500M |\n"

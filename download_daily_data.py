@@ -14,8 +14,10 @@ warnings.filterwarnings('ignore')
 # Initialize rqdatac
 rqdatac.init()
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Output directory
-BASE_DIR = '/home/hallo/data/ricecta/data'
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 os.makedirs(DAILY_DIR, exist_ok=True)
 

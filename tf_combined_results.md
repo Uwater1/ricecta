@@ -1,16 +1,16 @@
 # TF Futures Macro Factor Combination Backtest Report
 
 This report evaluates various combination methods for trading CFFEX 5-year Treasury Note futures (TF) using three macro factors:
-1. **PMI Expectation** (`PMI_ç”Ÿäº§ç»è¥æ´»åŠ¨é¢„æœŸ_å…¨å›½_å½“æœŸå€¼_æœˆ`)
-2. **Manufacturing PMI** (`åˆ¶é€ ä¸šé‡‡è´­ç»ç†æŒ‡æ•°PMI_å½“æœˆ`)
-3. **Social Financing** (`ç¤¾ä¼šèèµ„è§„æ¨¡_å½“æœˆå€¼` for Dataset A, and `ç¤¾ä¼šèèµ„è§„æ¨¡å­˜é‡_åŒæ¯”å¢é€Ÿ_æœˆæœ«æ•°` for Dataset B)
+1. **PMI Expectation** (`PMI_Éú²ú¾­Óª»î¶¯Ô¤ÆÚ_È«¹ú_µ±ÆÚÖµ_ÔÂ`)
+2. **Manufacturing PMI** (`ÖÆÔìÒµ²É¹º¾­ÀíÖ¸ÊıPMI_µ±ÔÂ`)
+3. **Social Financing** (`Éç»áÈÚ×Ê¹æÄ£_µ±ÔÂÖµ` for Dataset A, and `Éç»áÈÚ×Ê¹æÄ£´æÁ¿_Í¬±ÈÔöËÙ_ÔÂÄ©Êı` for Dataset B)
 
 All models apply **look-ahead free** calendar alignment (1-day shift after forward-filling) and account for **transaction costs & slippage (5 bps)**.
 
 ---
 
 ## Dataset A: Requested Monthly Macro Factors (Dec 2023 - Jun 2026)
-*Limited duration due to rqdatac availability of `ç¤¾ä¼šèèµ„è§„æ¨¡_å½“æœˆå€¼`.*
+*Limited duration due to rqdatac availability of `Éç»áÈÚ×Ê¹æÄ£_µ±ÔÂÖµ`.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
@@ -24,12 +24,12 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 | **Rolling_Ridge** | -0.20% | 0.74% | -0.26 | -1.79% | -0.13 | 10.53% | 3.053% |
 
 *Dataset A Cumulative Returns:*
-![Dataset A Equity Curve](/home/hallo/data/ricecta/figures/tf_combined_equity_a.png)
+![Dataset A Equity Curve](figures/tf_combined_equity_a.png)
 
 ---
 
 ## Dataset B: Long-History Macro Factors (Jun 2021 - Jun 2026)
-*Using `ç¤¾ä¼šèèµ„è§„æ¨¡å­˜é‡_åŒæ¯”å¢é€Ÿ_æœˆæœ«æ•°` to provide a full 5-year macro cycle backtest.*
+*Using `Éç»áÈÚ×Ê¹æÄ£´æÁ¿_Í¬±ÈÔöËÙ_ÔÂÄ©Êı` to provide a full 5-year macro cycle backtest.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
@@ -43,7 +43,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 | **Baseline_PMI** | 0.18% | 1.71% | 0.11 | -4.08% | 0.11 | 47.25% | 3.282% |
 
 *Dataset B Cumulative Returns:*
-![Dataset B Equity Curve](/home/hallo/data/ricecta/figures/tf_combined_equity_b.png)
+![Dataset B Equity Curve](figures/tf_combined_equity_b.png)
 
 ---
 
@@ -51,7 +51,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 
 1. **Correlation Alignment**:
    - Both PMI indexes exhibit **positive correlation** with TF futures price returns (meaning rising PMI/Expectation predicts rising bond futures prices in the 2021-2026 period). This suggests a positive yield-bond price regime discrepancy or specific momentum structure in the historical sample.
-   - Social Financing (bothç•¶æœˆå€¼ and å­˜é‡åŒæ¯”) exhibit **negative correlation** (meaning expanding credit leads to lower bond futures prices, aligning with standard macroeconomic logic where credit expansion increases interest rates and bond yields).
+   - Social Financing (both®”ÔÂÖµ and ´æÁ¿Í¬±È) exhibit **negative correlation** (meaning expanding credit leads to lower bond futures prices, aligning with standard macroeconomic logic where credit expansion increases interest rates and bond yields).
 
 2. **Combination Superiority**:
    - Combining factors provides significantly better and more stable risk-adjusted returns (higher Sharpe) than trading any individual factor alone.

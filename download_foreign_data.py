@@ -12,7 +12,9 @@ import yfinance as yf
 
 warnings.filterwarnings('ignore')
 
-BASE_DIR = '/home/hallo/data/ricecta'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = _SCRIPT_DIR
 DATA_ALT_DIR = os.path.join(BASE_DIR, 'data_alt')
 os.makedirs(DATA_ALT_DIR, exist_ok=True)
 

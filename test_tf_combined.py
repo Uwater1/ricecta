@@ -13,12 +13,14 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-BASE_DIR = '/home/hallo/data/ricecta/data'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 MACRO_DIR = os.path.join(BASE_DIR, 'macro_factors')
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+FIGURES_DIR = os.path.join(_SCRIPT_DIR, 'figures')
 os.makedirs(RESULTS_DIR, exist_ok=True)
-os.makedirs('/home/hallo/data/ricecta/figures', exist_ok=True)
+os.makedirs(FIGURES_DIR, exist_ok=True)
 
 def load_and_align_factors(dataset_type='A'):
     # Load TF daily price data
@@ -290,43 +292,61 @@ def main():
     # Run for Dataset B (long-history alternative, 2021 onwards)
     results_b, dates_b = run_combinations_for_dataset('B')
     
+    # Helper to compute drawdown from cumulative returns
+    def compute_drawdown(cum_ret):
+        running_max = cum_ret.cummax()
+        return (cum_ret - running_max) / running_max
+
     # Generate Plots
-    plt.figure(figsize=(12, 7))
+    # --- Dataset B: Equity + Drawdown ---
+    fig_b, (ax_b_eq, ax_b_dd) = plt.subplots(2, 1, figsize=(13, 10),
+        gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
     for name in ['EW_Continuous', 'EW_Binary', 'Consensus_Voting', 'Regime_Switching', 'Rolling_Ridge', 'Baseline_PMI']:
         if name in results_b:
             cum_rets = results_b[name]['cum_returns']
-            # Crop to valid range where we trade (e.g. from 2021-03 onwards when z-score initializes)
             cum_rets_valid = cum_rets[cum_rets.index >= '2021-06-01']
             if not cum_rets_valid.empty:
-                # Re-base to 1.0 at start
-                cum_rets_valid = cum_rets_valid / cum_rets_valid.iloc[0]
-                plt.plot(cum_rets_valid.index, cum_rets_valid, label=f"{name} (Sharpe={results_b[name]['sharpe']:.2f})")
-    plt.title("Dataset B (2021-2026): Cumulative Net Returns of TF Trading Signals")
-    plt.xlabel("Date")
-    plt.ylabel("Equity")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig('/home/hallo/data/ricecta/figures/tf_combined_equity_b.png')
-    plt.close()
+                rebased = cum_rets_valid / cum_rets_valid.iloc[0]
+                ax_b_eq.plot(rebased.index, rebased, label=f"{name} (Sharpe={results_b[name]['sharpe']:.2f})")
+                dd = compute_drawdown(rebased)
+                ax_b_dd.fill_between(dd.index, dd * 100, 0, alpha=0.3, label=name)
+    ax_b_eq.set_title("Dataset B (2021-2026): Cumulative Net Returns of TF Trading Signals")
+    ax_b_eq.set_ylabel("Equity")
+    ax_b_eq.legend(fontsize=8)
+    ax_b_eq.grid(True)
+    ax_b_dd.set_title("Dataset B: Underwater Drawdown")
+    ax_b_dd.set_xlabel("Date")
+    ax_b_dd.set_ylabel("Drawdown (%)")
+    ax_b_dd.legend(fontsize=7)
+    ax_b_dd.grid(True)
+    fig_b.tight_layout()
+    fig_b.savefig(os.path.join(FIGURES_DIR, 'tf_combined_equity_b.png'))
+    plt.close(fig_b)
 
-    plt.figure(figsize=(12, 7))
+    # --- Dataset A: Equity + Drawdown ---
+    fig_a, (ax_a_eq, ax_a_dd) = plt.subplots(2, 1, figsize=(13, 10),
+        gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
     for name in ['EW_Continuous', 'EW_Binary', 'Consensus_Voting', 'Regime_Switching', 'Rolling_Ridge', 'Baseline_PMI']:
         if name in results_a:
             cum_rets = results_a[name]['cum_returns']
-            # Crop to valid range (from Dec 2023 onwards)
             cum_rets_valid = cum_rets[cum_rets.index >= start_date_a]
             if not cum_rets_valid.empty:
-                cum_rets_valid = cum_rets_valid / cum_rets_valid.iloc[0]
-                plt.plot(cum_rets_valid.index, cum_rets_valid, label=f"{name} (Sharpe={results_a[name]['sharpe']:.2f})")
-    plt.title("Dataset A (2023-2026): Cumulative Net Returns of TF Trading Signals")
-    plt.xlabel("Date")
-    plt.ylabel("Equity")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig('/home/hallo/data/ricecta/figures/tf_combined_equity_a.png')
-    plt.close()
+                rebased = cum_rets_valid / cum_rets_valid.iloc[0]
+                ax_a_eq.plot(rebased.index, rebased, label=f"{name} (Sharpe={results_a[name]['sharpe']:.2f})")
+                dd = compute_drawdown(rebased)
+                ax_a_dd.fill_between(dd.index, dd * 100, 0, alpha=0.3, label=name)
+    ax_a_eq.set_title("Dataset A (2023-2026): Cumulative Net Returns of TF Trading Signals")
+    ax_a_eq.set_ylabel("Equity")
+    ax_a_eq.legend(fontsize=8)
+    ax_a_eq.grid(True)
+    ax_a_dd.set_title("Dataset A: Underwater Drawdown")
+    ax_a_dd.set_xlabel("Date")
+    ax_a_dd.set_ylabel("Drawdown (%)")
+    ax_a_dd.legend(fontsize=7)
+    ax_a_dd.grid(True)
+    fig_a.tight_layout()
+    fig_a.savefig(os.path.join(FIGURES_DIR, 'tf_combined_equity_a.png'))
+    plt.close(fig_a)
 
     # Generate Report
     report = f"""# TF Futures Macro Factor Combination Backtest Report
@@ -353,7 +373,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
         
     report += """
 *Dataset A Cumulative Returns:*
-![Dataset A Equity Curve](/home/hallo/data/ricecta/figures/tf_combined_equity_a.png)
+![Dataset A Equity Curve](figures/tf_combined_equity_a.png)
 
 ---
 
@@ -369,7 +389,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
         
     report += """
 *Dataset B Cumulative Returns:*
-![Dataset B Equity Curve](/home/hallo/data/ricecta/figures/tf_combined_equity_b.png)
+![Dataset B Equity Curve](figures/tf_combined_equity_b.png)
 
 ---
 
@@ -389,7 +409,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
    - This makes the strategies highly resilient to transaction costs and slippage, preserving almost all frictionless Sharpe ratio benefits.
 """
     
-    with open('/home/hallo/data/ricecta/tf_combined_results.md', 'w') as f:
+    with open(os.path.join(_SCRIPT_DIR, 'tf_combined_results.md'), 'w') as f:
         f.write(report)
         
     print("\n=== Backtest Report Saved to tf_combined_results.md ===")

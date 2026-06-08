@@ -15,7 +15,9 @@ warnings.filterwarnings('ignore')
 # Initialize rqdatac
 rqdatac.init()
 
-BASE_DIR = '/home/hallo/data/ricecta/data'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 MACRO_DIR = os.path.join(BASE_DIR, 'macro_factors')
 os.makedirs(MACRO_DIR, exist_ok=True)
 
@@ -63,7 +65,7 @@ def parse_markdown(filepath):
     return symbol_to_factors
 
 def download_factors():
-    md_path = '/home/hallo/data/ricecta/potential_alt_alphas.md'
+    md_path = os.path.join(_SCRIPT_DIR, 'potential_alt_alphas.md')
     print(f"Parsing {md_path}...")
     symbol_to_factors = parse_markdown(md_path)
     

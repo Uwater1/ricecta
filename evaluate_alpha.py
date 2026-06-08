@@ -227,7 +227,10 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, de
         "ic": mean_ic,
         "top_quintile_return": top_quintile_ann,
         "bottom_quintile_return": bot_quintile_ann,
-        "capacity_sharpes": capacity_sharpes
+        "capacity_sharpes": capacity_sharpes,
+        "cum_returns": cum_returns,
+        "drawdown": drawdown,
+        "port_net_returns": port_net_returns
     }
 
 if __name__ == '__main__':

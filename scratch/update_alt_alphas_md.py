@@ -3,9 +3,12 @@ import os
 import re
 import pandas as pd
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_DIR = os.path.dirname(_SCRIPT_DIR)
+
 # Load files
-MD_PATH = '/home/hallo/data/ricecta/alt_alphas.md'
-RESULTS_DIR = '/home/hallo/data/ricecta/data/results'
+MD_PATH = os.path.join(_PROJECT_DIR, 'alt_alphas.md')
+RESULTS_DIR = os.path.join(_PROJECT_DIR, 'data', 'results')
 
 EXCHANGE_MAPPING = {
     'C': 'DCE (大商所)', 'M': 'DCE (大商所)', 'Y': 'DCE (大商所)', 'P': 'DCE (大商所)',

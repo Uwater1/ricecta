@@ -8,10 +8,15 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from evaluate_alpha import evaluate_alpha
 
-DATA_DIR = '/home/hallo/data/ricecta/data/dominant_daily'
-ALT_DATA_DIR = '/home/hallo/data/ricecta/data_alt'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DATA_DIR = os.path.join(_SCRIPT_DIR, 'data', 'dominant_daily')
+ALT_DATA_DIR = os.path.join(_SCRIPT_DIR, 'data_alt')
 SYMBOLS = ['C', 'M', 'Y', 'P', 'CF', 'SR']
 
 ALL_SYMBOLS = [
@@ -189,6 +194,31 @@ def run_optimization(use_cubed=True):
     print(f"  Sortino Ratio: {res.get('sortino_ratio', 0.0):.4f}")
     print(f"  Information Coefficient (IC): {res.get('ic', 0.0):.4f}")
     print(f"  Capacity Sharpe (AUM 500M): {res.get('capacity_sharpes', {}).get(500000000, 0.0):.4f}")
+    
+    # --- Plot equity curve and drawdown ---
+    cum_ret = res.get('cum_returns')
+    dd = res.get('drawdown')
+    if cum_ret is not None and not cum_ret.empty and dd is not None and not dd.empty:
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 9), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+        rebased = cum_ret / cum_ret.iloc[0]
+        ax1.plot(rebased.index, rebased, color='steelblue', linewidth=1.2)
+        ax1.set_title(f'Optimized ForeignAg Lead-Lag Alpha  |  Sharpe={res.get("sharpe_ratio", 0.0):.2f}  Ann.Ret={res.get("annualized_return", 0.0)*100:.1f}%')
+        ax1.set_ylabel('Equity (rebased to 1.0)')
+        ax1.grid(True, linestyle='--', alpha=0.5)
+
+        ax2.fill_between(dd.index, dd * 100, 0, color='salmon', alpha=0.5)
+        ax2.set_title(f'Underwater Drawdown  |  MaxDD={res.get("max_drawdown", 0.0)*100:.2f}%')
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('Drawdown (%)')
+        ax2.grid(True, linestyle='--', alpha=0.5)
+
+        fig.tight_layout()
+        fig_dir = os.path.join(_SCRIPT_DIR, 'figures')
+        os.makedirs(fig_dir, exist_ok=True)
+        plot_path = os.path.join(fig_dir, 'ag_optimized_equity.png')
+        fig.savefig(plot_path, dpi=200)
+        plt.close(fig)
+        print(f"\nSaved equity + drawdown plot to {plot_path}")
     
     return current_n
 

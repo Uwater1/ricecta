@@ -13,7 +13,9 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-BASE_DIR = '/home/hallo/data/ricecta/data'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 MACRO_DIR = os.path.join(BASE_DIR, 'macro_factors')
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
@@ -51,7 +53,7 @@ def calculate_t_stat(r, n):
     return r * np.sqrt((n - 2) / (1 - r**2))
 
 def run_correlation_test():
-    md_path = '/home/hallo/data/ricecta/potential_alt_alphas.md'
+    md_path = os.path.join(_SCRIPT_DIR, 'potential_alt_alphas.md')
     symbol_to_factors = parse_markdown(md_path)
     
     rows = []

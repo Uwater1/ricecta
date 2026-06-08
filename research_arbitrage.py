@@ -8,14 +8,18 @@ import os
 import glob
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Directories
-BASE_DIR = "/home/hallo/data/ricecta/data"
+BASE_DIR = os.path.join(_SCRIPT_DIR, "data")
 SPOT_DIR = os.path.join(BASE_DIR, "spot_basis")
 FUTURES_DIR = os.path.join(BASE_DIR, "futures_5minute")
 SHIBOR_DIR = os.path.join(BASE_DIR, "shibor")
-FIGURES_DIR = "/home/hallo/data/ricecta/figures"
+FIGURES_DIR = os.path.join(_SCRIPT_DIR, "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
 # 21 commodity symbols
@@ -380,20 +384,32 @@ def run_research():
     for k, (df_ret, metr) in portfolio_results.items():
         print(f"{k:<30} | {metr['annualized_return']*100:10.2f}% | {metr['annualized_vol']*100:8.2f}% | {metr['sharpe_ratio']:6.2f} | {metr['max_drawdown']*100:6.2f}% | {metr['win_rate']*100:6.2f}%")
         
-    # Plot portfolio equity curves
-    plt.figure(figsize=(12, 7))
+    # Plot portfolio equity curves and drawdown
+    fig, (ax_eq, ax_dd) = plt.subplots(2, 1, figsize=(13, 10),
+        gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
     for k, (df_ret, metr) in portfolio_results.items():
-        cum_ret = (1.0 + df_ret).cumprod() - 1.0
-        plt.plot(cum_ret.index, cum_ret * 100.0, label=f"{k} (Sharpe: {metr['sharpe_ratio']:.2f})")
-        
-    plt.title("Chinese Futures Arbitrage Portfolio Cumulative Returns (2021-2026)")
-    plt.ylabel("Cumulative Return (%)")
-    plt.xlabel("Date")
-    plt.legend()
-    plt.grid(True, linestyle="--", alpha=0.5)
-    
+        cum_ret = (1.0 + df_ret).cumprod()
+        ax_eq.plot(cum_ret.index, (cum_ret - 1.0) * 100.0, label=f"{k} (Sharpe: {metr['sharpe_ratio']:.2f})")
+        # Drawdown
+        running_max = cum_ret.cummax()
+        dd = (cum_ret - running_max) / running_max * 100.0
+        ax_dd.fill_between(dd.index, dd, 0, alpha=0.4, label=f"{k} (MaxDD: {metr['max_drawdown']*100:.1f}%)")
+
+    ax_eq.set_title("Chinese Futures Arbitrage Portfolio Cumulative Returns (2021-2026)")
+    ax_eq.set_ylabel("Cumulative Return (%)")
+    ax_eq.legend()
+    ax_eq.grid(True, linestyle="--", alpha=0.5)
+
+    ax_dd.set_title("Underwater Drawdown")
+    ax_dd.set_xlabel("Date")
+    ax_dd.set_ylabel("Drawdown (%)")
+    ax_dd.legend(fontsize=8)
+    ax_dd.grid(True, linestyle="--", alpha=0.5)
+
+    fig.tight_layout()
     plot_path = os.path.join(FIGURES_DIR, "portfolio_equity_curves.png")
-    plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+    fig.savefig(plot_path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
     print(f"\nSaved portfolio equity curves to {plot_path}")
     
     # Save individual symbol results to CSV
@@ -407,7 +423,7 @@ def run_research():
         rows.append(row)
         
     df_out = pd.DataFrame(rows)
-    csv_path = "/home/hallo/data/ricecta/arbitrage_metrics_by_symbol.csv"
+    csv_path = os.path.join(_SCRIPT_DIR, "arbitrage_metrics_by_symbol.csv")
     df_out.to_csv(csv_path, index=False)
     print(f"Saved symbol-level metrics to {csv_path}")
 

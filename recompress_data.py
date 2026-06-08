@@ -26,7 +26,9 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-BASE_DIR = '/home/hallo/data/ricecta/data'
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 COMPRESSION = 'zstd'
 COMPRESSION_LEVEL = 5
 

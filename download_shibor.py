@@ -3,12 +3,14 @@ import os
 import pandas as pd
 import rqdatac
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Initialize rqdatac
 rqdatac.init()
 
 def download_shibor():
     print("=== Downloading SHIBOR Data ===")
-    out_dir = "/home/hallo/data/ricecta/data/shibor"
+    out_dir = os.path.join(_SCRIPT_DIR, "data", "shibor")
     os.makedirs(out_dir, exist_ok=True)
     
     filepath = os.path.join(out_dir, "shibor.parquet")

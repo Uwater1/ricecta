@@ -8,6 +8,8 @@ import os
 import time
 import warnings
 import pandas as pd
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 import akshare as ak
 import rqdatac
 import yfinance as yf
@@ -67,7 +69,7 @@ def save_parquet(df: pd.DataFrame, path: str) -> None:
     )
 
 # Define output directories
-BASE_DIR = '/home/hallo/data/ricecta/data'
+BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
 FUTURES_DIR = os.path.join(BASE_DIR, 'futures_5minute')
 SPOT_DIR = os.path.join(BASE_DIR, 'spot_basis')
 YIELD_DIR = os.path.join(BASE_DIR, 'yield_curve')
