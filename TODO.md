@@ -4,7 +4,6 @@ I was Assigned with tasks foucus on finding non price-Volume alpha
 (Notice it must reflect non-price-Volume properties)
 * Boss told be as we only trade 23 instrument, IC_IR might not work that well (but still calculate)
 * test the evaluation system with traditional price_volume-based alpha, then report back to my boss
-* I must read more essay before I proceed
 
 2. Generate new alpha ideas, then test them using task 1.
 
