@@ -206,7 +206,7 @@ def run():
         
     # Generate markdown report
     report = "# Alpha Performance Evaluation Report\n\n"
-    report += f"This report evaluates the performance of the {len(ALPHAS)} alphas across 23 Chinese commodity futures from 2021 to 2026.\n\n"
+    report += f"This report evaluates the performance of the {len(ALPHAS)} alphas across 23 Chinese commodity futures from 2016 to 2026.\n\n"
     
     report += "## Performance Metrics Summary Table\n\n"
     report += "| Alpha Name | Ann. Return | Ann. Vol | Sharpe | Deflated Sharpe (DSR) | Calmar | MaxDD | Sortino | Profit Factor | Win Rate | Hit Rate | IC (Rank) |\n"
@@ -288,12 +288,12 @@ def run():
 
     # Embed plots into the report
     report += "## Equity Curves\n\n"
-    report += f"![Alpha Equity Curves]({equity_path})\n\n"
+    report += "![Alpha Equity Curves](figures/alpha_equity_curves.png)\n\n"
     report += "## Drawdown Charts\n\n"
-    report += f"![Alpha Drawdowns]({dd_path})\n\n"
+    report += "![Alpha Drawdowns](figures/alpha_drawdowns.png)\n\n"
     if cap_path:
         report += "## Capacity Decay\n\n"
-        report += f"![Capacity Decay]({cap_path})\n\n"
+        report += "![Capacity Decay](figures/alpha_capacity_decay.png)\n\n"
 
     report += "## Capacity-Adjusted Sharpe Decay Table\n\n"
     report += "This table shows the decay of each alpha's Sharpe ratio at different levels of Assets Under Management (AUM) in RMB.\n\n"

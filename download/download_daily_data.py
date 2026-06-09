@@ -15,9 +15,10 @@ warnings.filterwarnings('ignore')
 rqdatac.init()
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_WORKSPACE_DIR = os.path.dirname(_SCRIPT_DIR)
 
 # Output directory
-BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
+BASE_DIR = os.path.join(_WORKSPACE_DIR, 'data')
 DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 os.makedirs(DAILY_DIR, exist_ok=True)
 

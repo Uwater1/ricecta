@@ -21,8 +21,26 @@ Daily spot-basis and 5-minute contract data were used with risk-free financing r
 
 ## 2. Project Structure
 
-- [research_arbitrage.py](file:///home/hallo/data/ricecta/research_arbitrage.py): Backtest simulation engine for daily basis momentum and 5-minute curve spreads.
-- [download_shibor.py](file:///home/hallo/data/ricecta/download_shibor.py): Downloads daily Shanghai Interbank Offered Rate (SHIBOR) data via `rqdatac`.
-- [arbitrage_metrics_by_symbol.csv](file:///home/hallo/data/ricecta/arbitrage_metrics_by_symbol.csv): CSV containing detailed metrics for all 21 commodities.
-- [arbitrage.md](file:///home/hallo/data/ricecta/arbitrage.md): Comprehensive research methodology and findings.
-- [figures/portfolio_equity_curves.png](file:///home/hallo/data/ricecta/figures/portfolio_equity_curves.png): Cumulative return performance curves.
+- **Core Strategy & Evaluation Scripts:**
+  - [research_arbitrage.py](file:///home/hallo/data/ricecta/research_arbitrage.py): Backtest simulation engine for daily basis momentum and 5-minute curve spreads.
+  - [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py): Full evaluation pipeline runner for daily + hold alphas.
+  - [alphas.py](file:///home/hallo/data/ricecta/alphas.py): Unified alpha calculation library.
+  - [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py): Performance metrics calculator.
+  - [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py): Contract holding strategy backtest engine.
+  - [run_hold_backtest.py](file:///home/hallo/data/ricecta/run_hold_backtest.py): Optimization CLI for holding parameters H and k.
+
+- **Data Download Scripts (in `download/`):**
+  - [download/download_data.py](file:///home/hallo/data/ricecta/download/download_data.py): Main downloader for futures minute bars, spot basis, yield curve, etc.
+  - [download/download_daily_data.py](file:///home/hallo/data/ricecta/download/download_daily_data.py): Downloads pre-adjusted dominant contract daily prices.
+  - [download/download_contracts_daily.py](file:///home/hallo/data/ricecta/download/download_contracts_daily.py): Downloads daily data for individual contracts.
+  - [download/download_foreign_data.py](file:///home/hallo/data/ricecta/download/download_foreign_data.py): Downloads daily foreign agricultural futures prices and exchange rates.
+  - [download/download_macro_factors.py](file:///home/hallo/data/ricecta/download/download_macro_factors.py): Parses potential factors and fetches macro data.
+  - [download/download_shibor.py](file:///home/hallo/data/ricecta/download/download_shibor.py): Downloads SHIBOR financing rates.
+
+- **Research and Results Reports:**
+  - [arbitrage.md](file:///home/hallo/data/ricecta/arbitrage.md): Comprehensive arbitrage study methodology and conclusions.
+  - [alpha_evaluation_report.md](file:///home/hallo/data/ricecta/alpha_evaluation_report.md): Unified alpha strategy evaluation report.
+  - [alt_alphas.md](file:///home/hallo/data/ricecta/alt_alphas.md): Macro alpha factors and cross-sectional / time-series portfolio analysis.
+  - [hold_strategy_report.md](file:///home/hallo/data/ricecta/hold_strategy_report.md): Hold strategy optimization results report.
+  - [arbitrage_metrics_by_symbol.csv](file:///home/hallo/data/ricecta/arbitrage_metrics_by_symbol.csv): Detailed arbitrage metrics for all 23 commodities.
+

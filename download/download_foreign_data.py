@@ -13,8 +13,9 @@ import yfinance as yf
 warnings.filterwarnings('ignore')
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_WORKSPACE_DIR = os.path.dirname(_SCRIPT_DIR)
 
-BASE_DIR = _SCRIPT_DIR
+BASE_DIR = _WORKSPACE_DIR
 DATA_ALT_DIR = os.path.join(BASE_DIR, 'data_alt')
 os.makedirs(DATA_ALT_DIR, exist_ok=True)
 
@@ -122,4 +123,3 @@ if __name__ == '__main__':
     download_all()
     download_fx_rates()
     print("=== Foreign Data Download Completed ===")
-

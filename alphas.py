@@ -183,7 +183,7 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         macro_data_dir = os.path.join(_SCRIPT_DIR, 'data', 'macro_factors')
     # Load daily spot basis data for KalmanFilter_BOS
     spot_dfs = []
-    for year in range(2021, 2027):
+    for year in range(2016, 2027):
         path = os.path.join(spot_dir, f"spot_basis_{year}.parquet")
         if os.path.exists(path):
             spot_dfs.append(pd.read_parquet(path))
@@ -251,9 +251,10 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.to_datetime(df.index)
         df = df.sort_index()
-        
         # Calculate daily returns
         df["returns"] = df["close"].pct_change()
+        # Replace inf/nan and clip to daily price limits [-10%, +10%] to prevent metric distortion from zero adjusted prices
+        df["returns"] = df["returns"].replace([np.inf, -np.inf], np.nan).fillna(0.0).clip(-0.1, 0.1)
         
         # 1. HTFC_Alpha19_tsrank_mom_rev
         # TS_Rank(volume,32)* (1-TS_Rank(((close+high) -low),16)))* (1-TS_Rank(returns,32)))

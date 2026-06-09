@@ -19,7 +19,7 @@ rtk uv pip install --python venv/bin/python -r requirements.txt
 
 2. Download SHIBOR data:
 ```bash
-rtk venv/bin/python download_shibor.py
+rtk venv/bin/python download/download_shibor.py
 ```
 
 3. Run backtest simulation:
@@ -35,7 +35,7 @@ rtk venv/bin/python research_arbitrage.py
 Framework evaluates 9 alpha signals across 23 commodity futures.
 
 ### Structure
-- **Data Downloader:** [download_daily_data.py](file:///home/hallo/data/ricecta/download_daily_data.py) — fetches pre-adjusted dominant daily contracts (no roll gaps).
+- **Data Downloader:** [download_daily_data.py](file:///home/hallo/data/ricecta/download/download_daily_data.py) — fetches pre-adjusted dominant daily contracts (no roll gaps).
 - **Alpha Library:** [alphas.py](file:///home/hallo/data/ricecta/alphas.py) — calculates 7 daily signals + 1 no-rolling discretized signal (`Alt_Macro_Alpha_NoRoll`). Also exposes `get_dominant_switch_dates()` (canonical source) and `BEST_HOLD_PARAMS` (optimized hold period H and contract index k per symbol).
 - **Metrics Evaluator:** [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py) — calculates DSR (multiple testing), Sortino, Turnover-Adjusted Calmar, Capacity-Adjusted Sharpe Decay (market impact).
 - **Hold Strategy Engine:** [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py) — per-symbol contract hold backtest with OI-based liquidity filtering and maturity exit rules. Imports `get_dominant_switch_dates` from `alphas.py`.
@@ -64,7 +64,7 @@ rtk venv/bin/python run_evaluation.py 9  # runs NoRoll hold strategy
 - **Optimal N parameters ($N \in [3,60]$):** `C`: 3, `M`: 3, `Y`: 5, `P`: 55, `CF`: 4, `SR`: 50.
 - **Vectorized Evaluation Speedup:** Vectorized weights, IC Spearman correlation, and quintiles in [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py). Execution time down from 30+s to ~2s.
 - **Evaluation CLI args:** Added argument parser in [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) to run specific alpha.
-- **Alternative Macro Data Testing Pipeline:** Created `download_macro_factors.py` and `test_alt_alphas.py` to parse, download, and screen 83 candidate macro factors using Spearman correlation against future returns. Documented in `alt_alphas.md`, sorted by significance.
+- **Alternative Macro Data Testing Pipeline:** Created `download/download_macro_factors.py` and `test_alt_alphas.py` to parse, download, and screen 83 candidate macro factors using Spearman correlation against future returns. Documented in `alt_alphas.md`, sorted by significance. Raw aligned daily timeseries data (PMI factors vs forward returns) for AU saved as [raw_aligned_timeseries.csv](file:///home/hallo/data/ricecta/raw_aligned_timeseries.csv) at workspace root.
 - **Alpha Library Integration (`Alt_Macro_Alpha`):** Added `Alt_Macro_Alpha` into `alphas.py`, dynamically computing the optimal representation (level, diff, or z-score) of the best macro factor signed by its correlation per symbol.
 - **Flexible Evaluation Framework & 20-Day Switch:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Switched configuration to target the optimal 20-day horizon correlation. Alt_Macro_Alpha_TS achieves a Sharpe ratio of 0.90 (up from 0.81) and Alt_Macro_Alpha_XS achieves 0.62 (up from 0.25). Included 20-day horizon summary and top 3 tables in `alt_alphas.md`.
 
@@ -93,7 +93,7 @@ rtk venv/bin/python test_tf_combined.py
 - **Commands to Run:**
   - Download individual contracts data:
   ```bash
-  rtk venv/bin/python download_contracts_daily.py
+  rtk venv/bin/python download/download_contracts_daily.py
   ```
   - Run unified evaluation (includes NoRoll as alpha 9):
   ```bash
@@ -103,3 +103,8 @@ rtk venv/bin/python test_tf_combined.py
   ```bash
   rtk venv/bin/python run_hold_backtest.py
   ```
+
+## Pre-2021 Backtest & Return Cleaning (Jun 2026)
+- **Zero Close Prices and Inf Returns**: Pre-adjusted prices can drop to or below zero. Computing `pct_change()` on zero close prices creates `inf` values that pollute portfolio returns and result in `nan`/`inf` performance metrics. Always replace `inf`/`-inf` with `nan` and fill with `0.0` to sanitize returns.
+- **Spot Basis & Dominant Mappings Data Scope**: Spot basis data is downloaded yearly via AkShare. Dominant contracts mapping is fetched from rqdatac. Ensure these files are downloaded for the full backtest horizon (2016-2026) to avoid empty trades before 2021.
+- **Report Markdown Image Paths**: Use relative paths (`figures/name.png`) instead of absolute container paths (`/data/ricecta/figures/name.png`) for report images, enabling markdown rendering in any host reader environment.

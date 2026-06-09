@@ -10,6 +10,8 @@ import warnings
 import pandas as pd
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_WORKSPACE_DIR = os.path.dirname(_SCRIPT_DIR)
+
 import akshare as ak
 import rqdatac
 import yfinance as yf
@@ -69,7 +71,7 @@ def save_parquet(df: pd.DataFrame, path: str) -> None:
     )
 
 # Define output directories
-BASE_DIR = os.path.join(_SCRIPT_DIR, 'data')
+BASE_DIR = os.path.join(_WORKSPACE_DIR, 'data')
 FUTURES_DIR = os.path.join(BASE_DIR, 'futures_5minute')
 SPOT_DIR = os.path.join(BASE_DIR, 'spot_basis')
 YIELD_DIR = os.path.join(BASE_DIR, 'yield_curve')
@@ -170,7 +172,7 @@ def download_futures_5minute():
                     save_parquet(df_group, filepath)
                     downloaded_set.add(contract)
                     print(f"    Saved {contract}: {df_group.shape[0]} rows")
-
+ 
                 # Write empty parquet for requested contracts that didn't return any data
                 for contract in contracts_to_download:
                     if contract not in downloaded_set:
