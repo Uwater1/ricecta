@@ -87,8 +87,10 @@ def compute_switch_forward_returns(df_price, switch_dates):
 
     # Fixed calendar-day forward returns (short-term / medium-term)
     close_series = df_price['close']
-    result['fwd_ret_5d'] = close_series.pct_change(5).shift(-5).values
-    result['fwd_ret_20d'] = close_series.pct_change(20).shift(-20).values
+    fwd_ret_5d = close_series.pct_change(5).shift(-5).replace([np.inf, -np.inf], np.nan)
+    fwd_ret_20d = close_series.pct_change(20).shift(-20).replace([np.inf, -np.inf], np.nan)
+    result['fwd_ret_5d'] = fwd_ret_5d.values
+    result['fwd_ret_20d'] = fwd_ret_20d.values
 
     for i, label in enumerate(SWITCH_HORIZONS, start=1):
         # The target switch is the i-th switch from now (0-indexed: first_switch_pos + i - 1)
@@ -112,6 +114,7 @@ def compute_switch_forward_returns(df_price, switch_dates):
 
         fwd_ret = np.full(n, np.nan)
         fwd_ret[valid] = close[target_td_pos[valid]] / close[np.arange(n)[valid]] - 1.0
+        fwd_ret[~np.isfinite(fwd_ret)] = np.nan  # Replace inf and -inf with nan
 
         result[f'fwd_ret_{label}'] = fwd_ret
         result[f'days_{label}'] = days_to_switch
@@ -201,15 +204,23 @@ def run_correlation_test():
                 'zscore': s_zscore
             }
             
-            # Compute correlations for each signal representation and contract-switch horizon
+            # Calculate release trading dates (first trading day strictly after each release date)
+            pos = np.searchsorted(trading_dates, df_fac.index, side='right')
+            valid_pos = pos[pos < len(trading_dates)]
+            release_trading_dates = trading_dates[valid_pos].unique()
+
+            # Compute correlations for each signal representation
             for sig_name, sig_series in signals.items():
+                horizon_stats = {}
                 for horizon in HORIZONS:
                     fwd_col = f"fwd_ret_{horizon}"
                     
-                    # Align and drop NaNs
-                    df_corr = pd.DataFrame({'sig': sig_series, 'fwd': df_price[fwd_col]}).dropna()
+                    # Align and reindex to only the release trading dates, then drop NaNs
+                    df_corr = pd.DataFrame({'sig': sig_series, 'fwd': df_price[fwd_col]}).reindex(release_trading_dates).dropna()
+                    df_corr = df_corr[np.isfinite(df_corr['sig']) & np.isfinite(df_corr['fwd'])]
                     n_obs = len(df_corr)
-                    if n_obs < 30:
+                    
+                    if n_obs < 15:
                         continue
                         
                     # Pearson
@@ -220,18 +231,58 @@ def run_correlation_test():
                     r_spear, p_spear = stats.spearmanr(df_corr['sig'], df_corr['fwd'])
                     t_spear = calculate_t_stat(r_spear, n_obs)
                     
-                    rows.append({
-                        'symbol': symbol,
-                        'factor': raw_factor,
-                        'representation': sig_name,
-                        'horizon': horizon,
+                    # Sub-period split for temporal stability
+                    mid_idx = n_obs // 2
+                    df_first = df_corr.iloc[:mid_idx]
+                    df_second = df_corr.iloc[mid_idx:]
+                    
+                    r_first, _ = stats.spearmanr(df_first['sig'], df_first['fwd']) if len(df_first) >= 5 else (np.nan, np.nan)
+                    r_second, _ = stats.spearmanr(df_second['sig'], df_second['fwd']) if len(df_second) >= 5 else (np.nan, np.nan)
+                    
+                    temporal_consistent = False
+                    if not np.isnan(r_first) and not np.isnan(r_second):
+                        temporal_consistent = (np.sign(r_first) == np.sign(r_second)) and (r_first != 0.0) and (r_second != 0.0)
+                        
+                    horizon_stats[horizon] = {
                         'n_obs': n_obs,
                         'pearson_corr': r_pears,
                         'pearson_t': t_pears,
                         'pearson_p': p_pears,
                         'spearman_corr': r_spear,
                         'spearman_t': t_spear,
-                        'spearman_p': p_spear
+                        'spearman_p': p_spear,
+                        'spearman_first_half': r_first,
+                        'spearman_second_half': r_second,
+                        'temporal_consistent': temporal_consistent
+                    }
+                
+                # Check horizon sign consistency between 5d and 20d
+                r_5d = horizon_stats.get('5d', {}).get('spearman_corr', np.nan)
+                r_20d = horizon_stats.get('20d', {}).get('spearman_corr', np.nan)
+                horizon_consistent = False
+                if not np.isnan(r_5d) and not np.isnan(r_20d):
+                    horizon_consistent = (np.sign(r_5d) == np.sign(r_20d)) and (r_5d != 0.0) and (r_20d != 0.0)
+                
+                for horizon in HORIZONS:
+                    if horizon not in horizon_stats:
+                        continue
+                    h_stat = horizon_stats[horizon]
+                    rows.append({
+                        'symbol': symbol,
+                        'factor': raw_factor,
+                        'representation': sig_name,
+                        'horizon': horizon,
+                        'n_obs': h_stat['n_obs'],
+                        'pearson_corr': h_stat['pearson_corr'],
+                        'pearson_t': h_stat['pearson_t'],
+                        'pearson_p': h_stat['pearson_p'],
+                        'spearman_corr': h_stat['spearman_corr'],
+                        'spearman_t': h_stat['spearman_t'],
+                        'spearman_p': h_stat['spearman_p'],
+                        'spearman_first_half': h_stat['spearman_first_half'],
+                        'spearman_second_half': h_stat['spearman_second_half'],
+                        'temporal_consistent': h_stat['temporal_consistent'],
+                        'horizon_consistent_5d_20d': horizon_consistent
                     })
                     
     df_results = pd.DataFrame(rows)
@@ -282,14 +333,14 @@ def run_correlation_test():
         df_best.to_csv(best_h_path, index=False)
         
         print(f"\n=== Best Alternative Data Factors per Symbol ({h}) ===")
-        print(df_best[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
+        print(df_best[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t', 'temporal_consistent', 'horizon_consistent_5d_20d']].to_string(index=False))
         
         # Top 3 per symbol
         df_top3 = df_h.sort_values(['symbol', 'abs_spearman_t'], ascending=[True, False]).groupby('symbol').head(3)
         top3_path = os.path.join(RESULTS_DIR, f'top3_factors_{h}_summary.csv')
         df_top3.to_csv(top3_path, index=False)
         print(f"\n=== Top 3 Alternative Data Factors per Symbol ({h}) ===")
-        print(df_top3[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t']].to_string(index=False))
+        print(df_top3[['symbol', 'factor', 'representation', 'spearman_corr', 'spearman_t', 'temporal_consistent', 'horizon_consistent_5d_20d']].to_string(index=False))
 
     return df_results, horizon_days_stats
 

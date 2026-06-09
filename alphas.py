@@ -209,31 +209,31 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
     else:
         fx_rates = pd.DataFrame()
 
-    # Best-performing macro factor configs per symbol from screening results (look-ahead free, 1d-shifted)
+    # Best-performing macro factor configs per symbol from screening results (look-ahead free, 1d-shifted, release-date-only aligned)
     BEST_MACRO_CONFIGS = {
-        'AG': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
-        'AL': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
-        'AU': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': -1},
-        'C': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'diff', 'sign': -1},
-        'CF': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'level', 'sign': 1},
-        'CU': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
-        'I': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'diff', 'sign': 1},
-        'J': {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': -1},
-        'JD': {'factor': 'PPI_食品制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
-        'M': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'level', 'sign': -1},
-        'MA': {'factor': '非制造业PMI_建筑业_全国_当期值_月', 'representation': 'diff', 'sign': -1},
-        'NI': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': -1},
-        'P': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'zscore', 'sign': -1},
-        'RB': {'factor': '非制造业PMI_建筑业_全国_当期值_月', 'representation': 'diff', 'sign': -1},
-        'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},
-        'SA': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
-        'SC': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'zscore', 'sign': -1},
-        'SN': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'level', 'sign': 1},
-        'SR': {'factor': 'PPI_食品制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
-        'TA': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'zscore', 'sign': -1},
-        'TF': {'factor': '制造业采购经理指数PMI_当月', 'representation': 'level', 'sign': 1},
-        'V': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
-        'Y': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1}
+        'AG': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},
+        'C': {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},
+        'CF': {'factor': 'PPI_纺织业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'CU': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'diff', 'sign': 1},
+        'I': {'factor': 'GDP增长贡献率_第二产业_累计同比_季', 'representation': 'zscore', 'sign': -1},
+        'J': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
+        'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
+        'M': {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': 1},
+        'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
+        'NI': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1},
+        'P': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': 1},
+        'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
+        'RU': {'factor': 'PPI_化学原料及化学制品制造业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
+        'SA': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
+        'SC': {'factor': 'CPI-PPI_差值_当月', 'representation': 'level', 'sign': -1},
+        'SN': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
+        'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
+        'TA': {'factor': 'PPIRM_纺织原料类(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
+        'TF': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': -1},
+        'V': {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},
+        'Y': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1}
     }
 
     all_data = []
