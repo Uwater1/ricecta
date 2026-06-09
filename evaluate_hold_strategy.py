@@ -224,6 +224,7 @@ def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, 
             'direction': 'LONG' if direction > 0 else 'SHORT',
             'p_entry': p_entry,
             'p_exit': p_exit,
+            'hold_days': len(trade_dates),
             'raw_return': raw_trade_ret,
             'net_return': net_trade_ret
         })
@@ -261,6 +262,16 @@ def backtest_hold_strategy(symbol, signal_series, df_contracts, metadata, H, k, 
     # Calculate performance metrics
     metrics = calculate_metrics(daily_returns, trades)
     
+    # Save trade log to CSV
+    if trades:
+        results_dir = os.path.join(_SCRIPT_DIR, 'data', 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        trade_log_path = os.path.join(results_dir, f"trade_log_{symbol}.csv")
+        df_trades = pd.DataFrame(trades)
+        cols = ['entry_date', 'exit_date', 'contract', 'direction', 'p_entry', 'p_exit', 'hold_days', 'raw_return', 'net_return']
+        cols = [c for c in cols if c in df_trades.columns]
+        df_trades[cols].to_csv(trade_log_path, index=False)
+        
     return {
         'daily_returns': daily_returns,
         'trades': trades,

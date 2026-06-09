@@ -8,6 +8,8 @@ import re
 import numpy as np
 import pandas as pd
 import numba
+import json
+from contract_splicer import ContractSplicer
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DOMINANT_DIR = os.path.join(_SCRIPT_DIR, 'data', 'dominant_contracts')
@@ -238,14 +240,29 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         'Y': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1}
     }
 
+    # Hot-load from JSON if exists
+    config_json_path = os.path.join(_SCRIPT_DIR, 'data', 'results', 'best_macro_configs.json')
+    if os.path.exists(config_json_path):
+        try:
+            with open(config_json_path, 'r', encoding='utf-8') as f:
+                loaded_configs = json.load(f)
+                for sym, cfg in loaded_configs.items():
+                    BEST_MACRO_CONFIGS[sym] = cfg
+        except Exception as e:
+            print(f"Warning: could not load best_macro_configs.json: {e}")
+
     all_data = []
 
     for symbol in symbols:
-        price_path = os.path.join(data_dir, f"{symbol}.parquet")
-        if not os.path.exists(price_path):
+        # Load k-th nearest liquid contract price using ContractSplicer
+        k = BEST_HOLD_PARAMS.get(symbol, (20, 1))[1]
+        try:
+            splicer = ContractSplicer(symbol, k=k)
+            df = splicer.build()
+        except Exception as e:
+            print(f"Warning: could not splice contract prices for {symbol}: {e}")
             continue
             
-        df = pd.read_parquet(price_path)
         if df.empty:
             continue
             
@@ -335,28 +352,37 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
                 try:
                     df_fac = pd.read_parquet(factor_path)
                     if not df_fac.empty:
-                        if 'info_date' in df_fac.index.names:
-                            df_fac = df_fac.reset_index()
-                        df_fac['info_date'] = pd.to_datetime(df_fac['info_date'])
-                        df_fac = df_fac.set_index('info_date').sort_index()
-                        df_fac = df_fac[~df_fac.index.duplicated(keep='last')]
-                        
-                        all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
-                        if cfg['representation'] == 'level':
-                            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
-                            s = val_daily.reindex(df.index)
-                        elif cfg['representation'] == 'diff':
-                            fac_diff = df_fac['value'].diff()
-                            diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
-                            s = diff_daily.reindex(df.index)
-                        elif cfg['representation'] == 'zscore':
-                            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
-                            s_level = val_daily.reindex(df.index)
-                            s = (s_level - s_level.rolling(252).mean()) / s_level.rolling(252).std()
-                        else:
-                            s = pd.Series(np.nan, index=df.index)
-                        
-                        df["Alt_Macro_Alpha"] = (s * cfg['sign']).astype(np.float32)
+                        # NaN guard: check for at least 12 non-NaN observations
+                        non_nan_count = df_fac['value'].notna().sum()
+                        if non_nan_count >= 12:
+                            if 'info_date' in df_fac.index.names:
+                                df_fac = df_fac.reset_index()
+                            df_fac['info_date'] = pd.to_datetime(df_fac['info_date'])
+                            df_fac = df_fac.set_index('info_date').sort_index()
+                            df_fac = df_fac[~df_fac.index.duplicated(keep='last')]
+                            
+                            all_dates = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
+                            if cfg['representation'] == 'level':
+                                val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
+                                s = val_daily.reindex(df.index)
+                            elif cfg['representation'] == 'diff':
+                                fac_diff = df_fac['value'].diff()
+                                diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
+                                s = diff_daily.reindex(df.index)
+                            elif cfg['representation'] == 'zscore':
+                                val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
+                                s_level = val_daily.reindex(df.index)
+                                s = (s_level - s_level.rolling(252).mean()) / s_level.rolling(252).std()
+                            else:
+                                s = pd.Series(np.nan, index=df.index)
+                            
+                            raw_signal = s * cfg['sign']
+                            # Winsorize at [1%, 99%] using rolling 252-day window (look-ahead free)
+                            q_low = raw_signal.rolling(252, min_periods=12).quantile(0.01)
+                            q_high = raw_signal.rolling(252, min_periods=12).quantile(0.99)
+                            winsorized = raw_signal.clip(lower=q_low, upper=q_high)
+                            
+                            df["Alt_Macro_Alpha"] = winsorized.astype(np.float32)
                 except Exception:
                     pass
 

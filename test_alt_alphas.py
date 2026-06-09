@@ -19,6 +19,10 @@ import scipy.stats as stats
 import warnings
 
 from evaluate_hold_strategy import get_dominant_switch_dates
+from alphas import BEST_HOLD_PARAMS
+from contract_splicer import ContractSplicer
+import argparse
+import json
 
 warnings.filterwarnings('ignore')
 
@@ -337,7 +341,45 @@ def plot_horizon_stability(df_results, best_factors_dict, figures_dir):
     plt.close()
     print(f"Saved horizon stability grid plot to: {plot_path}")
 
-def run_correlation_test():
+def check_new_data(symbol_to_factors):
+    watermark_path = os.path.join(RESULTS_DIR, '.last_run_state.json')
+    watermarks = {}
+    if os.path.exists(watermark_path):
+        try:
+            with open(watermark_path, 'r', encoding='utf-8') as f:
+                watermarks = json.load(f)
+        except Exception:
+            pass
+
+    # Gather all unique factor files to check
+    all_factors = set()
+    for factors in symbol_to_factors.values():
+        for f in factors:
+            all_factors.add(f)
+            
+    has_new = (not watermarks)
+    current_watermarks = {}
+    for factor in all_factors:
+        filename = re.sub(r'[\\/*?:"<>|]', '_', factor) + ".parquet"
+        factor_path = os.path.join(MACRO_DIR, filename)
+        if os.path.exists(factor_path):
+            try:
+                df_fac = pd.read_parquet(factor_path)
+                if not df_fac.empty:
+                    if 'info_date' in df_fac.index.names:
+                        df_fac = df_fac.reset_index()
+                    max_date = pd.to_datetime(df_fac['info_date']).max()
+                    max_date_str = max_date.strftime('%Y-%m-%d')
+                    current_watermarks[filename] = max_date_str
+                    
+                    if filename not in watermarks or watermarks[filename] < max_date_str:
+                        has_new = True
+            except Exception:
+                pass
+                
+    return has_new, current_watermarks
+
+def run_correlation_test(force=False):
     md_path = os.path.join(_SCRIPT_DIR, 'potential_alt_alphas.md')
     symbol_to_factors = parse_markdown(md_path)
     
@@ -345,17 +387,14 @@ def run_correlation_test():
     horizon_days_stats = {}  # {symbol: {H1: median_days, H2: ..., ...}}
     
     for symbol in SYMBOLS:
-        price_path = os.path.join(DAILY_DIR, f"{symbol}.parquet")
-        if not os.path.exists(price_path):
+        # Load k-th nearest liquid contract price using ContractSplicer
+        k = BEST_HOLD_PARAMS.get(symbol, (20, 1))[1]
+        try:
+            splicer = ContractSplicer(symbol, k=k)
+            df_price = splicer.build()
+        except Exception as e:
+            print(f"  Warning: could not splice contract prices for {symbol}: {e}")
             continue
-            
-        df_price = pd.read_parquet(price_path)
-        if df_price.empty:
-            continue
-            
-        if not isinstance(df_price.index, pd.DatetimeIndex):
-            df_price.index = pd.to_datetime(df_price.index)
-        df_price = df_price.sort_index()
         
         # Load dominant contract switch dates (data-driven, per-symbol)
         try:
@@ -683,7 +722,35 @@ def run_correlation_test():
     if best_factors_dict:
         plot_horizon_stability(df_results, best_factors_dict, FIGURES_DIR)
         
+        # Save best_macro_configs.json
+        configs_json_path = os.path.join(RESULTS_DIR, 'best_macro_configs.json')
+        with open(configs_json_path, 'w', encoding='utf-8') as f:
+            json.dump(best_factors_dict, f, indent=4, ensure_ascii=False)
+        print(f"Saved best macro configs to {configs_json_path}")
+        
+    # Save watermarks
+    if current_watermarks:
+        watermark_path = os.path.join(RESULTS_DIR, '.last_run_state.json')
+        with open(watermark_path, 'w', encoding='utf-8') as f:
+            json.dump(current_watermarks, f, indent=4)
+        print(f"Saved run watermarks to: {watermark_path}")
+        
     return df_results, horizon_days_stats
 
 if __name__ == '__main__':
-    run_correlation_test()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--force', action='store_true', help='Force execution regardless of data updates')
+    args = parser.parse_args()
+    
+    md_path = os.path.join(_SCRIPT_DIR, 'potential_alt_alphas.md')
+    symbol_to_factors = parse_markdown(md_path)
+    has_new, current_watermarks = check_new_data(symbol_to_factors)
+    
+    if not has_new and not args.force:
+        print("No new macro data detected. Skipping run.")
+    else:
+        if args.force:
+            print("Force run requested. Proceeding...")
+        else:
+            print("New macro data detected. Proceeding...")
+        run_correlation_test(force=args.force)

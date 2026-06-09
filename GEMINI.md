@@ -117,3 +117,11 @@ rtk venv/bin/python test_tf_combined.py
 ## Pre-2021 Backtest & Return Cleaning (Jun 2026)
 - **Zero Close Prices and Inf Returns**: Pre-adjusted prices can drop to or below zero. Computing `pct_change()` on zero close prices creates `inf` values that pollute portfolio returns and result in `nan`/`inf` performance metrics. Always replace `inf`/`-inf` with `nan` and fill with `0.0` to sanitize returns. For multi-day forward returns, mask close prices <= 0.0, and clean returns outside `[-0.9, 4.0]` to NaN to remove division artifacts.
 - **Report Markdown Image Paths**: Use relative paths (`figures/name.png`) instead of absolute container paths (`/data/ricecta/figures/name.png`) for report images, enabling markdown rendering in any host reader environment.
+
+## Production Readiness & Contract-Specific Pricing (Jun 2026)
+- **Contract Splicing (No Dominant Contract Dependency):** Implemented [contract_splicer.py](file:///home/hallo/data/ricecta/contract_splicer.py) to build ratio-adjusted continuous daily price series directly from individual contracts under `data/contracts_daily/` using top-3 rolling open interest and maturity month limits. Removed all dependency on `dominant_daily` parquets for evaluation and screening.
+- **Release-Gated Screening:** Added a watermark tracking mechanism (`.last_run_state.json`) in [test_alt_alphas.py](file:///home/hallo/data/ricecta/test_alt_alphas.py) to skip re-running sweeps when no new macro factor data is released. Use `rtk python test_alt_alphas.py --force` to override.
+- **Dynamic Config Loading:** [alphas.py](file:///home/hallo/data/ricecta/alphas.py) hot-loads robust factors from `data/results/best_macro_configs.json` if available, with a hardcoded dictionary fallback.
+- **Signal Hardening:** Applied rolling 252-day winsorization (1% to 99%) and a minimum 12-observation NaN guard in [alphas.py](file:///home/hallo/data/ricecta/alphas.py) to protect signal generation.
+- **Detailed Trade Logging:** Backtest logs now output to `data/results/trade_log_{symbol}.csv` including `hold_days`, raw return, transaction costs, and price levels.
+- **Macro Data Updater:** Run `rtk python download/update_macro_data.py` to refresh all macro factor files from rqdatac up to the current date.
