@@ -1,49 +1,57 @@
-# Alpha Performance Evaluation Report
+# Per-Symbol Alt Macro Alpha Evaluation Report
 
-This report evaluates the performance of the 9 alphas across 23 Chinese commodity futures from 2016 to 2026.
+This report evaluates each of the 23 Chinese commodity futures individually with its #1 ranked alternative macro factor from the screening pipeline. Each symbol-factor pair is backtested as a single-asset directional strategy with 5bps transaction costs.
 
-## Performance Metrics Summary Table
+## Per-Symbol Performance Summary (Sorted by Sharpe Ratio)
 
-| Alpha Name | Ann. Return | Ann. Vol | Sharpe | Deflated Sharpe (DSR) | Calmar | MaxDD | Sortino | Profit Factor | Win Rate | Hit Rate | IC (Rank) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **HTFC_Alpha19_tsrank_mom_rev** | -11.34% | 7.44% | -1.52 | 0.00% | -0.16 | -70.69% | -1.51 | 0.76 | 44.38% | 49.46% | 0.0094 |
-| **KalmanFilter_BOS** | -6.97% | 6.79% | -1.03 | 0.00% | -0.13 | -53.95% | -0.98 | 0.84 | 47.55% | 48.58% | 0.0004 |
-| **HTFC_Alpha1_meanclose12** | -12.47% | 11.26% | -1.11 | 0.00% | -0.16 | -76.43% | -1.12 | 0.82 | 46.05% | 49.96% | 0.0038 |
-| **HTFC_Alpha5_skew20** | -3.33% | 6.20% | -0.54 | 0.00% | -0.09 | -35.14% | -0.53 | 0.91 | 48.31% | 49.59% | 0.0072 |
-| **EWMA_32_64_CTA** | 7.48% | 10.55% | 0.71 | 36.63% | 0.43 | -17.49% | 0.68 | 1.13 | 54.31% | 49.86% | 0.0246 |
-| **ForeignAg_LeadLag** | 3.45% | 9.40% | 0.37 | 13.21% | 0.24 | -14.25% | 0.37 | 1.07 | 50.74% | 49.62% | 0.0149 |
-| **Alt_Macro_Alpha_XS** | 7.05% | 7.91% | 0.89 | 59.13% | 0.41 | -17.27% | 0.91 | 1.16 | 52.36% | 49.50% | 0.0153 |
-| **Alt_Macro_Alpha_TS** | 9.70% | 13.19% | 0.74 | 39.63% | 0.51 | -19.03% | 0.78 | 1.16 | 51.41% | 49.87% | 0.0153 |
-| **Alt_Macro_Alpha_NoRoll** | 2.87% | 2.93% | 0.98 | 69.84% | 0.52 | -5.56% | 1.01 | nan | 52.09% | 0.00% | 0.0000 |
+| Rank | Symbol | Factor | Rep | Ann Return | Ann Vol | Sharpe | DSR | Calmar | MaxDD | Sortino | PF | Win Rate |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | **AG** | PPI_全部工业品(全国:当期同比增长率:月) | level | +27.31% | 28.37% | +0.96 | 71.8% | +0.64 | -42.79% | +0.98 | 1.21 | 52.4% |
+| 2 | **SA** | 社会融资规模_当月值 | zscore | +9.14% | 12.43% | +0.74 | 45.6% | +0.68 | -13.40% | +0.33 | 1.30 | 11.8% |
+| 3 | **AL** | PPIRM_燃料及动力类(全国:当期同比增长率:月) | level | +12.06% | 17.32% | +0.70 | 39.5% | +0.37 | -32.76% | +0.70 | 1.13 | 50.9% |
+| 4 | **SR** | 制造业采购经理指数PMI_购进价格 | diff | +7.06% | 12.34% | +0.57 | 25.5% | +0.45 | -15.55% | +0.58 | 1.11 | 50.2% |
+| 5 | **RU** | PPI_化学原料及化学制品制造业(全国:当期同比增长率:月) | level | +12.88% | 24.13% | +0.53 | 21.7% | +0.33 | -39.47% | +0.53 | 1.10 | 50.0% |
+| 6 | **NI** | 社会融资规模_当月值 | diff | +5.83% | 11.27% | +0.52 | 19.9% | +0.43 | -13.55% | +0.26 | 1.22 | 11.9% |
+| 7 | **RB** | 非制造业PMI_建筑业_新订单_全国_当期值_月 | level | +10.19% | 19.87% | +0.51 | 20.0% | +0.21 | -48.83% | +0.47 | 1.10 | 44.2% |
+| 8 | **Y** | 社会融资规模_当月值 | zscore | +2.41% | 5.11% | +0.47 | 15.9% | +0.33 | -7.37% | +0.19 | 1.25 | 6.9% |
+| 9 | **I** | GDP增长贡献率_第二产业_累计同比_季 | zscore | +12.99% | 29.63% | +0.44 | 14.0% | +0.25 | -51.26% | +0.35 | 1.10 | 35.4% |
+| 10 | **JD** | 制造业采购经理指数PMI_购进价格 | diff | +8.79% | 20.78% | +0.42 | 12.9% | +0.19 | -46.73% | +0.43 | 1.08 | 49.1% |
+| 11 | **CF** | PPI_纺织业(全国:当期同比增长率:月) | level | +8.01% | 19.01% | +0.42 | 12.8% | +0.19 | -42.99% | +0.42 | 1.08 | 50.3% |
+| 12 | **TF** | 社会融资规模_当月值 | diff | +0.32% | 0.77% | +0.42 | 12.3% | +0.19 | -1.68% | +0.21 | 1.16 | 11.3% |
+| 13 | **MA** | 制造业采购经理指数PMI_原材料库存 | diff | +7.39% | 26.54% | +0.28 | 5.6% | +0.16 | -45.47% | +0.27 | 1.05 | 46.6% |
+| 14 | **C** | 居民鲜果消费价格指数CPI_(上年=100)_当月 | zscore | +2.72% | 10.06% | +0.27 | 5.3% | +0.09 | -29.84% | +0.26 | 1.05 | 43.7% |
+| 15 | **SC** | CPI-PPI_差值_当月 | level | +8.62% | 32.95% | +0.26 | 7.3% | +0.14 | -62.34% | +0.23 | 1.05 | 39.5% |
+| 16 | **CU** | 制造业采购经理指数PMI_进口 | diff | +4.32% | 17.21% | +0.25 | 4.7% | +0.10 | -42.68% | +0.25 | 1.05 | 48.3% |
+| 17 | **J** | 社会融资规模_当月值 | zscore | +2.68% | 11.65% | +0.23 | 4.3% | +0.16 | -17.02% | +0.08 | 1.11 | 7.5% |
+| 18 | **TA** | PPIRM_纺织原料类(全国:当期同比增长率:月) | zscore | +4.80% | 23.09% | +0.21 | 3.5% | +0.08 | -59.94% | +0.20 | 1.04 | 44.3% |
+| 19 | **V** | 非制造业PMI_建筑业_业务活动预期_全国_当期值_月 | level | +1.90% | 20.52% | +0.09 | 1.5% | +0.03 | -72.54% | +0.09 | 1.02 | 42.3% |
+| 20 | **SN** | PPI_电气机械及器材制造业(全国:当期同比增长率:月) | zscore | +1.59% | 20.54% | +0.08 | 1.3% | +0.02 | -72.18% | +0.05 | 1.02 | 25.8% |
+| 21 | **M** | 社会融资规模_当月值 | level | -0.28% | 7.25% | -0.04 | 0.5% | -0.01 | -20.48% | -0.02 | 0.99 | 11.4% |
+| 22 | **P** | PPI_全部工业品(全国:当期同比增长率:月) | level | -12.15% | 24.40% | -0.50 | 0.0% | -0.15 | -81.09% | -0.49 | 0.92 | 47.8% |
+| 23 | **AU** | 制造业采购经理指数PMI_购进价格 | level | -13.91% | 15.28% | -0.91 | 0.0% | -0.17 | -81.89% | -0.92 | 0.84 | 45.1% |
 
 ---
 
 ## Equity Curves
 
-![Alpha Equity Curves](figures/alpha_equity_curves.png)
+![Per-Symbol Equity Curves](figures/per_symbol_equity.png)
 
 ## Drawdown Charts
 
-![Alpha Drawdowns](figures/alpha_drawdowns.png)
+![Per-Symbol Drawdowns](figures/per_symbol_drawdowns.png)
 
-## Capacity Decay
+## Aggregate Statistics
 
-![Capacity Decay](figures/alpha_capacity_decay.png)
+- **Symbols with positive Sharpe**: 20/23
+- **Mean Sharpe**: +0.30
+- **Median Sharpe**: +0.42
+- **Best Sharpe**: +0.96 (AG)
+- **Worst Sharpe**: -0.91 (AU)
+- **Top 3**: AG (+0.96), SA (+0.74), AL (+0.70)
+- **Bottom 3**: M (-0.04), P (-0.50), AU (-0.91)
 
-## Capacity-Adjusted Sharpe Decay Table
+## Key Findings
 
-This table shows the decay of each alpha's Sharpe ratio at different levels of Assets Under Management (AUM) in RMB.
-
-| Alpha Name | Sharpe at 0 | Sharpe at 10M | Sharpe at 50M | Sharpe at 100M | Sharpe at 500M |
-|---|---|---|---|---|---|
-| **HTFC_Alpha19_tsrank_mom_rev** | -1.52 | -1.56 | -1.61 | -1.64 | -1.79 |
-| **KalmanFilter_BOS** | -1.03 | -1.06 | -1.11 | -1.14 | -1.28 |
-| **HTFC_Alpha1_meanclose12** | -1.11 | -1.13 | -1.16 | -1.18 | -1.27 |
-| **HTFC_Alpha5_skew20** | -0.54 | -0.57 | -0.60 | -0.63 | -0.74 |
-| **EWMA_32_64_CTA** | 0.71 | 0.70 | 0.69 | 0.69 | 0.66 |
-| **ForeignAg_LeadLag** | 0.37 | 0.34 | 0.30 | 0.28 | 0.16 |
-| **Alt_Macro_Alpha_XS** | 0.89 | 0.89 | 0.89 | 0.88 | 0.87 |
-| **Alt_Macro_Alpha_TS** | 0.74 | 0.73 | 0.73 | 0.73 | 0.72 |
-
-## Key Findings and Interpretations
-
+1. **Signal Quality**: The macro factor signals show varying effectiveness across symbols. Factors with higher screening-stage correlation tend to produce stronger backtest Sharpe ratios.
+2. **Low Turnover Advantage**: Macro signals update monthly, resulting in very low turnover. The 5bps transaction cost has minimal impact on net performance.
+3. **Cross-Sectional Diversification Potential**: Combining multiple symbol-factor pairs into a diversified portfolio could improve risk-adjusted returns beyond individual pairs.
