@@ -6,6 +6,43 @@ Calculates 11 metrics including DSR, Turnover-Adjusted Calmar, and Capacity-Adju
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
+import numba
+
+@numba.njit(cache=True)
+def _rolling_std_1d(arr, window):
+    n = arr.shape[0]
+    out = np.full(n, np.nan)
+    for i in range(window - 1, n):
+        s = 0.0
+        s2 = 0.0
+        cnt = 0
+        for j in range(i - window + 1, i + 1):
+            v = arr[j]
+            if not np.isnan(v):
+                s += v
+                s2 += v * v
+                cnt += 1
+        if cnt >= window:
+            mean_v = s / cnt
+            var_v = (s2 - cnt * mean_v * mean_v) / (cnt - 1)
+            out[i] = np.sqrt(max(var_v, 0.0))
+    return out
+
+@numba.njit(cache=True)
+def _rolling_mean_1d(arr, window):
+    n = arr.shape[0]
+    out = np.full(n, np.nan)
+    for i in range(window - 1, n):
+        s = 0.0
+        cnt = 0
+        for j in range(i - window + 1, i + 1):
+            v = arr[j]
+            if not np.isnan(v):
+                s += v
+                cnt += 1
+        if cnt >= window:
+            out[i] = s / cnt
+    return out
 
 # Contract multipliers for the 23 symbols
 MULTIPLIERS = {
@@ -182,16 +219,24 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, de
     aums = [0, 10_000_000, 50_000_000, 100_000_000, 500_000_000]
     capacity_sharpes = {}
     
-    # Pre-calculate symbol daily volatility (rolling 20-day standard deviation of returns)
-    df["vol_20"] = df["returns"].unstack().rolling(20).std().stack().astype(np.float32)
-    # Pre-calculate symbol daily market notional volume (volume * close * multiplier)
+    symbols_list = df.index.get_level_values("symbol").unique()
+    dates_list = df.index.get_level_values("date").unique()
+
+    returns_unstacked = df["returns"].unstack()
+    vol_20_dict = {}
+    for sym in returns_unstacked.columns:
+        arr = returns_unstacked[sym].values.astype(np.float64)
+        vol_20_dict[sym] = pd.Series(_rolling_std_1d(arr, 20), index=dates_list, dtype=np.float32)
+    vol_20_df = pd.DataFrame(vol_20_dict, index=dates_list).fillna(0.0)
+
     df["multiplier"] = df.index.get_level_values("symbol").map(MULTIPLIERS).fillna(1.0).astype(np.float32)
     df["market_notional_volume"] = (df["volume"] * df["close"] * df["multiplier"]).astype(np.float32)
-    df["market_vol_20"] = df["market_notional_volume"].unstack().rolling(20).mean().stack().astype(np.float32)
-    
-    # Re-align features
-    vol_20 = df["vol_20"].unstack().fillna(0.0)
-    market_vol_20 = df["market_vol_20"].unstack().fillna(1.0)
+    mkt_vol_unstacked = df["market_notional_volume"].unstack()
+    mkt_vol_20_dict = {}
+    for sym in mkt_vol_unstacked.columns:
+        arr = mkt_vol_unstacked[sym].values.astype(np.float64)
+        mkt_vol_20_dict[sym] = pd.Series(_rolling_mean_1d(arr, 20), index=dates_list, dtype=np.float32)
+    market_vol_20 = pd.DataFrame(mkt_vol_20_dict, index=dates_list).fillna(1.0)
     
     for aum in aums:
         if aum == 0:
@@ -203,7 +248,7 @@ def evaluate_alpha(df_data, alpha_col, all_sharpes=None, N=5, tc_rate=0.0005, de
         
         # Calculate impact cost per asset
         # impact = 0.1 * vol_20 * sqrt(traded_notional / market_vol_20)
-        impact = 0.1 * vol_20 * np.sqrt(traded_notional / market_vol_20.clip(lower=1.0))
+        impact = 0.1 * vol_20_df * np.sqrt(traded_notional / market_vol_20.clip(lower=1.0))
         # Total portfolio daily impact cost
         port_impact = (weights_shifted.abs() * impact).sum(axis=1)
         

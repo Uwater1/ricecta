@@ -17,20 +17,30 @@ DAILY_DIR = os.path.join(BASE_DIR, 'dominant_daily')
 SPOT_DIR = os.path.join(BASE_DIR, 'spot_basis')
 CONTRACTS_DIR = os.path.join(BASE_DIR, 'contracts_daily')
 
+_metadata_cache = None
+_contracts_cache = {}
+
 def load_metadata():
+    global _metadata_cache
+    if _metadata_cache is not None:
+        return _metadata_cache.copy()
     path = os.path.join(CONTRACTS_DIR, 'metadata.parquet')
     if not os.path.exists(path):
         raise FileNotFoundError(f"Metadata file not found: {path}")
-    return pd.read_parquet(path)
+    _metadata_cache = pd.read_parquet(path)
+    return _metadata_cache.copy()
 
 def load_symbol_contracts(symbol):
+    if symbol in _contracts_cache:
+        return _contracts_cache[symbol].copy()
     path = os.path.join(CONTRACTS_DIR, f"{symbol}.parquet")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Contracts file not found for {symbol}: {path}")
     df = pd.read_parquet(path)
     # Sort index [order_book_id, date]
     df = df.sort_index()
-    return df
+    _contracts_cache[symbol] = df
+    return df.copy()
 
 def get_nth_trading_day_before(calendar_dates, target_date, n):
     """Find the n-th trading day before the target_date in the calendar using binary search."""

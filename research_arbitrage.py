@@ -8,6 +8,7 @@ import os
 import glob
 import numpy as np
 import pandas as pd
+import numba
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -185,6 +186,55 @@ def backtest_basis_momentum(symbol, df_spot, shibor, tc_rate=0.0003, lookback=20
     metrics = compute_metrics(df_ret, shibor)
     return df_ret, metrics
 
+@numba.njit(cache=True)
+def _numba_intraday_curve_arb(near_close, dom_close, mean_s, std_s, entry_z, exit_z, tc_rate):
+    n_bars = near_close.shape[0]
+    day_pnl = 0.0
+    pos = 0
+    entry_spread = 0.0
+    entry_notional = 0.0
+
+    for bar_idx in range(n_bars):
+        p_near = near_close[bar_idx]
+        p_dom = dom_close[bar_idx]
+        spread = p_near - p_dom
+        if std_s == 0.0:
+            continue
+        z_score = (spread - mean_s) / std_s
+
+        if bar_idx == n_bars - 1 and pos != 0:
+            if pos == 1:
+                trade_return = (spread - entry_spread) / entry_notional
+            else:
+                trade_return = -(spread - entry_spread) / entry_notional
+            day_pnl += trade_return - 2.0 * tc_rate
+            pos = 0
+            continue
+
+        if pos == 0:
+            if z_score < -entry_z:
+                pos = 1
+                entry_spread = spread
+                entry_notional = p_near + p_dom
+                day_pnl -= 2.0 * tc_rate
+            elif z_score > entry_z:
+                pos = -1
+                entry_spread = spread
+                entry_notional = p_near + p_dom
+                day_pnl -= 2.0 * tc_rate
+        elif pos == 1:
+            if z_score >= -exit_z:
+                pos = 0
+                trade_return = (spread - entry_spread) / entry_notional
+                day_pnl += trade_return - 2.0 * tc_rate
+        elif pos == -1:
+            if z_score <= exit_z:
+                pos = 0
+                trade_return = -(spread - entry_spread) / entry_notional
+                day_pnl += trade_return - 2.0 * tc_rate
+
+    return day_pnl
+
 def backtest_curve_arbitrage(symbol, df_spot, tc_rate=0.0003, z_window=20, entry_z=2.0, exit_z=0.2):
     """
     Curve Arbitrage (Calendar Spread) backtest using 5-minute data.
@@ -249,72 +299,18 @@ def backtest_curve_arbitrage(symbol, df_spot, tc_rate=0.0003, z_window=20, entry
             daily_returns_list.append((date_t, 0.0))
             continue
             
-        # Align on index (datetime)
-        aligned = pd.merge(
-            near_day[["close"]].rename(columns={"close": "near_close"}),
-            dom_day[["close"]].rename(columns={"close": "dom_close"}),
-            left_index=True,
-            right_index=True,
-            how="inner"
-        )
-        
-        if aligned.empty:
+        aligned_index = near_day.index.intersection(dom_day.index)
+        if len(aligned_index) == 0:
             daily_returns_list.append((date_t, 0.0))
             continue
             
-        # Run intraday simulation with EOD flat forcing
-        day_pnl = 0.0
-        pos = 0 # 1: Long spread (Buy near, Sell dom), -1: Short spread, 0: Flat
-        entry_spread = 0.0
-        entry_notional = 0.0
+        near_aligned = near_day.loc[aligned_index, "close"].values.astype(np.float64)
+        dom_aligned = dom_day.loc[aligned_index, "close"].values.astype(np.float64)
         
-        n_bars = len(aligned)
-        bar_idx = 0
-        for dt, bar in aligned.iterrows():
-            bar_idx += 1
-            p_near = bar["near_close"]
-            p_dom = bar["dom_close"]
-            spread = p_near - p_dom
-            z_score = (spread - mean_s) / std_s
-            
-            # If EOD (last bar of the day), force exit if open
-            if bar_idx == n_bars and pos != 0:
-                if pos == 1:
-                    trade_return = (spread - entry_spread) / entry_notional
-                else:
-                    trade_return = -(spread - entry_spread) / entry_notional
-                day_pnl += trade_return - 2.0 * tc_rate
-                pos = 0
-                continue
-            
-            # Position logic
-            if pos == 0:
-                if z_score < -entry_z:
-                    # Enter long spread (buy near, sell dom)
-                    pos = 1
-                    entry_spread = spread
-                    entry_notional = p_near + p_dom
-                    # Deduct transaction cost (2 contracts = 2 * tc_rate)
-                    day_pnl -= 2.0 * tc_rate
-                elif z_score > entry_z:
-                    # Enter short spread (sell near, buy dom)
-                    pos = -1
-                    entry_spread = spread
-                    entry_notional = p_near + p_dom
-                    # Deduct transaction cost
-                    day_pnl -= 2.0 * tc_rate
-            elif pos == 1:
-                if z_score >= -exit_z:
-                    # Exit
-                    pos = 0
-                    trade_return = (spread - entry_spread) / entry_notional
-                    day_pnl += trade_return - 2.0 * tc_rate
-            elif pos == -1:
-                if z_score <= exit_z:
-                    # Exit
-                    pos = 0
-                    trade_return = -(spread - entry_spread) / entry_notional
-                    day_pnl += trade_return - 2.0 * tc_rate
+        day_pnl = _numba_intraday_curve_arb(
+            near_aligned, dom_aligned, float(mean_s), float(std_s),
+            entry_z, exit_z, tc_rate
+        )
                     
         daily_returns_list.append((date_t, day_pnl))
         

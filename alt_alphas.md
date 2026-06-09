@@ -1,41 +1,49 @@
-# Alternative Data Alphas for Futures (Release-Date-Only Correlation)
+# Alternative Data Alphas for Futures (Rigorous Horizon Stability Sweep)
 
-This document evaluates the effectiveness of alternative macroeconomic factors for the 23 futures underlyings, utilizing a **look-ahead free** alignment methodology and **release-date-only sampling** (only sampling the first trading day after each data release to avoid autocorrelation bias).
+This document evaluates the effectiveness of alternative macroeconomic factors for the 23 futures underlyings, utilizing a **look-ahead free** alignment methodology, **release-date-only sampling**, and a **rigorous horizon stability sweep** across calendar horizons from 5d to 25d.
 
-## Methodology Update: Release-Date-Only Correlation & Soundness Checks
-Previously, macroeconomic factors were aligned to daily trading returns, leading to artificial t-statistic inflation due to autocorrelation (since monthly macro data remains static for 20+ trading days). We now only sample returns and signals on the first trading day after each release (`info_date`).
+## Methodology Update: Release-Date-Only Correlation & Horizon Stability Sweep
+Macroeconomic factors are released monthly, which leads to severe autocorrelation bias if analyzed on daily data. To resolve this, we sample returns and signals only on the first trading day after each release date (`info_date`).
 
-To ensure statistical soundness, we also implement two checks:
-1. **Temporal Consistency (Split-sample check)**: The release-aligned data is split into first and second halves. The Spearman correlation is calculated on both sub-periods. A factor is temporally consistent if the correlation sign does not flip between the two sub-periods.
-2. **Horizon sign-consistency**: We verify if the correlation has the same sign across different horizons (specifically `5d` vs `20d`). If the sign flips, the correlation may be spurious.
+To prove the usefulness and statistical robustness of the selected alternative factors, we implement the following statistical checks:
+1. **Horizon Stability Sweep ($5\text{d} \dots 25\text{d}$)**: We evaluate the signal's correlation across all calendar horizons from 5 to 25 trading days.
+2. **Newey-West HAC t-statistic**: Since forward returns over longer horizons overlap (e.g., a 25d return on monthly releases overlaps with the next release), we use **Newey-West (HAC) standard error adjustments** on the rank-transformed variables to compute autocorrelation-robust t-statistics and p-values. The lag $L$ is dynamically set to $\text{max}(0, \lceil H / 20 \rceil - 1)$ based on the average 20-day spacing between monthly releases.
+3. **Horizon Sign Consistency**: A factor is considered horizon-consistent if its Spearman correlation has the same sign as the primary 20d horizon across at least 90% of the horizons from 5d to 25d (Sign Consistency Fraction, SCF $\ge 90\%$). This filters out spiky, horizon-spurious signals.
+4. **Temporal Consistency (Split-Half Check)**: The release-aligned data is split chronologically into first and second halves. The correlation sign must not flip between the two sub-periods at the 20d horizon.
 
-## Performance Summary Table (20-Day Horizon) — PRIMARY
+### Horizon Stability Grid Plot
+The grid plot below displays the Spearman correlation (y-axis) vs calendar horizons (x-axis) from 5d to 25d for each symbol's best robust factor, showing the Full Sample (blue), First-Half (green dashed), and Second-Half (orange dashed) curves.
 
-| Rank | Symbol | Best Factor | Signal Type | Spearman Corr | t-statistic | p-value | Temp. Consistent | Horiz. Consistent |
-|---|---|---|---|---|---|---|---|---|
-| 1 | **SN** | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *zscore* | 0.5608 | 3.77 | 6.86e-04 | No | Yes |
-| 2 | **JD** | `制造业采购经理指数PMI_购进价格` | *diff* | 0.3116 | 3.62 | 4.27e-04 | Yes | Yes |
-| 3 | **TF** | `社会融资规模_当月值` | *diff* | -0.5632 | -3.48 | 1.80e-03 | Yes | No |
-| 4 | **Y** | `社会融资规模_当月值` | *zscore* | 0.6735 | 3.41 | 4.23e-03 | Yes | Yes |
-| 5 | **AG** | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | -0.2941 | -3.40 | 9.15e-04 | Yes | Yes |
-| 6 | **SA** | `社会融资规模_当月值` | *zscore* | 0.6294 | 3.03 | 8.99e-03 | Yes | Yes |
-| 7 | **AL** | `PPIRM_燃料及动力类(全国:当期同比增长率:月)` | *level* | -0.2638 | -3.02 | 3.07e-03 | Yes | Yes |
-| 8 | **C** | `居民鲜果消费价格指数CPI_(上年=100)_当月` | *zscore* | -0.2648 | -2.92 | 4.23e-03 | Yes | Yes |
-| 9 | **RB** | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2822 | 2.88 | 4.87e-03 | Yes | Yes |
-| 10 | **NI** | `社会融资规模_当月值` | *diff* | 0.4888 | 2.86 | 8.31e-03 | Yes | Yes |
-| 11 | **RU** | `PPI_化学原料及化学制品制造业(全国:当期同比增长率:月)` | *level* | -0.2464 | -2.81 | 5.81e-03 | Yes | Yes |
-| 12 | **P** | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | 0.2437 | 2.78 | 6.38e-03 | Yes | Yes |
-| 13 | **AU** | `制造业采购经理指数PMI_购进价格` | *level* | -0.2398 | -2.73 | 7.31e-03 | Yes | Yes |
-| 14 | **CF** | `PPI_纺织业(全国:当期同比增长率:月)` | *level* | -0.2356 | -2.68 | 8.44e-03 | Yes | Yes |
-| 15 | **V** | `非制造业PMI_建筑业_业务活动预期_全国_当期值_月` | *level* | 0.2645 | 2.67 | 8.84e-03 | Yes | Yes |
-| 16 | **I** | `GDP增长贡献率_第二产业_累计同比_季` | *zscore* | -0.4431 | -2.37 | 2.65e-02 | Yes | Yes |
-| 17 | **SR** | `制造业采购经理指数PMI_购进价格` | *diff* | 0.2070 | 2.34 | 2.10e-02 | Yes | Yes |
-| 18 | **J** | `社会融资规模_当月值` | *zscore* | 0.5265 | 2.32 | 3.62e-02 | Yes | Yes |
-| 19 | **MA** | `制造业采购经理指数PMI_原材料库存` | *diff* | 0.2002 | 2.25 | 2.64e-02 | Yes | Yes |
-| 20 | **CU** | `制造业采购经理指数PMI_进口` | *diff* | 0.1799 | 2.02 | 4.55e-02 | Yes | Yes |
-| 21 | **SC** | `CPI-PPI_差值_当月` | *level* | -0.2196 | -1.95 | 5.50e-02 | No | Yes |
-| 22 | **M** | `社会融资规模_当月值` | *level* | 0.3241 | 1.78 | 8.63e-02 | Yes | Yes |
-| 23 | **TA** | `PPIRM_纺织原料类(全国:当期同比增长率:月)` | *zscore* | 0.1441 | 1.52 | 1.31e-01 | Yes | Yes |
+![Horizon Stability Grid Plot](figures/horizon_stability.png)
+
+## Performance Summary Table (Horizon-Robust Best Factors) — PRIMARY
+Selected by prioritizing **Horizon-Consistent Sweep** (SCF $\ge 90\%$) and **Temporal Consistency** (same sign in both halves), and sorted by **Mean Absolute NW t-statistic** across $H \in [5, 25]$.
+
+| Rank | Symbol | Best Robust Factor | Signal Type | Spearman 20d | NW t (20d) | NW p-value (20d) | Temp. Consistent | Horizon Sign-Consistency | Mean NW t-stat | Smoothness Index |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | **SA** | `PPI_电气机械及器材制造业(全国:当期同比增长率:月)` | *diff* | 0.4666 | 3.27 | 1.06e-03 | Yes | 100% (21/21) | 3.28 | 0.063 |
+| 2 | **JD** | `制造业采购经理指数PMI_购进价格` | *diff* | 0.3116 | 3.79 | 1.50e-04 | Yes | 100% (21/21) | 3.24 | 0.021 |
+| 3 | **RB** | `非制造业PMI_建筑业_新订单_全国_当期值_月` | *level* | 0.2822 | 3.34 | 8.48e-04 | Yes | 100% (21/21) | 3.16 | 0.034 |
+| 4 | **TF** | `社会融资规模_当月值` | *diff* | -0.5632 | -4.15 | 3.28e-05 | Yes | 95% (20/21) | 2.88 | 0.086 |
+| 5 | **AG** | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | -0.2941 | -3.74 | 1.82e-04 | Yes | 100% (21/21) | 2.82 | 0.020 |
+| 6 | **Y** | `社会融资规模_当月值` | *zscore* | 0.6735 | 4.86 | 1.15e-06 | Yes | 100% (21/21) | 2.77 | 0.081 |
+| 7 | **RU** | `PMI_生产经营活动预期_全国_当期值_月` | *level* | -0.2366 | -2.17 | 3.00e-02 | Yes | 100% (21/21) | 2.59 | 0.024 |
+| 8 | **P** | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | 0.2437 | 2.92 | 3.50e-03 | Yes | 100% (21/21) | 2.52 | 0.034 |
+| 9 | **NI** | `制造业采购经理指数PMI_新订单` | *diff* | 0.2366 | 2.85 | 4.32e-03 | Yes | 100% (21/21) | 2.51 | 0.030 |
+| 10 | **CU** | `PPI_全部工业品(全国:当期同比增长率:月)` | *level* | -0.1716 | -2.00 | 4.57e-02 | Yes | 100% (21/21) | 2.50 | 0.031 |
+| 11 | **V** | `非制造业PMI_建筑业_业务活动预期_全国_当期值_月` | *level* | 0.2645 | 2.72 | 6.62e-03 | Yes | 100% (21/21) | 2.50 | 0.022 |
+| 12 | **AU** | `制造业采购经理指数PMI_购进价格` | *level* | -0.2398 | -2.81 | 4.89e-03 | Yes | 100% (21/21) | 2.31 | 0.029 |
+| 13 | **C** | `制造业采购经理指数PMI_购进价格` | *diff* | 0.1594 | 1.76 | 7.90e-02 | Yes | 100% (21/21) | 2.28 | 0.032 |
+| 14 | **SR** | `制造业采购经理指数PMI_购进价格` | *diff* | 0.2070 | 2.30 | 2.16e-02 | Yes | 100% (21/21) | 2.26 | 0.029 |
+| 15 | **CF** | `PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)` | *diff* | -0.2461 | -1.74 | 8.24e-02 | Yes | 100% (21/21) | 2.26 | 0.043 |
+| 16 | **I** | `GDP增长贡献率_第二产业_累计同比_季` | *zscore* | -0.4431 | -2.79 | 5.34e-03 | Yes | 100% (21/21) | 2.25 | 0.044 |
+| 17 | **MA** | `制造业采购经理指数PMI_原材料库存` | *diff* | 0.2002 | 2.25 | 2.46e-02 | Yes | 100% (21/21) | 2.14 | 0.021 |
+| 18 | **AL** | `PPIRM_燃料及动力类(全国:当期同比增长率:月)` | *level* | -0.2638 | -3.04 | 2.37e-03 | Yes | 100% (21/21) | 2.14 | 0.031 |
+| 19 | **SN** | `PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月` | *diff* | 0.2670 | 2.44 | 1.48e-02 | Yes | 100% (21/21) | 1.91 | 0.024 |
+| 20 | **M** | `社会融资规模_当月值` | *zscore* | 0.2882 | 1.24 | 2.15e-01 | Yes | 100% (21/21) | 1.60 | 0.059 |
+| 21 | **J** | `社会融资规模_当月值` | *zscore* | 0.5265 | 2.26 | 2.36e-02 | Yes | 100% (21/21) | 1.46 | 0.105 |
+| 22 | **TA** | `PMI_生产经营活动预期_全国_当期值_月` | *diff* | -0.1242 | -1.25 | 2.12e-01 | Yes | 100% (21/21) | 1.43 | 0.022 |
+| 23 | **SC** | `国内生产总值GDP_累计同比` | *level* | 0.1158 | 0.63 | 5.30e-01 | Yes | 95% (20/21) | 1.20 | 0.049 |
 
 ## Performance Summary Table (5-Day Horizon)
 

@@ -358,16 +358,16 @@ def main():
     report = f"""# TF Futures Macro Factor Combination Backtest Report
 
 This report evaluates various combination methods for trading CFFEX 5-year Treasury Note futures (TF) using three macro factors:
-1. **PMI Expectation** (`PMI_生产经营活动预期_全国_当期值_月`)
-2. **Manufacturing PMI** (`制造业采购经理指数PMI_当月`)
-3. **Social Financing** (`社会融资规模_当月值` for Dataset A, and `社会融资规模存量_同比增速_月末数` for Dataset B)
+1. **PMI Expectation** (`PMI Business Expectation`)
+2. **Manufacturing PMI** (`Manufacturing PMI`)
+3. **Social Financing** (`Social Financing (Monthly)` for Dataset A, and `Social Financing Stock (YoY)` for Dataset B)
 
 All models apply **look-ahead free** calendar alignment (1-day shift after forward-filling) and account for **transaction costs & slippage (5 bps)**.
 
 ---
 
 ## Dataset A: Requested Monthly Macro Factors (Dec 2023 - Jun 2026)
-*Limited duration due to rqdatac availability of `社会融资规模_当月值`.*
+*Limited duration due to rqdatac availability of `Social Financing (Monthly)`.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
@@ -384,7 +384,7 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 ---
 
 ## Dataset B: Long-History Macro Factors (Jun 2016 - Jun 2026)
-*Using `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest.*
+*Using `Social Financing Stock (YoY)` to provide a full 10-year macro cycle backtest.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|

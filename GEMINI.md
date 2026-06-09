@@ -69,10 +69,14 @@ rtk venv/bin/python run_evaluation.py 9  # runs NoRoll hold strategy
 - **Flexible Evaluation Framework & 20-Day Switch:** Updated `evaluate_alpha.py` to support time-series weighting via a `demean` parameter. Modified `run_evaluation.py` to evaluate both cross-sectional (`Alt_Macro_Alpha_XS`) and time-series (`Alt_Macro_Alpha_TS`) portfolios. Switched configuration to target the optimal 20-day horizon correlation. Included 20-day horizon summary and top 3 tables in `alt_alphas.md`.
 - **Release-Date-Only Correlation & Soundness (Jun 2026):**
   - **Autocorrelation Correction:** Modified `test_alt_alphas.py` to sample signals and returns only on first trading day after each factor's `info_date` (release date), removing autocorrelation bias and t-statistic inflation.
+  - **Horizon Stability Sweep ($5\text{d} \dots 25\text{d}$):** Expanded screening to run a full sweep across calendar horizons from 5 to 25 trading days.
+  - **Newey-West HAC Adjustments:** Implemented simple OLS Newey-West (HAC) standard error adjustments in numpy on rank-transformed variables, producing robust t-statistics/p-values for Spearman correlation over overlapping return horizons.
+  - **Horizon Sign-Consistency:** Filters out factors that do not share the same correlation sign as the 20d horizon across at least 90% of the sweep range (SCF $\ge 90\%$).
   - **Temporal Stability Check:** Release-aligned sample split into first/second halves. Checks if Spearman correlation sign is consistent across sub-periods.
-  - **Horizon Sign-Consistency:** Compares sign of `5d` and `20d` Spearman correlation to reject horizon-spurious factors.
-  - **Updated Portfolio Performance:** `Alt_Macro_Alpha_XS` achieves Sharpe 0.95 (up from 0.62), `Alt_Macro_Alpha_TS` achieves Sharpe 1.06 (up from 0.90), `Alt_Macro_Alpha_NoRoll` achieves Sharpe 1.17.
-  - **Alpha Config Updates:** Updated `BEST_MACRO_CONFIGS` in [alphas.py](file:///home/hallo/data/ricecta/alphas.py) to use new release-aligned optimal factors.
+  - **Visualization:** Generates a 5x5 grid subplot (`figures/horizon_stability.png`) displaying Full Sample vs Split-Half stability curves across horizons.
+  - **Updated Portfolio Performance:** Selecting robust factors yields Sharpe 1.16 for `Alt_Macro_Alpha_XS`, Sharpe 1.13 for `Alt_Macro_Alpha_TS`, and Sharpe 1.26 for `Alt_Macro_Alpha_NoRoll`.
+  - **Alpha Config Updates:** Updated `BEST_MACRO_CONFIGS` in [alphas.py](file:///home/hallo/data/ricecta/alphas.py) to use new robust factors.
+  - **Backtest Caching Speedup:** Implemented in-memory caching of contract Parquet data and metadata in [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py), cutting backtest execution time by over 50%.
 
 ## TF Futures Macro Factor Combination Research
 - **Macro Factor Data Availability**: `社会融资规模_当月值` from rqdatac starts in December 2023, limiting joint factor testing to Dec 2023 - Jun 2026. Use `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest (from 2016 onwards).

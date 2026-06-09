@@ -191,8 +191,10 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
     if spot_dfs:
         df_spot = pd.concat(spot_dfs).sort_values("date").reset_index(drop=True)
         df_spot["date"] = pd.to_datetime(df_spot["date"], format="%Y%m%d")
+        spot_by_symbol = {sym: grp.set_index("date").sort_index() for sym, grp in df_spot.groupby("symbol")}
     else:
         df_spot = pd.DataFrame()
+        spot_by_symbol = {}
 
     # Load exchange rates for ForeignAg_LeadLag
     usd_path = os.path.join(alt_data_dir, "USDCNY.parquet")
@@ -214,23 +216,23 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         'AG': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
         'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
         'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},
-        'C': {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},
-        'CF': {'factor': 'PPI_纺织业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'CU': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'diff', 'sign': 1},
+        'C': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
+        'CF': {'factor': 'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},
+        'CU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
         'I': {'factor': 'GDP增长贡献率_第二产业_累计同比_季', 'representation': 'zscore', 'sign': -1},
         'J': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
         'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-        'M': {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': 1},
+        'M': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
         'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
-        'NI': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1},
+        'NI': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'diff', 'sign': 1},
         'P': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': 1},
         'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
-        'RU': {'factor': 'PPI_化学原料及化学制品制造业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'SA': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
-        'SC': {'factor': 'CPI-PPI_差值_当月', 'representation': 'level', 'sign': -1},
-        'SN': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
+        'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},
+        'SA': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': 1},
+        'SC': {'factor': '国内生产总值GDP_累计同比', 'representation': 'level', 'sign': 1},
+        'SN': {'factor': 'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月', 'representation': 'diff', 'sign': 1},
         'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-        'TA': {'factor': 'PPIRM_纺织原料类(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
+        'TA': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},
         'TF': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': -1},
         'V': {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},
         'Y': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1}
@@ -251,48 +253,48 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.to_datetime(df.index)
         df = df.sort_index()
+        for col in ["open", "high", "low", "close", "volume"]:
+            df[col] = df[col].astype(np.float32)
         # Calculate daily returns
         df["returns"] = df["close"].pct_change()
         # Replace inf/nan and clip to daily price limits [-10%, +10%] to prevent metric distortion from zero adjusted prices
-        df["returns"] = df["returns"].replace([np.inf, -np.inf], np.nan).fillna(0.0).clip(-0.1, 0.1)
+        df["returns"] = df["returns"].replace([np.inf, -np.inf], np.nan).fillna(0.0).clip(-0.1, 0.1).astype(np.float32)
         
         # 1. HTFC_Alpha19_tsrank_mom_rev
         # TS_Rank(volume,32)* (1-TS_Rank(((close+high) -low),16)))* (1-TS_Rank(returns,32)))
         tr_vol = ts_rank(df["volume"], 32)
         tr_range = ts_rank(df["close"] + df["high"] - df["low"], 16)
         tr_ret = ts_rank(df["returns"], 32)
-        df["HTFC_Alpha19_tsrank_mom_rev"] = tr_vol * (1.0 - tr_range) * (1.0 - tr_ret)
+        df["HTFC_Alpha19_tsrank_mom_rev"] = (tr_vol * (1.0 - tr_range) * (1.0 - tr_ret)).astype(np.float32)
         
         # 2. KalmanFilter_BOS
         # Run Kalman Filter on Basis Over Spot
-        if not df_spot.empty and symbol in df_spot["symbol"].unique():
-            df_sym_spot = df_spot[df_spot["symbol"] == symbol].copy()
-            df_sym_spot = df_sym_spot.set_index("date").sort_index()
-            # Align basis rate with the price dataframe
-            basis_rate = df_sym_spot["dom_basis_rate"].reindex(df.index)
+        if symbol in spot_by_symbol:
+            df_sym_spot = spot_by_symbol[symbol]
+            basis_rate = df_sym_spot["dom_basis_rate"].astype(np.float32).reindex(df.index)
         else:
             # Fallback if no spot data
             basis_rate = pd.Series(0.0, index=df.index)
             
         # Run 1D Kalman filter
-        kf_state = run_kalman_filter(basis_rate.values, Q=1e-4, R=1e-2)
-        residual = basis_rate - kf_state
+        kf_state = run_kalman_filter(basis_rate.values.astype(np.float64), Q=1e-4, R=1e-2)
+        residual = (basis_rate - kf_state).astype(np.float32)
         # Normalize residual as Z-score
-        df["KalmanFilter_BOS"] = residual / residual.rolling(20).std()
+        df["KalmanFilter_BOS"] = (residual / residual.rolling(20).std()).astype(np.float32)
         
         # 3. HTFC_Alpha1_meanclose12
         # mean(close,window=12)/close
-        df["HTFC_Alpha1_meanclose12"] = df["close"].rolling(12).mean() / df["close"]
+        df["HTFC_Alpha1_meanclose12"] = (df["close"].rolling(12).mean() / df["close"]).astype(np.float32)
         
         # 4. HTFC_Alpha5_skew20
         # -1*skewness(returns,window=20)
-        df["HTFC_Alpha5_skew20"] = -1.0 * df["returns"].rolling(20).skew()
+        df["HTFC_Alpha5_skew20"] = (-1.0 * df["returns"].rolling(20).skew()).astype(np.float32)
         
         # 5. EWMA_32_64_CTA
         # (EMA(close, 32) - EMA(close, 64)) / close
         ema32 = df["close"].ewm(span=32, adjust=False).mean()
         ema64 = df["close"].ewm(span=64, adjust=False).mean()
-        df["EWMA_32_64_CTA"] = (ema32 - ema64) / df["close"]
+        df["EWMA_32_64_CTA"] = ((ema32 - ema64) / df["close"]).astype(np.float32)
         
         # 6. ForeignAg_LeadLag
         # Lead-lag difference of N-day changes cubed (to highlight anomalies)
