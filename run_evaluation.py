@@ -274,7 +274,7 @@ def run():
         ax.set_xlabel('Alpha')
         ax.set_ylabel('Sharpe Ratio')
         ax.set_title('Capacity-Adjusted Sharpe Decay by AUM Level')
-        ax.set_xticks(x + width * 2)
+        ax.set_xticks(x + width * (len(aum_keys) - 1) / 2)
         ax.set_xticklabels(valid_alphas, rotation=30, ha='right', fontsize=8)
         ax.legend()
         ax.grid(True, axis='y', linestyle='--', alpha=0.5)

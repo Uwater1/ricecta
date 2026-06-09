@@ -17,7 +17,6 @@ import numpy as np
 import numba
 import scipy.stats as stats
 import warnings
-import statsmodels.api as sm
 
 from evaluate_hold_strategy import get_dominant_switch_dates
 
@@ -311,7 +310,10 @@ def plot_horizon_stability(df_results, best_factors_dict, figures_dir):
             short_factor = short_factor[:12] + '...' + short_factor[-10:]
             
         ax.set_title(f"{symbol}: {short_factor}\n({rep}, SCF={best_cfg['horizon_sign_consistency_pct']*100:.0f}%)", fontsize=9, fontweight='bold')
-        ax.set_ylim(-0.8, 0.8)
+        # Dynamic y-axis based on actual correlation range for this symbol
+        max_abs_corr = df_sub[['spearman_corr', 'spearman_first_half', 'spearman_second_half']].abs().max().max()
+        ylim = max(0.8, np.ceil((max_abs_corr + 0.15) * 10) / 10)
+        ax.set_ylim(-ylim, ylim)
         ax.grid(True, linestyle=':', alpha=0.6)
         ax.tick_params(axis='both', which='major', labelsize=8)
         
@@ -488,15 +490,16 @@ def run_correlation_test():
                     r_pears, p_pears = stats.pearsonr(df_corr['sig'], df_corr['fwd'])
                     t_pears = calculate_t_stat(r_pears, n_obs)
                     
-                    r_spear, p_spear = stats.spearmanr(df_corr['sig'], df_corr['fwd'])
-                    t_spear = calculate_t_stat(r_spear, n_obs)
+                    # Use NW-adjusted Spearman for switch horizons (consistent with calendar horizons)
+                    switch_H_days = horizon_days_stats[symbol].get(horizon, 20)
+                    r_spear, t_spear, p_spear = compute_newey_west_spearman(df_corr['sig'], df_corr['fwd'], switch_H_days)
                     
                     mid_idx = n_obs // 2
                     df_first = df_corr.iloc[:mid_idx]
                     df_second = df_corr.iloc[mid_idx:]
                     
-                    r_first, _ = stats.spearmanr(df_first['sig'], df_first['fwd']) if len(df_first) >= 5 else (np.nan, np.nan)
-                    r_second, _ = stats.spearmanr(df_second['sig'], df_second['fwd']) if len(df_second) >= 5 else (np.nan, np.nan)
+                    r_first, _, _ = compute_newey_west_spearman(df_first['sig'], df_first['fwd'], switch_H_days, n_obs_min=5)
+                    r_second, _, _ = compute_newey_west_spearman(df_second['sig'], df_second['fwd'], switch_H_days, n_obs_min=5)
                     
                     temporal_consistent = False
                     if not np.isnan(r_first) and not np.isnan(r_second):

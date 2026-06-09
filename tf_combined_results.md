@@ -1,27 +1,27 @@
 # TF Futures Macro Factor Combination Backtest Report
 
 This report evaluates various combination methods for trading CFFEX 5-year Treasury Note futures (TF) using three macro factors:
-1. **PMI Expectation** (`PMI_生产经营活动预期_全国_当期值_月`)
-2. **Manufacturing PMI** (`制造业采购经理指数PMI_当月`)
-3. **Social Financing** (`社会融资规模_当月值` for Dataset A, and `社会融资规模存量_同比增速_月末数` for Dataset B)
+1. **PMI Expectation** (`PMI Business Expectation`)
+2. **Manufacturing PMI** (`Manufacturing PMI`)
+3. **Social Financing** (`Social Financing (Monthly)` for Dataset A, and `Social Financing Stock (YoY)` for Dataset B)
 
 All models apply **look-ahead free** calendar alignment (1-day shift after forward-filling) and account for **transaction costs & slippage (5 bps)**.
 
 ---
 
 ## Dataset A: Requested Monthly Macro Factors (Dec 2023 - Jun 2026)
-*Limited duration due to rqdatac availability of `社会融资规模_当月值`.*
+*Limited duration due to rqdatac availability of `Social Financing (Monthly)`.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
-| **Baseline_PMI** | 2.13% | 1.65% | 1.29 | -1.23% | 1.36 | 52.68% | 4.013% |
-| **Consensus_Voting** | 1.80% | 1.47% | 1.23 | -1.41% | 1.22 | 44.15% | 8.194% |
-| **Baseline_SocialFin** | 1.75% | 1.63% | 1.08 | -1.03% | 1.12 | 48.83% | 6.856% |
-| **EW_Continuous** | 0.66% | 0.92% | 0.72 | -1.03% | 0.79 | 48.33% | 5.947% |
-| **EW_Binary** | 1.16% | 1.66% | 0.70 | -2.12% | 0.74 | 49.67% | 8.361% |
-| **Regime_Switching** | 1.02% | 1.63% | 0.62 | -1.63% | 0.62 | 48.83% | 6.856% |
-| **Rolling_Ridge** | 0.06% | 0.17% | 0.36 | -0.16% | 0.07 | 2.51% | 0.334% |
-| **Baseline_PMI_Expect** | -1.12% | 1.64% | -0.68 | -4.17% | -0.64 | 49.67% | 7.692% |
+| **Baseline_PMI_Expect** | 3.88% | 1.59% | 2.44 | -0.72% | 2.79 | 53.33% | 0.000% |
+| **Consensus_Voting** | 3.47% | 1.51% | 2.30 | -0.72% | 2.34 | 50.00% | 0.000% |
+| **EW_Continuous** | 2.01% | 0.93% | 2.16 | -0.45% | 2.46 | 51.67% | 0.462% |
+| **EW_Binary** | 2.31% | 1.60% | 1.44 | -0.80% | 1.56 | 51.67% | 0.000% |
+| **Rolling_Ridge** | 0.04% | 0.15% | 0.26 | -0.05% | 0.05 | 1.67% | 0.000% |
+| **Baseline_SocialFin** | -0.21% | 1.59% | -0.13 | -1.00% | -0.12 | 50.00% | 0.000% |
+| **Baseline_PMI** | -0.52% | 1.61% | -0.33 | -0.87% | -0.31 | 51.67% | 0.000% |
+| **Regime_Switching** | -1.49% | 1.59% | -0.93 | -1.05% | -0.86 | 48.33% | 0.000% |
 
 *Dataset A Cumulative Returns:*
 ![Dataset A Equity Curve](figures/tf_combined_equity_a.png)
@@ -29,18 +29,18 @@ All models apply **look-ahead free** calendar alignment (1-day shift after forwa
 ---
 
 ## Dataset B: Long-History Macro Factors (Jun 2016 - Jun 2026)
-*Using `社会融资规模存量_同比增速_月末数` to provide a full 10-year macro cycle backtest.*
+*Using `Social Financing Stock (YoY)` to provide a full 10-year macro cycle backtest.*
 
 | Combination Strategy | Ann. Return | Ann. Vol | Sharpe Ratio | Max Drawdown | Sortino | Win Rate | Daily Turnover |
 |---|---|---|---|---|---|---|---|
-| **Baseline_SocialFin** | 1.27% | 2.07% | 0.61 | -3.65% | 0.57 | 40.66% | 1.317% |
-| **Rolling_Ridge** | 0.61% | 1.07% | 0.56 | -2.04% | 0.39 | 23.33% | 0.505% |
-| **EW_Continuous** | 0.85% | 1.53% | 0.56 | -2.46% | 0.62 | 49.63% | 2.956% |
-| **Consensus_Voting** | 0.91% | 1.97% | 0.46 | -4.16% | 0.44 | 42.72% | 3.128% |
-| **Baseline_PMI** | 0.82% | 2.28% | 0.36 | -4.48% | 0.35 | 50.95% | 2.881% |
-| **EW_Binary** | 0.78% | 2.28% | 0.34 | -4.51% | 0.34 | 50.86% | 3.045% |
-| **Regime_Switching** | 0.49% | 2.21% | 0.22 | -4.83% | 0.21 | 46.05% | 2.798% |
-| **Baseline_PMI_Expect** | 0.26% | 1.99% | 0.13 | -6.14% | 0.12 | 44.07% | 3.251% |
+| **EW_Continuous** | 3.36% | 1.93% | 1.74 | -1.10% | 2.54 | 54.73% | 0.804% |
+| **Baseline_PMI_Expect** | 2.82% | 2.13% | 1.32 | -1.06% | 1.32 | 47.74% | 0.000% |
+| **EW_Binary** | 2.99% | 2.64% | 1.13 | -1.60% | 1.24 | 55.56% | 1.646% |
+| **Baseline_PMI** | 2.78% | 2.64% | 1.05 | -1.97% | 1.19 | 53.09% | 0.823% |
+| **Consensus_Voting** | 2.20% | 2.36% | 0.93 | -1.45% | 0.93 | 46.91% | 0.823% |
+| **Rolling_Ridge** | 1.11% | 1.63% | 0.68 | -1.22% | 0.70 | 35.39% | 0.729% |
+| **Regime_Switching** | 0.39% | 2.54% | 0.15 | -3.64% | 0.16 | 48.15% | 0.823% |
+| **Baseline_SocialFin** | -1.50% | 2.39% | -0.63 | -3.40% | -0.59 | 41.56% | 0.000% |
 
 *Dataset B Cumulative Returns:*
 ![Dataset B Equity Curve](figures/tf_combined_equity_b.png)

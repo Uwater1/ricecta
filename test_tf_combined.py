@@ -50,6 +50,7 @@ def load_and_align_factors(dataset_type='A'):
     ]
     
     aligned_signals = {}
+    release_trading_dates_set = set()
     
     for factor in factors:
         filename = re.sub(r'[\\/*?:"<>|]', '_', factor) + ".parquet"
@@ -79,15 +80,20 @@ def load_and_align_factors(dataset_type='A'):
         diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
         s_diff = diff_daily.reindex(trading_dates)
         
+        # Release-date-only rule: first trading day strictly after each info_date release
+        pos = np.searchsorted(trading_dates, df_fac.index, side='right')
+        valid_pos = pos[pos < len(trading_dates)]
+        release_trading_dates_set.update(trading_dates[valid_pos].unique())
+        
         aligned_signals[factor] = {
             'level': s_level,
             'diff': s_diff,
             'zscore': s_zscore
         }
         
-    return df_price, aligned_signals
+    return df_price, aligned_signals, release_trading_dates_set
 
-def evaluate_signals(df_price, signals, tc_rate=0.0005, start_date=None):
+def evaluate_signals(df_price, signals, tc_rate=0.0005, start_date=None, release_trading_dates=None):
     results = {}
     
     for sig_name, sig_series in signals.items():
@@ -103,6 +109,13 @@ def evaluate_signals(df_price, signals, tc_rate=0.0005, start_date=None):
         
         # Net returns
         net_ret = port_ret - turnover * tc_rate
+        
+        # Release-date-only rule: only count returns on dates when new macro data was released
+        # This eliminates autocorrelation bias from carry returns between releases
+        if release_trading_dates is not None:
+            release_mask = net_ret.index.isin(release_trading_dates)
+            net_ret = net_ret[release_mask]
+            turnover = turnover[turnover.index.isin(release_trading_dates)]
         
         if start_date is not None:
             net_ret = net_ret[net_ret.index >= start_date]
@@ -145,7 +158,7 @@ def evaluate_signals(df_price, signals, tc_rate=0.0005, start_date=None):
 
 def run_combinations_for_dataset(dataset_type='A', start_date=None):
     print(f"\n--- Running combinations for Dataset Type: {dataset_type} ---")
-    df_price, aligned = load_and_align_factors(dataset_type)
+    df_price, aligned, release_trading_dates = load_and_align_factors(dataset_type)
     
     # Dynamic lookahead-free rolling correlation sign (using 1008-day window)
     # This automatically handles economic regime shifts (e.g. sign switches)
@@ -283,8 +296,9 @@ def run_combinations_for_dataset(dataset_type='A', start_date=None):
     combined_signals['Baseline_PMI'] = np.sign(sig_pmi).fillna(0.0)
     combined_signals['Baseline_SocialFin'] = np.sign(sig_soc).fillna(0.0)
     
-    # Run backtests
-    eval_results = evaluate_signals(df_price, combined_signals, start_date=start_date)
+    # Run backtests with release-date-only evaluation
+    eval_results = evaluate_signals(df_price, combined_signals, start_date=start_date,
+                                    release_trading_dates=release_trading_dates)
     return eval_results, df_price.index
 
 def main():
