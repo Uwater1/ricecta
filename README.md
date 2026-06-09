@@ -26,6 +26,7 @@ Daily spot-basis and 5-minute contract data were used with risk-free financing r
   - [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py): Full evaluation pipeline runner for daily + hold alphas.
   - [alphas.py](file:///home/hallo/data/ricecta/alphas.py): Unified alpha calculation library.
   - [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py): Performance metrics calculator.
+  - [evaluate_per_symbol.py](file:///home/hallo/data/ricecta/evaluate_per_symbol.py): Per-symbol single-asset backtest for each symbol's #1 macro factor.
   - [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py): Contract holding strategy backtest engine.
   - [run_hold_backtest.py](file:///home/hallo/data/ricecta/run_hold_backtest.py): Optimization CLI for holding parameters H and k.
 
@@ -39,8 +40,8 @@ Daily spot-basis and 5-minute contract data were used with risk-free financing r
 
 - **Research and Results Reports:**
   - [arbitrage.md](file:///home/hallo/data/ricecta/arbitrage.md): Comprehensive arbitrage study methodology and conclusions.
-  - [alpha_evaluation_report.md](file:///home/hallo/data/ricecta/alpha_evaluation_report.md): Unified alpha strategy evaluation report.
-  - [alt_alphas.md](file:///home/hallo/data/ricecta/alt_alphas.md): Macro alpha factors and cross-sectional / time-series portfolio analysis.
+  - [alpha_evaluation_report.md](file:///home/hallo/data/ricecta/alpha_evaluation_report.md): Per-symbol alpha strategy evaluation report.
+  - [alt_alphas.md](file:///home/hallo/data/ricecta/alt_alphas.md): Macro alpha factor screening, horizon stability analysis, and cross-sectional portfolio results.
   - [hold_strategy_report.md](file:///home/hallo/data/ricecta/hold_strategy_report.md): Hold strategy optimization results report.
   - [arbitrage_metrics_by_symbol.csv](file:///home/hallo/data/ricecta/arbitrage_metrics_by_symbol.csv): Detailed arbitrage metrics for all 23 commodities.
 

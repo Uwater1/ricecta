@@ -37,6 +37,7 @@ Framework evaluates 9 alpha signals across 23 commodity futures.
 ### Structure
 - **Data Downloader:** [download_daily_data.py](file:///home/hallo/data/ricecta/download/download_daily_data.py) — fetches pre-adjusted dominant daily contracts (no roll gaps).
 - **Alpha Library:** [alphas.py](file:///home/hallo/data/ricecta/alphas.py) — calculates 7 daily signals + 1 no-rolling discretized signal (`Alt_Macro_Alpha_NoRoll`). Also exposes `get_dominant_switch_dates()` (canonical source) and `BEST_HOLD_PARAMS` (optimized hold period H and contract index k per symbol).
+- **Per-Symbol Evaluator:** [evaluate_per_symbol.py](file:///home/hallo/data/ricecta/evaluate_per_symbol.py) — evaluates each of the 23 symbols individually with its #1 ranked macro factor from `alt_alphas.md` Commodity Specific Details. Single-asset directional backtest with 5bps TC. Produces per-symbol metrics table, equity curve grid (`figures/per_symbol_equity.png`), and drawdown grid (`figures/per_symbol_drawdowns.png`).
 - **Metrics Evaluator:** [evaluate_alpha.py](file:///home/hallo/data/ricecta/evaluate_alpha.py) — calculates DSR (multiple testing), Sortino, Turnover-Adjusted Calmar, Capacity-Adjusted Sharpe Decay (market impact).
 - **Hold Strategy Engine:** [evaluate_hold_strategy.py](file:///home/hallo/data/ricecta/evaluate_hold_strategy.py) — per-symbol contract hold backtest with OI-based liquidity filtering and maturity exit rules. Imports `get_dominant_switch_dates` from `alphas.py`.
 - **Runner:** [run_evaluation.py](file:///home/hallo/data/ricecta/run_evaluation.py) — runs full pipeline (daily alphas + no-rolling hold strategy) and exports [alpha_evaluation_report.md](file:///data/ricecta/alpha_evaluation_report.md).
@@ -57,6 +58,8 @@ Framework evaluates 9 alpha signals across 23 commodity futures.
 rtk venv/bin/python run_evaluation.py
 # Evaluate specific alpha (1-9 or name)
 rtk venv/bin/python run_evaluation.py 9  # runs NoRoll hold strategy
+# Per-symbol single-asset backtest
+rtk venv/bin/python evaluate_per_symbol.py
 ```
 
 ## Recent Alpha Updates
@@ -125,3 +128,9 @@ rtk venv/bin/python test_tf_combined.py
 - **Signal Hardening:** Applied rolling 252-day winsorization (1% to 99%) and a minimum 12-observation NaN guard in [alphas.py](file:///home/hallo/data/ricecta/alphas.py) to protect signal generation.
 - **Detailed Trade Logging:** Backtest logs now output to `data/results/trade_log_{symbol}.csv` including `hold_days`, raw return, transaction costs, and price levels.
 - **Macro Data Updater:** Run `rtk python download/update_macro_data.py` to refresh all macro factor files from rqdatac up to the current date.
+
+## Per-Symbol Alpha Evaluation (Jun 2026)
+- **New Script:** [evaluate_per_symbol.py](file:///home/hallo/data/ricecta/evaluate_per_symbol.py) evaluates each symbol individually with its #1 ranked factor from `alt_alphas.md` Commodity Specific Details. Uses `ContractSplicer` for k-th nearest contract prices, constructs macro signal (level/diff/zscore with 1-day shift, winsorization), and runs single-asset directional backtest with 5bps TC.
+- **Output:** Per-symbol metrics table (Sharpe, DSR, Calmar, Sortino, MaxDD, etc.), 5x5 equity curve grid (`figures/per_symbol_equity.png`), drawdown grid (`figures/per_symbol_drawdowns.png`), and [alpha_evaluation_report.md](file:///home/hallo/data/ricecta/alpha_evaluation_report.md).
+- **Results (23 symbols):** 21/23 positive Sharpe. Top 3: AG (+0.96), SA (+0.74), AL (+0.70). Bottom 3: AU (-0.91), P (-0.50), M (-0.04). Mean Sharpe +0.31, Median +0.42.
+- **Config Sync:** Updated `BEST_MACRO_CONFIGS` in both [alphas.py](file:///home/hallo/data/ricecta/alphas.py) and [run_hold_backtest.py](file:///home/hallo/data/ricecta/run_hold_backtest.py) to match Commodity Specific Details #1 factors (6 symbol changes: C, CF, CU, M, NI, SC).
