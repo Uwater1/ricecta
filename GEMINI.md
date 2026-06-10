@@ -134,3 +134,16 @@ rtk venv/bin/python test_tf_combined.py
 - **Output:** Per-symbol metrics table (Sharpe, DSR, Calmar, Sortino, MaxDD, etc.), 5x5 equity curve grid (`figures/per_symbol_equity.png`), drawdown grid (`figures/per_symbol_drawdowns.png`), and [alpha_evaluation_report.md](file:///home/hallo/data/ricecta/alpha_evaluation_report.md).
 - **Results (23 symbols):** 21/23 positive Sharpe. Top 3: AG (+0.96), SA (+0.74), AL (+0.70). Bottom 3: AU (-0.91), P (-0.50), M (-0.04). Mean Sharpe +0.31, Median +0.42.
 - **Config Sync:** Updated `BEST_MACRO_CONFIGS` in both [alphas.py](file:///home/hallo/data/ricecta/alphas.py) and [run_hold_backtest.py](file:///home/hallo/data/ricecta/run_hold_backtest.py) to match Commodity Specific Details #1 factors (6 symbol changes: C, CF, CU, M, NI, SC).
+
+## Look-ahead-free Aligned Macro & Price Dataset (Jun 2026)
+- **Data Filtering & Alignment Pipeline:** Implemented [build_macro_price_df.py](file:///home/hallo/data/ricecta/build_macro_price_df.py) to parse, filter, and align macro factors with daily prices.
+- **Noise Reduction:** Filters out unrelated factors for each symbol, retaining only those with an absolute Spearman t-statistic $\ge 1.0$ at the 20d horizon.
+- **Look-ahead-free Alignment:** Releases are shifted by 1 calendar day (`info_date + 1`) and mapped to the first active trading day (automatically resolving weekends and Chinese holidays), then forward-filled daily.
+- **Outputs:**
+  - `data/results/macro_price_aligned.parquet`: Multi-indexed long panel DataFrame `[date, symbol, factor, representation]` of all related pairs (792k+ rows).
+  - `data/results/aligned_by_symbol/{symbol}_aligned.csv`: Symbol-specific wide CSVs.
+  - `data/results/macro_price_aligned_ag.csv`: Special wide dataset for `AG` (Silver) marking release dates and composite signals for effective PMIs.
+- **Command to Run:**
+```bash
+rtk venv/bin/python build_macro_price_df.py
+```
