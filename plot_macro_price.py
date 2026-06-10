@@ -137,7 +137,7 @@ def main():
             
         # Setup modern dark/light style
         plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
-        fig, ax = plt.subplots(figsize=(14, 7), dpi=200)
+        fig, ax = plt.subplots(figsize=(14, 7), dpi=300)
         
         ax.plot(df_sub.index, df_sub['close'], color='#2b6cb0', linewidth=2.0,
                 alpha=0.95, zorder=3)
@@ -228,7 +228,7 @@ def main():
         
         # Save figure
         plot_path = os.path.join(figures_dir, f"macro_price_{symbol}.png")
-        plt.savefig(plot_path, dpi=200)
+        plt.savefig(plot_path, dpi=300)
         plt.close()
         
     print("Succeeded in generating and saving overlay plots to the figures/ folder.")
