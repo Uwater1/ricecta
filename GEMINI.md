@@ -125,3 +125,16 @@ rtk venv/bin/python test_tf_combined.py
 - **Signal Hardening:** Applied rolling 252-day winsorization (1% to 99%) and a minimum 12-observation NaN guard in [alphas.py](file:///home/hallo/data/ricecta/alphas.py) to protect signal generation.
 - **Detailed Trade Logging:** Backtest logs now output to `data/results/trade_log_{symbol}.csv` including `hold_days`, raw return, transaction costs, and price levels.
 - **Macro Data Updater:** Run `rtk python download/update_macro_data.py` to refresh all macro factor files from rqdatac up to the current date.
+
+## Look-ahead-free Aligned Macro & Price Dataset (Jun 2026)
+- **Data Filtering & Alignment Pipeline:** Implemented [build_macro_price_df.py](file:///home/hallo/data/ricecta/build_macro_price_df.py) to parse, filter, and align macro factors with daily prices.
+- **Noise Reduction:** Filters out unrelated factors for each symbol, retaining only those with an absolute Spearman t-statistic $\ge 1.0$ at the 20d horizon.
+- **Look-ahead-free Alignment:** Releases are shifted by 1 calendar day (`info_date + 1`) and mapped to the first active trading day (automatically resolving weekends and Chinese holidays), then forward-filled daily.
+- **Outputs:**
+  - `data/results/macro_price_aligned.parquet`: Multi-indexed long panel DataFrame `[date, symbol, factor, representation]` of all related pairs (792k+ rows).
+  - `data/results/aligned_by_symbol/{symbol}_aligned.csv`: Symbol-specific wide CSVs.
+  - `data/results/macro_price_aligned_ag.csv`: Special wide dataset for `AG` (Silver) marking release dates and composite signals for effective PMIs.
+- **Command to Run:**
+```bash
+rtk venv/bin/python build_macro_price_df.py
+```
