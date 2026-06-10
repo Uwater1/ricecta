@@ -18,32 +18,37 @@ warnings.filterwarnings('ignore')
 
 # Factor display name map for cleaner column naming
 FACTOR_DISPLAY_NAMES = {
-    'PPI_全部工业品(全国:当期同比增长率:月)': 'PPI_All_Industry_YoY',
-    'PPIRM_燃料及动力类(全国:当期同比增长率:月)': 'PPIRM_Fuel_Power_YoY',
-    '制造业采购经理指数PMI_购进价格': 'PMI_Input_Price',
-    '制造业采购经理指数PMI_当月': 'Manufacturing_PMI',
-    '制造业采购经理指数PMI_原材料库存': 'PMI_Raw_Material_Inventory',
-    '制造业采购经理指数PMI_新订单': 'PMI_New_Orders',
-    '非制造业PMI_建筑业_新订单_全国_当期值_月': 'Non_Mfg_PMI_Constr_New_Orders',
-    'PMI_生产经营活动预期_全国_当期值_月': 'PMI_Business_Expectation',
     '非制造业PMI_建筑业_业务活动预期_全国_当期值_月': 'Non_Mfg_PMI_Constr_Expectation',
-    'PPI_皮革、毛皮、羽毛及其制品 and 制鞋业(全国:当期同比增长率:月)': 'PPI_Leather_Footwear_YoY',
-    'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月': 'PPI_Telecom_Electronics_YoY',
-    'PPI_电气机械及器材制造业(全国:当期同比增长率:月)': 'PPI_Electrical_Machinery_YoY',
-    'GDP增长贡献率_第二产业_累计同比_季': 'GDP_Contribution_2nd_Industry_YoY',
+    'PPI_石油加工、炼焦及核燃料加工业(全国:当期同比增长率:月)': 'PPI_Petroleum_Coking_Nuclear_YoY',
     '社会融资规模_当月值': 'Social_Financing_Monthly',
-    '社会融资规模存量_同比增速_月末数': 'Social_Financing_Stock_YoY',
+    '制造业采购经理指数PMI_原材料库存': 'PMI_Raw_Material_Inventory',
+    'PPIRM_农副产品类(全国:当期同比增长率:月)': 'PPIRM_Agri_Products_YoY',
+    'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)': 'PPI_Leather_Footwear_YoY',
+    '国内生产总值GDP(现价)_全国_当期同比增长率_季': 'Nominal_GDP_YoY',
     '国内生产总值GDP_累计同比': 'GDP_Cumulative_YoY',
+    'PPI_电气机械及器材制造业(全国:当期同比增长率:月)': 'PPI_Electrical_Machinery_YoY',
+    '制造业采购经理指数PMI_购进价格': 'PMI_Input_Price',
+    '制造业采购经理指数PMI_进口': 'PMI_Import',
+    '居民鲜果消费价格指数CPI_(上年=100)_当月': 'CPI_Fresh_Fruit_YoY',
+    'PPIRM_燃料及动力类(全国:当期同比增长率:月)': 'PPIRM_Fuel_Power_YoY',
+    'PMI_生产经营活动预期_全国_当期值_月': 'PMI_Business_Expectation',
+    'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月': 'PPI_Telecom_Electronics_YoY',
+    '制造业采购经理指数PMI_新出口订单': 'PMI_New_Export_Orders',
+    'PPI_全部工业品(全国:当期同比增长率:月)': 'PPI_All_Industry_YoY',
 }
 
 def get_clean_name(factor_name):
-    if factor_name in FACTOR_DISPLAY_NAMES:
-        return FACTOR_DISPLAY_NAMES[factor_name]
-    # Fallback clean name
-    clean = re.sub(r'[\\/*?:"<>|(),：\s]', '_', factor_name).strip('_')
+    display = FACTOR_DISPLAY_NAMES.get(factor_name, factor_name)
+    # Remove Chinese characters
+    display = re.sub(r'[\u4e00-\u9fff]', '', display)
+    # Replace non-alphanumeric characters with underscore
+    clean = re.sub(r'[\\/*?:"<>|(),：\s-]', '_', display).strip('_')
     # Replace contiguous underscores
     clean = re.sub(r'_{2,}', '_', clean)
+    if not clean:
+        clean = "Macro_Factor"
     return clean
+
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))

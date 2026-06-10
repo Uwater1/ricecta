@@ -3,6 +3,7 @@
 Generates high-quality charts for commodity prices with look-ahead-free macro factor
 release dates plotted directly as colored points on the price line.
 Green indicates a positive factor change/surprise, Red indicates negative.
+All text is strictly in English to prevent tofu character rendering issues.
 """
 import os
 import re
@@ -12,38 +13,73 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import warnings
 
 warnings.filterwarnings('ignore')
 
-# Factor display name map for legend
+_POS_LIGHT = np.array(mcolors.to_rgb('#81e6d9'))
+_POS_DARK = np.array(mcolors.to_rgb('#234e52'))
+_NEG_LIGHT = np.array(mcolors.to_rgb('#feb2b2'))
+_NEG_DARK = np.array(mcolors.to_rgb('#742a2a'))
+
+def _magnitude_to_sizes(magnitudes):
+    if len(magnitudes) == 0:
+        return np.array([])
+    if len(magnitudes) == 1:
+        return np.array([100])
+    p33 = magnitudes.quantile(0.33)
+    p66 = magnitudes.quantile(0.66)
+    p90 = magnitudes.quantile(0.90)
+    bins = [0, p33, p66, p90, np.inf]
+    labels = [50, 100, 160, 220]
+    return np.array([labels[i] for i in np.digitize(magnitudes.values, bins[1:])])
+
+def _magnitude_to_colors(magnitudes, direction='positive'):
+    if len(magnitudes) == 0:
+        return []
+    light, dark = (_POS_LIGHT, _POS_DARK) if direction == 'positive' else (_NEG_LIGHT, _NEG_DARK)
+    m_range = magnitudes.max() - magnitudes.min()
+    t = np.full(len(magnitudes), 0.5) if m_range < 1e-9 else (magnitudes - magnitudes.min()) / m_range
+    return [mcolors.to_hex(light * (1 - ti) + dark * ti) for ti in t]
+
+# Exact display name map matching build_macro_price_df.py for alignment
 FACTOR_DISPLAY_NAMES = {
-    'PPI_全部工业品(全国:当期同比增长率:月)': 'PPI All Industry (YoY)',
-    'PPIRM_燃料及动力类(全国:当期同比增长率:月)': 'PPIRM Fuel & Power (YoY)',
-    '制造业采购经理指数PMI_购进价格': 'PMI Input Price',
-    '制造业采购经理指数PMI_当月': 'Manufacturing PMI',
-    '制造业采购经理指数PMI_原材料库存': 'PMI Raw Material Inventory',
-    '制造业采购经理指数PMI_新订单': 'PMI New Orders',
-    '非制造业PMI_建筑业_新订单_全国_当期值_月': 'Non-Mfg PMI Constr. New Orders',
-    'PMI_生产经营活动预期_全国_当期值_月': 'PMI Business Expectation',
-    '非制造业PMI_建筑业_业务活动预期_全国_当期值_月': 'Non-Mfg PMI Constr. Expectation',
-    'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)': 'PPI Leather & Footwear (YoY)',
-    'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月': 'PPI Telecom & Electronics (YoY)',
-    'PPI_电气机械及器材制造业(全国:当期同比增长率:月)': 'PPI Electrical Machinery (YoY)',
-    'GDP增长贡献率_第二产业_累计同比_季': 'GDP Contribution 2nd Industry (Cum YoY)',
-    '社会融资规模_当月值': 'Social Financing (Monthly)',
-    '社会融资规模存量_同比增速_月末数': 'Social Financing Stock (YoY)',
-    '国内生产总值GDP_累计同比': 'GDP Cumulative YoY',
+    '非制造业PMI_建筑业_业务活动预期_全国_当期值_月': 'Non_Mfg_PMI_Constr_Expectation',
+    'PPI_石油加工、炼焦及核燃料加工业(全国:当期同比增长率:月)': 'PPI_Petroleum_Coking_Nuclear_YoY',
+    '社会融资规模_当月值': 'Social_Financing_Monthly',
+    '制造业采购经理指数PMI_原材料库存': 'PMI_Raw_Material_Inventory',
+    'PPIRM_农副产品类(全国:当期同比增长率:月)': 'PPIRM_Agri_Products_YoY',
+    'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)': 'PPI_Leather_Footwear_YoY',
+    '国内生产总值GDP(现价)_全国_当期同比增长率_季': 'Nominal_GDP_YoY',
+    '国内生产总值GDP_累计同比': 'GDP_Cumulative_YoY',
+    'PPI_电气机械及器材制造业(全国:当期同比增长率:月)': 'PPI_Electrical_Machinery_YoY',
+    '制造业采购经理指数PMI_购进价格': 'PMI_Input_Price',
+    '制造业采购经理指数PMI_进口': 'PMI_Import',
+    '居民鲜果消费价格指数CPI_(上年=100)_当月': 'CPI_Fresh_Fruit_YoY',
+    'PPIRM_燃料及动力类(全国:当期同比增长率:月)': 'PPIRM_Fuel_Power_YoY',
+    'PMI_生产经营活动预期_全国_当期值_月': 'PMI_Business_Expectation',
+    'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月': 'PPI_Telecom_Electronics_YoY',
+    '制造业采购经理指数PMI_新出口订单': 'PMI_New_Export_Orders',
+    'PPI_全部工业品(全国:当期同比增长率:月)': 'PPI_All_Industry_YoY',
 }
 
-def get_display_name(factor):
-    return FACTOR_DISPLAY_NAMES.get(factor, factor)
-
 def get_clean_name(factor_name):
-    # Replace spaces/colons/slashes with underscore
-    clean = re.sub(r'[\\/*?:"<>|(),：\s]', '_', factor_name).strip('_')
+    display = FACTOR_DISPLAY_NAMES.get(factor_name, factor_name)
+    # Remove Chinese characters
+    display = re.sub(r'[\u4e00-\u9fff]', '', display)
+    # Replace non-alphanumeric characters with underscore
+    clean = re.sub(r'[\\/*?:"<>|(),：\s-]', '_', display).strip('_')
+    # Replace contiguous underscores
     clean = re.sub(r'_{2,}', '_', clean)
+    if not clean:
+        clean = "Macro_Factor"
     return clean
+
+def get_nice_display_name(factor_name):
+    clean = get_clean_name(factor_name)
+    # Replace underscores with spaces for premium look on charts
+    return clean.replace('_', ' ')
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -60,14 +96,14 @@ def main():
     with open(config_path, 'r', encoding='utf-8') as f:
         best_configs = json.load(f)
         
-    # Standard translation of symbols to Chinese names
+    # Strictly English names to avoid Tofu rendering in Matplotlib
     symbol_names = {
-        'C': 'Corn (玉米)', 'M': 'Soymeal (豆粕)', 'Y': 'Soyoil (豆油)', 'P': 'Palm Oil (棕榈油)',
-        'V': 'PVC', 'J': 'Coke (焦炭)', 'JD': 'Eggs (鸡蛋)', 'I': 'Iron Ore (铁矿石)',
-        'CU': 'Copper (沪铜)', 'AL': 'Aluminum (沪铝)', 'AU': 'Gold (沪金)', 'AG': 'Silver (沪银)',
-        'RB': 'Rebar (螺纹钢)', 'RU': 'Rubber (天然橡胶)', 'NI': 'Nickel (沪镍)', 'SN': 'Tin (沪锡)',
-        'SC': 'Crude Oil (原油)', 'CF': 'Cotton (棉花)', 'SR': 'Sugar (白糖)', 'TA': 'PTA',
-        'MA': 'Methanol (甲醇)', 'SA': 'Soda Ash (纯碱)', 'TF': '5Y Treasury Bond (国债)'
+        'C': 'Corn', 'M': 'Soymeal', 'Y': 'Soyoil', 'P': 'Palm Oil',
+        'V': 'PVC', 'J': 'Coke', 'JD': 'Eggs', 'I': 'Iron Ore',
+        'CU': 'Copper', 'AL': 'Aluminum', 'AU': 'Gold', 'AG': 'Silver',
+        'RB': 'Rebar', 'RU': 'Rubber', 'NI': 'Nickel', 'SN': 'Tin',
+        'SC': 'Crude Oil', 'CF': 'Cotton', 'SR': 'Sugar', 'TA': 'PTA',
+        'MA': 'Methanol', 'SA': 'Soda Ash', 'TF': '5Y Treasury Bond'
     }
     
     print("Generating price & macro overlay plots...")
@@ -75,6 +111,7 @@ def main():
     for symbol, cfg in best_configs.items():
         csv_path = os.path.join(aligned_dir, f"{symbol}_aligned.csv")
         if not os.path.exists(csv_path):
+            print(f"Warning: {csv_path} not found.")
             continue
             
         # Load aligned daily series
@@ -90,6 +127,7 @@ def main():
         col_rel = f"fac_{clean_f_name}_{rep}_release"
         
         if col_val not in df.columns or col_rel not in df.columns:
+            print(f"Warning: Column {col_val} not in {symbol}_aligned.csv columns. Skipping.")
             continue
             
         # Get active slices
@@ -101,53 +139,89 @@ def main():
         plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
         fig, ax = plt.subplots(figsize=(14, 7), dpi=200)
         
-        # Plot price line with subtle area shading underneath
-        ax.plot(df_sub.index, df_sub['close'], color='#4a90e2', linewidth=2.0, label='Spliced Close Price', alpha=0.9)
-        ax.fill_between(df_sub.index, df_sub['close'], color='#4a90e2', alpha=0.08)
-        
-        # Filter for release points
-        releases = df_sub[df_sub[col_rel] == 1]
-        
-        # Determine surprise direction (positive or negative change/level)
-        # For 'diff', positive change is > 0
-        # For 'zscore' or 'level', we can check if it is above or below its rolling average, or diff from previous release
+        ax.plot(df_sub.index, df_sub['close'], color='#2b6cb0', linewidth=2.0,
+                alpha=0.95, zorder=3)
+        ax.fill_between(df_sub.index, df_sub['close'], color='#2b6cb0', alpha=0.01)
+
+        releases = df_sub[df_sub[col_rel] == 1].copy()
+
         if rep == 'diff':
-            pos_releases = releases[releases[col_val] * sign > 0]
-            neg_releases = releases[releases[col_val] * sign < 0]
-            neutral_releases = releases[releases[col_val] == 0]
+            releases['magnitude'] = (releases[col_val] * sign).abs()
+            pos_releases = releases[releases[col_val] * sign > 0].copy()
+            neg_releases = releases[releases[col_val] * sign < 0].copy()
+            neutral_releases = releases[releases[col_val] == 0].copy()
         else:
-            # Check difference between current release value and previous day (to represent the step change)
             prev_vals = df_sub[col_val].shift(1)
-            releases_with_prev = releases.copy()
-            releases_with_prev['prev_val'] = prev_vals.loc[releases.index]
-            releases_with_prev['change'] = (releases_with_prev[col_val] - releases_with_prev['prev_val']).fillna(0)
-            
-            pos_releases = releases_with_prev[releases_with_prev['change'] * sign > 0]
-            neg_releases = releases_with_prev[releases_with_prev['change'] * sign < 0]
-            neutral_releases = releases_with_prev[releases_with_prev['change'] == 0]
-            
-        # Plot markers directly on the price line
+            releases['prev_val'] = prev_vals.loc[releases.index]
+            releases['change'] = (releases[col_val] - releases['prev_val']).fillna(0)
+            releases['magnitude'] = (releases['change'] * sign).abs()
+            pos_releases = releases[releases['change'] * sign > 0].copy()
+            neg_releases = releases[releases['change'] * sign < 0].copy()
+            neutral_releases = releases[releases['change'] * sign == 0].copy()
+
+        for dt in pos_releases.index:
+            ax.axvline(x=dt, color='#319795', alpha=0.18, linewidth=0.8, zorder=2)
+        for dt in neg_releases.index:
+            ax.axvline(x=dt, color='#e53e3e', alpha=0.18, linewidth=0.8, zorder=2)
+        for dt in neutral_releases.index:
+            ax.axvline(x=dt, color='#718096', alpha=0.12, linewidth=0.5, zorder=2)
+
+        price_range = df_sub['close'].max() - df_sub['close'].min()
+        y_offset = price_range * 0.05
+
+        legend_handles = []
+        legend_handles.append(plt.Line2D([0], [0], color='#2b6cb0', linewidth=2.0,
+            label='Spliced Close Price'))
+
         if not pos_releases.empty:
-            ax.scatter(pos_releases.index, pos_releases['close'], color='#2ca02c', marker='^', s=100, 
-                       label='Positive Macro Surprise (Long)', zorder=5, edgecolors='black', linewidths=0.5)
+            sizes = _magnitude_to_sizes(pos_releases['magnitude'])
+            colors = _magnitude_to_colors(pos_releases['magnitude'], 'positive')
+            ax.scatter(pos_releases.index, pos_releases['close'] + y_offset, c=colors, marker='^',
+                       s=sizes, zorder=5, edgecolors='black', linewidths=0.3)
+            legend_handles.append(plt.Line2D([0], [0], marker='^', color='w',
+                markerfacecolor='#234e52', markersize=10, label='Positive (Large)'))
+            legend_handles.append(plt.Line2D([0], [0], marker='^', color='w',
+                markerfacecolor='#81e6d9', markersize=7, label='Positive (Small)'))
+
         if not neg_releases.empty:
-            ax.scatter(neg_releases.index, neg_releases['close'], color='#d62728', marker='v', s=100, 
-                       label='Negative Macro Surprise (Short)', zorder=5, edgecolors='black', linewidths=0.5)
+            sizes = _magnitude_to_sizes(neg_releases['magnitude'])
+            colors = _magnitude_to_colors(neg_releases['magnitude'], 'negative')
+            ax.scatter(neg_releases.index, neg_releases['close'] - y_offset, c=colors, marker='v',
+                       s=sizes, zorder=5, edgecolors='black', linewidths=0.3)
+            legend_handles.append(plt.Line2D([0], [0], marker='v', color='w',
+                markerfacecolor='#742a2a', markersize=10, label='Negative (Large)'))
+            legend_handles.append(plt.Line2D([0], [0], marker='v', color='w',
+                markerfacecolor='#feb2b2', markersize=7, label='Negative (Small)'))
+
         if not neutral_releases.empty:
-            ax.scatter(neutral_releases.index, neutral_releases['close'], color='#7f7f7f', marker='o', s=60, 
-                       label='Neutral Release', zorder=4, edgecolors='black', linewidths=0.5)
-            
-        # Format chart
+            ax.scatter(neutral_releases.index, neutral_releases['close'] + y_offset, color='#718096',
+                       marker='o', s=20, zorder=4, edgecolors='black', linewidths=0.3)
+            legend_handles.append(plt.Line2D([0], [0], marker='o', color='w',
+                markerfacecolor='#718096', markersize=5, label='Neutral'))
+
+        legend_handles.append(plt.Line2D([0], [0], color='#319795', alpha=0.5,
+            linewidth=2, label='Positive release line'))
+        legend_handles.append(plt.Line2D([0], [0], color='#e53e3e', alpha=0.5,
+            linewidth=2, label='Negative release line'))
+
         title_name = symbol_names.get(symbol, symbol)
-        display_factor = get_display_name(factor_name)
-        
-        ax.set_title(f"{title_name} Price & {display_factor} ({rep.capitalize()}) Releases\n(Look-ahead-free Aligned Release Points, 2016-2026)", 
-                     fontsize=14, fontweight='bold', pad=15, color='#2c3e50')
-        
-        ax.set_xlabel("Date", fontsize=11, labelpad=10)
-        ax.set_ylabel(f"Close Price ({symbol})", fontsize=11, labelpad=10)
-        ax.legend(loc='upper left', frameon=True, facecolor='white', edgecolor='#e2e2e2', fontsize=10)
-        ax.grid(True, linestyle='--', alpha=0.5)
+        nice_factor = get_nice_display_name(factor_name)
+
+        ax.set_title(f"{title_name} Price & {nice_factor} ({rep.upper()}) Releases\n"
+                     f"(Look-ahead-free Aligned Release Points, 2016-2026)",
+                     fontsize=13, fontweight='bold', pad=15, color='#2d3748')
+
+        ax.set_xlabel("Date", fontsize=10, labelpad=8, color='#4a5568')
+        ax.set_ylabel(f"Close Price ({symbol})", fontsize=10, labelpad=8, color='#4a5568')
+        ax.legend(handles=legend_handles, loc='upper left', frameon=True,
+                  facecolor='white', edgecolor='#e2e8f0', fontsize=8)
+        ax.grid(True, linestyle='--', alpha=0.4)
+        ax.tick_params(axis='both', colors='#4a5568', labelsize=9)
+
+        y_min = df_sub['close'].min()
+        y_max = df_sub['close'].max()
+        y_pad = (y_max - y_min) * 0.08
+        ax.set_ylim(y_min - y_pad, y_max + y_pad)
         
         # Optimize margins
         plt.tight_layout()
