@@ -45,6 +45,32 @@ Selected by prioritizing **Horizon-Consistent Sweep** (SCF $\ge 90\%$) and **Tem
 | 22 | **TA** | `PMI_生产经营活动预期_全国_当期值_月` | *diff* | -0.1242 | -1.25 | 2.12e-01 | Yes | 100% (21/21) | 1.43 | 0.022 |
 | 23 | **SC** | `国内生产总值GDP_累计同比` | *level* | 0.1158 | 0.63 | 5.30e-01 | Yes | 95% (20/21) | 1.20 | 0.049 |
 
+## Canonical Configuration Note
+
+The "Performance Summary Table (Horizon-Robust Best Factors)" above defines the **canonical macro factor configurations** for all 23 symbols. These configs are synchronized across:
+
+- [`evaluate_per_symbol.py::SYMBOL_FACTOR_CONFIGS`](file://c:\Users\Administrator\Documents\ricecta\evaluate_per_symbol.py#L36-L58)
+- [`alphas.py::BEST_MACRO_CONFIGS`](file://c:\Users\Administrator\Documents\ricecta\alphas.py#L218-L242)
+- `data/results/best_macro_configs.json` (if exists, hot-loaded at runtime)
+
+### Sign Convention
+
+- **Sign = +1**: Positive Spearman correlation → Long when factor increases
+- **Sign = -1**: Negative Spearman correlation → Short when factor increases
+
+This ensures signal direction aligns with the correlation between factor values and forward returns.
+
+### Important Notes
+
+1. **M, P, AU Performance**: Despite passing horizon-robust statistical tests, these three symbols show negative Sharpe ratios in single-asset backtests (-0.04 to -0.93). This indicates that statistical significance does not guarantee profitability after transaction costs. Consider:
+   - Using alternative factors from the Top-3 lists (see below)
+   - Reducing position sizes or increasing holding periods
+   - Combining with other signals in a multi-factor portfolio
+
+2. **Validation Warnings**: The evaluation script includes validation checks that flag symbols where signals produce >10% annual losses before transaction costs. Review warnings carefully as they may indicate configuration errors or regime shifts.
+
+3. **Config Updates**: When updating macro factor selections, ensure changes are applied consistently to both `evaluate_per_symbol.py` and `alphas.py` to maintain alignment between evaluation and production code.
+
 ## Performance Summary Table (5-Day Horizon)
 
 | Rank | Symbol | Best Factor | Signal Type | Spearman Corr | t-statistic | p-value | Temp. Consistent | Horiz. Consistent |

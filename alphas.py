@@ -214,31 +214,31 @@ def compute_alphas(data_dir, spot_dir, symbols, alt_data_dir=None, macro_data_di
         fx_rates = pd.DataFrame()
 
     # Best-performing macro factor configs per symbol from screening results (look-ahead free, 1d-shifted, release-date-only aligned)
-    # Sign convention: +1 if spearman_corr > 0, -1 if spearman_corr < 0 (flip negative correlations to positive alpha direction)
+    # Sign convention: +1 if spearman_corr > 0, -1 if spearman_corr < 0 (aligns with correlation direction)
     BEST_MACRO_CONFIGS = {
-        'AG': {'factor': '制造业采购经理指数PMI_新出口订单', 'representation': 'diff', 'sign': 1},
-        'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},
-        'C': {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},
-        'CF': {'factor': 'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'CU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'I': {'factor': 'PPI_石油加工、炼焦及核燃料加工业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-        'J': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
-        'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-        'M': {'factor': 'PPIRM_农副产品类(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': -1},
-        'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
-        'NI': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1},
-        'P': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'level', 'sign': -1},
-        'RB': {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},
-        'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},
-        'SA': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': 1},
-        'SC': {'factor': '国内生产总值GDP_累计同比', 'representation': 'level', 'sign': 1},
-        'SN': {'factor': 'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月', 'representation': 'diff', 'sign': 1},
-        'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-        'TA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
-        'TF': {'factor': '国内生产总值GDP(现价)_全国_当期同比增长率_季', 'representation': 'level', 'sign': -1},
-        'V': {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},
-        'Y': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1}
+        'SA': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': 1},   # Spearman=+0.4666
+        'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},                   # Spearman=+0.3116
+        'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},        # Spearman=+0.2822
+        'TF': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': -1},                             # Spearman=-0.5632
+        'AG': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},         # Spearman=-0.2941
+        'Y': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.6735
+        'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},            # Spearman=-0.2366
+        'P': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': 1},          # Spearman=+0.2437
+        'NI': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'diff', 'sign': 1},                     # Spearman=+0.2366
+        'CU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},         # Spearman=-0.1716
+        'V': {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},  # Spearman=+0.2645
+        'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},                 # Spearman=-0.2398
+        'C': {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},       # Spearman=-0.2648
+        'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},                   # Spearman=+0.2070
+        'CF': {'factor': 'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},  # Spearman=-0.2461
+        'I': {'factor': 'GDP增长贡献率_第二产业_累计同比_季', 'representation': 'zscore', 'sign': -1},            # Spearman=-0.4431
+        'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},                 # Spearman=+0.2002
+        'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},     # Spearman=-0.2638
+        'SN': {'factor': 'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月', 'representation': 'diff', 'sign': 1},  # Spearman=+0.2670
+        'M': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.2882
+        'J': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.5265
+        'TA': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},             # Spearman=-0.1242
+        'SC': {'factor': '国内生产总值GDP_累计同比', 'representation': 'level', 'sign': 1},                        # Spearman=+0.1158
     }
 
     # Hot-load from JSON if exists

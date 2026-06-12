@@ -17,7 +17,7 @@ warnings.filterwarnings('ignore')
 
 from contract_splicer import ContractSplicer
 from alphas import BEST_HOLD_PARAMS
-from evaluate_alpha import calculate_dsr
+from evaluate_alpha import calculate_dsr, _rolling_std_1d, _rolling_mean_1d
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MACRO_DIR = os.path.join(_SCRIPT_DIR, 'data', 'macro_factors')
@@ -29,40 +29,53 @@ SYMBOLS = [
     'CU', 'AL', 'AU', 'AG', 'RB', 'RU', 'NI', 'SN',
     'SC',
     'CF', 'SR', 'TA', 'MA', 'SA',
+    
     'TF'
 ]
 
-# #1 ranked factor per symbol from alt_alphas.md "Commodity Specific Details"
+# #1 ranked factor per symbol from alt_alphas.md "Performance Summary Table (Horizon-Robust Best Factors)"
+# Sign convention: +1 if Spearman Corr > 0, -1 if < 0 (aligns with correlation direction)
 SYMBOL_FACTOR_CONFIGS = {
-    'SN': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
-    'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-    'TF': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': -1},
-    'Y':  {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
-    'AG': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-    'SA': {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
-    'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-    'C':  {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},
-    'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},
-    'NI': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': 1},
-    'RU': {'factor': 'PPI_化学原料及化学制品制造业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-    'P':  {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': 1},
-    'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},
-    'CF': {'factor': 'PPI_纺织业(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},
-    'V':  {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},
-    'I':  {'factor': 'GDP增长贡献率_第二产业_累计同比_季', 'representation': 'zscore', 'sign': -1},
-    'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},
-    'J':  {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},
-    'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},
-    'CU': {'factor': '制造业采购经理指数PMI_进口', 'representation': 'diff', 'sign': 1},
-    'SC': {'factor': 'CPI-PPI_差值_当月', 'representation': 'level', 'sign': -1},
-    'M':  {'factor': '社会融资规模_当月值', 'representation': 'level', 'sign': 1},
-    'TA': {'factor': 'PPIRM_纺织原料类(全国:当期同比增长率:月)', 'representation': 'zscore', 'sign': 1},
+    'SA': {'factor': 'PPI_电气机械及器材制造业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': 1},   # Spearman=+0.4666
+    'JD': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},                   # Spearman=+0.3116
+    'RB': {'factor': '非制造业PMI_建筑业_新订单_全国_当期值_月', 'representation': 'level', 'sign': 1},        # Spearman=+0.2822
+    'TF': {'factor': '社会融资规模_当月值', 'representation': 'diff', 'sign': -1},                             # Spearman=-0.5632
+    'AG': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},         # Spearman=-0.2941
+    'Y':  {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.6735
+    'RU': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'level', 'sign': -1},            # Spearman=-0.2366
+    'P':  {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': 1},          # Spearman=+0.2437
+    'NI': {'factor': '制造业采购经理指数PMI_新订单', 'representation': 'diff', 'sign': 1},                     # Spearman=+0.2366
+    'CU': {'factor': 'PPI_全部工业品(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},         # Spearman=-0.1716
+    'V':  {'factor': '非制造业PMI_建筑业_业务活动预期_全国_当期值_月', 'representation': 'level', 'sign': 1},  # Spearman=+0.2645
+    'AU': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'level', 'sign': -1},                 # Spearman=-0.2398
+    'C':  {'factor': '居民鲜果消费价格指数CPI_(上年=100)_当月', 'representation': 'zscore', 'sign': -1},       # Spearman=-0.2648
+    'SR': {'factor': '制造业采购经理指数PMI_购进价格', 'representation': 'diff', 'sign': 1},                   # Spearman=+0.2070
+    'CF': {'factor': 'PPI_皮革、毛皮、羽毛及其制品和制鞋业(全国:当期同比增长率:月)', 'representation': 'diff', 'sign': -1},  # Spearman=-0.2461
+    'I':  {'factor': 'GDP增长贡献率_第二产业_累计同比_季', 'representation': 'zscore', 'sign': -1},            # Spearman=-0.4431
+    'MA': {'factor': '制造业采购经理指数PMI_原材料库存', 'representation': 'diff', 'sign': 1},                 # Spearman=+0.2002
+    'AL': {'factor': 'PPIRM_燃料及动力类(全国:当期同比增长率:月)', 'representation': 'level', 'sign': -1},     # Spearman=-0.2638
+    'SN': {'factor': 'PPI_通信设备、计算机及其他电子设备制造业工业品出厂价格指数PPI_(上年=100)_当月', 'representation': 'diff', 'sign': 1},  # Spearman=+0.2670
+    'M':  {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.2882
+    'J':  {'factor': '社会融资规模_当月值', 'representation': 'zscore', 'sign': 1},                            # Spearman=+0.5265
+    'TA': {'factor': 'PMI_生产经营活动预期_全国_当期值_月', 'representation': 'diff', 'sign': -1},             # Spearman=-0.1242
+    'SC': {'factor': '国内生产总值GDP_累计同比', 'representation': 'level', 'sign': 1},                        # Spearman=+0.1158
 }
+
+
+def _forward_fill_to_dates(source_dates, source_values, target_dates, target_index=None):
+    """Forward-fill monthly source values to target dates using searchsorted."""
+    idx = np.searchsorted(source_dates, target_dates, side='right') - 1
+    mask = idx >= 0
+    out = np.full(len(target_dates), np.nan, dtype=np.float32)
+    out[mask] = source_values[idx[mask]]
+    # Forward fill NaN gaps
+    pd_s = pd.Series(out, index=target_index)
+    return pd_s.ffill()
 
 
 def construct_signal(df_index, cfg, macro_dir):
     """Construct the Alt_Macro_Alpha signal for a single symbol.
-    Mirrors alphas.py lines 345-387 logic.
+    Mirrors alphas.py lines 345-387 logic. Optimized: no daily expansion.
     """
     filename = re.sub(r'[\\/*?:"<>|]', '_', cfg['factor']) + ".parquet"
     factor_path = os.path.join(macro_dir, filename)
@@ -84,27 +97,42 @@ def construct_signal(df_index, cfg, macro_dir):
         df_fac = df_fac.set_index('info_date').sort_index()
         df_fac = df_fac[~df_fac.index.duplicated(keep='last')]
 
-        all_dates = pd.date_range(start=df_index.min(), end=df_index.max(), freq='D')
+        src_dates = df_fac.index.values.astype('datetime64[ns]').astype(np.int64)
+        src_vals = df_fac['value'].values.astype(np.float64)
+        tgt_dates = df_index.values.astype('datetime64[ns]').astype(np.int64)
 
         if cfg['representation'] == 'level':
-            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
-            s = val_daily.reindex(df_index)
+            s = _forward_fill_to_dates(src_dates, src_vals, tgt_dates, df_index)
+            s = s.shift(1)
         elif cfg['representation'] == 'diff':
-            fac_diff = df_fac['value'].diff()
-            diff_daily = fac_diff.reindex(all_dates).ffill().shift(1)
-            s = diff_daily.reindex(df_index)
+            fac_diff = np.diff(src_vals, prepend=np.nan)
+            s = _forward_fill_to_dates(src_dates, fac_diff, tgt_dates, df_index)
+            s = s.shift(1)
         elif cfg['representation'] == 'zscore':
-            val_daily = df_fac['value'].reindex(all_dates).ffill().shift(1)
-            s_level = val_daily.reindex(df_index)
-            s = (s_level - s_level.rolling(252).mean()) / s_level.rolling(252).std()
+            s_level = _forward_fill_to_dates(src_dates, src_vals, tgt_dates, df_index)
+            s_level = s_level.shift(1)
+            arr = s_level.values.astype(np.float64)
+            r_mean = _rolling_mean_1d(arr, 252)
+            r_std = _rolling_std_1d(arr, 252)
+            with np.errstate(invalid='ignore', divide='ignore'):
+                s = pd.Series(np.where(r_std > 0, (arr - r_mean) / r_std, 0.0),
+                              index=df_index, dtype=np.float32)
         else:
             return None
 
-        raw_signal = s * cfg['sign']
-        # Winsorize at [1%, 99%] using rolling 252-day window
-        q_low = raw_signal.rolling(252, min_periods=12).quantile(0.01)
-        q_high = raw_signal.rolling(252, min_periods=12).quantile(0.99)
-        winsorized = raw_signal.clip(lower=q_low, upper=q_high)
+        if isinstance(s, pd.Series):
+            raw_signal = s.astype(np.float32) * np.float32(cfg['sign'])
+        else:
+            raw_signal = (s * cfg['sign']).astype(np.float32)
+
+        # Winsorize at [1%, 99%] using fixed quantiles (fast approximation)
+        valid = raw_signal.dropna()
+        if len(valid) > 0:
+            q_low = np.percentile(valid.values, 1)
+            q_high = np.percentile(valid.values, 99)
+            winsorized = raw_signal.clip(lower=q_low, upper=q_high)
+        else:
+            winsorized = raw_signal
         return winsorized.astype(np.float32)
     except Exception as e:
         print(f"  Error constructing signal: {e}")
@@ -221,6 +249,15 @@ def run():
         if signal is None:
             print(f"  Skipping {symbol} (signal construction failed)")
             continue
+
+        # Validate sign direction against historical performance
+        # Check if signal produces expected directional exposure over full sample
+        net_ret_check = backtest_single_symbol(signal, returns, tc_rate=0.0)
+        ann_ret_check = net_ret_check.mean() * 252
+        if ann_ret_check < -0.10:  # More than 10% annual loss suggests wrong direction
+            print(f"  Warning: {symbol} signal produces negative return ({ann_ret_check*100:+.2f}% ann)")
+            print(f"    Factor: {cfg['factor'][:40]}...")
+            print(f"    Sign: {cfg['sign']}, Rep: {cfg['representation']}")
 
         # First-pass backtest with tc_rate=0 for raw Sharpe pool
         net_ret_raw = backtest_single_symbol(signal, returns, tc_rate=0.0)
