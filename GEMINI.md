@@ -147,3 +147,16 @@ rtk venv/bin/python test_tf_combined.py
 ```bash
 rtk venv/bin/python build_macro_price_df.py
 ```
+
+## Bollinger Band CTA Strategy Validation (Jun 2026)
+- **Concept:** Replication and validation of Bollinger Band-based CTA strategy on 15-minute K-lines across 23 commodity futures.
+- **Parameters:** 300 K-line MA, $\beta=1.5$ Bollinger Bands, 8x Std TP, ATR leverage, Monthly 10% realized vol targeting, and monthly dynamic universe selection (5B turnover filter, >=5 trades lookback, positive Sharpe/Calmar filter).
+- **Warmup Fix:** Corrected universe filtering logic to bypass trade-frequency and performance filters during 2021 (the first 12 months) preventing premature exclusion of symbols from universe due to incomplete history.
+- **Performance Results (Equal-Weighted, 23 symbols, 1.3 bps TC):**
+  - Full Sample (2021-2026): Sharpe 0.97, Ann Return 3.45%, Vol 3.56%, Max Drawdown -3.12%, Calmar 1.11.
+  - Out-of-Sample (2022-2026): Sharpe 0.86, Ann Return 3.16%, Vol 3.68%, Max Drawdown -3.12%, Calmar 1.02.
+- **Verification Report:** Generated [bollinger_validation_report.md](file:///home/hallo/data/ricecta/bollinger/bollinger_validation_report.md).
+- **Run Command:**
+```bash
+rtk venv/bin/python -m bollinger.run_bollinger_backtest
+```
